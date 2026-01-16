@@ -13,6 +13,13 @@ export default defineNuxtConfig({
     enabled: true
   },
 
+  components: [
+    {
+      path: '~/components',
+      pathPrefix: false
+    }
+  ],
+
   css: ['~/assets/css/main.css'],
 
   runtimeConfig: {

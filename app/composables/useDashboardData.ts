@@ -1,0 +1,114 @@
+export interface Shop {
+  id: number
+  name: string
+  phone_number: string
+  owner_id: number
+  is_active: boolean
+  picture: string
+  description: string
+  settings: {
+    currency: string
+    timezone: string
+    auto_reply: boolean
+    reply_message: string
+    payment_method: string
+  }
+}
+
+export interface OrderStats {
+  total_orders: number
+  pending_orders: number
+  completed_orders: number
+  cancelled_orders: number
+  total_revenue: number
+  average_order_value: number
+}
+
+export interface ProductStats {
+  total: number
+  active: number
+}
+
+export interface CustomerStats {
+  total: number
+  this_month: number
+}
+
+export const useDashboardData = () => {
+  const config = useRuntimeConfig()
+
+  const shop = ref<Shop | null>(null)
+  const orderStats = ref<OrderStats | null>(null)
+  const productStats = ref<ProductStats>({ total: 0, active: 0 })
+  const customerStats = ref<CustomerStats>({ total: 0, this_month: 0 })
+  const isLoading = ref(true)
+  const error = ref<string | null>(null)
+
+  const fetchShop = async () => {
+    try {
+      const data = await $fetch<Shop>(`${config.public.apiUrl}/api/shops/my`, {
+        credentials: 'include'
+      })
+      shop.value = data
+    } catch (err: any) {
+      if (err.status !== 404) {
+        console.error('Failed to fetch shop:', err)
+      }
+    }
+  }
+
+  const fetchOrderStats = async () => {
+    try {
+      const data = await $fetch<OrderStats>(`${config.public.apiUrl}/api/orders/stats`, {
+        credentials: 'include'
+      })
+      orderStats.value = data
+    } catch (err: any) {
+      console.error('Failed to fetch order stats:', err)
+    }
+  }
+
+  const fetchProductStats = async () => {
+    try {
+      const data = await $fetch<{ products: any[], total: number }>(`${config.public.apiUrl}/api/products?limit=1`, {
+        credentials: 'include'
+      })
+      productStats.value = {
+        total: data.total || 0,
+        active: data.total || 0
+      }
+    } catch (err: any) {
+      console.error('Failed to fetch product stats:', err)
+    }
+  }
+
+  const fetchAll = async () => {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      await Promise.all([
+        fetchShop(),
+        fetchOrderStats(),
+        fetchProductStats()
+      ])
+    } catch (err: any) {
+      error.value = 'Failed to load dashboard data'
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  return {
+    shop,
+    orderStats,
+    productStats,
+    customerStats,
+    isLoading,
+    error,
+    fetchAll,
+    fetchShop,
+    fetchOrderStats,
+    fetchProductStats
+  }
+}
