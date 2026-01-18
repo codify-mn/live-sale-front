@@ -6,13 +6,11 @@ useSeoMeta({
   title: 'Бүтээгдэхүүн - Singulatim'
 })
 
-const { fetchProducts, createProduct, deleteProduct, fetchCategories } = useProducts()
+const { fetchProducts, deleteProduct, fetchCategories } = useProducts()
 const toast = useToast()
 const router = useRouter()
 
 const loading = ref(true)
-const creating = ref(false)
-const createModalOpen = ref(false)
 const products = ref<Product[]>([])
 const total = ref(0)
 const categories = ref<string[]>([])
@@ -21,24 +19,32 @@ const filter = reactive({
   keyword: '',
   category: 'all',
   status: 'all',
+  stock: 'all',
   page: 1,
   size: 10
 })
 
 const statusOptions = [
-  { label: 'Бүгд', value: 'all' },
+  { label: 'Бүх төлөв', value: 'all' },
   { label: 'Ноорог', value: 'draft' },
   { label: 'Идэвхтэй', value: 'active' },
   { label: 'Дууссан', value: 'out_of_stock' },
   { label: 'Архивлагдсан', value: 'archived' }
 ]
 
+const stockOptions = [
+  { label: 'Бүх үлдэгдэл', value: 'all' },
+  { label: 'Байгаа', value: 'in_stock' },
+  { label: 'Дуусаж байгаа', value: 'low_stock' },
+  { label: 'Дууссан', value: 'out_of_stock' }
+]
+
 const columns: TableColumn<Product>[] = [
-  { accessorKey: 'name', header: 'Нэр' },
-  { accessorKey: 'category', header: 'Ангилал' },
-  { accessorKey: 'base_price', header: 'Үнэ' },
-  { accessorKey: 'stock', header: 'Үлдэгдэл' },
+  { accessorKey: 'name', header: 'Бараа бүтээгдэхүүн' },
   { accessorKey: 'status', header: 'Төлөв' },
+  { accessorKey: 'base_price', header: 'Үнийн дүн' },
+  { accessorKey: 'stock', header: 'Үлдэгдэл' },
+  { accessorKey: 'category', header: 'Ангилал' },
   { accessorKey: 'actions', header: '' }
 ]
 
@@ -80,9 +86,10 @@ const loadProducts = async () => {
 
 const loadCategories = async () => {
   try {
-    categories.value = await fetchCategories()
+    const result = await fetchCategories()
+    categories.value = Array.isArray(result) ? result : []
   } catch {
-    // ignore
+    categories.value = []
   }
 }
 
@@ -93,8 +100,28 @@ const getStock = (product: Product): number => {
   return product.inventory?.stock_quantity || 0
 }
 
+const getStockLabel = (product: Product): string => {
+  const stock = getStock(product)
+  if (stock === 0) return 'Дууссан'
+  if (stock <= 5) return `${stock}ш үлдсэн`
+  return `${stock}ш үлдсэн`
+}
+
 const formatPrice = (price: number): string => {
   return new Intl.NumberFormat('mn-MN').format(price) + '₮'
+}
+
+// Pagination helpers
+const startItem = computed(() => (filter.page - 1) * filter.size + 1)
+const endItem = computed(() => Math.min(filter.page * filter.size, total.value))
+const totalPages = computed(() => Math.ceil(total.value / filter.size))
+
+const prevPage = () => {
+  if (filter.page > 1) filter.page--
+}
+
+const nextPage = () => {
+  if (filter.page < totalPages.value) filter.page++
 }
 
 // Delete modal
@@ -105,28 +132,6 @@ const deleting = ref(false)
 const openDeleteModal = (product: Product) => {
   productToDelete.value = product
   deleteModalOpen.value = true
-}
-
-const onSubmitCreate = async (data: any) => {
-  creating.value = true
-  try {
-    const product = await createProduct(data)
-    toast.add({
-      title: 'Амжилттай',
-      description: 'Бүтээгдэхүүн үүсгэгдлээ',
-      color: 'success'
-    })
-    createModalOpen.value = false
-    router.push(`/dashboard/products/${product.id}`)
-  } catch (err: any) {
-    toast.add({
-      title: 'Алдаа',
-      description: err.data?.message || 'Бүтээгдэхүүн үүсгэхэд алдаа гарлаа',
-      color: 'error'
-    })
-  } finally {
-    creating.value = false
-  }
 }
 
 const confirmDelete = async () => {
@@ -153,8 +158,27 @@ const confirmDelete = async () => {
   }
 }
 
+// Action menu items
+const getActionItems = (product: Product) => [
+  [{
+    label: 'Харах',
+    icon: 'i-lucide-eye',
+    click: () => router.push(`/dashboard/products/${product.id}`)
+  }, {
+    label: 'Засах',
+    icon: 'i-lucide-pencil',
+    click: () => router.push(`/dashboard/products/${product.id}`)
+  }],
+  [{
+    label: 'Устгах',
+    icon: 'i-lucide-trash-2',
+    color: 'error' as const,
+    click: () => openDeleteModal(product)
+  }]
+]
+
 // Watch filters
-watch([() => filter.keyword, () => filter.category, () => filter.status], () => {
+watch([() => filter.keyword, () => filter.category, () => filter.status, () => filter.stock], () => {
   filter.page = 1
   loadProducts()
 }, { debounce: 300 } as any)
@@ -168,167 +192,171 @@ onMounted(() => {
 </script>
 
 <template>
-  <UDashboardPanel id="products">
-    <template #header>
-      <UDashboardNavbar
-        title="Бүтээгдэхүүн"
-      >
-        <template #leading>
-          <UDashboardSearchButton />
-        </template>
-
-        <template #right>
+  <div class="flex flex-col h-full w-full">
+    <!-- Header -->
+    <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-800">
+      <div class="flex items-start justify-between">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+            Бараа бүтээгдэхүүн
+          </h1>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Бараа бүтээгдэхүүний нийт жагсаалт
+          </p>
+        </div>
+        <div class="flex items-center gap-3">
           <UButton
-            icon="i-lucide-plus"
-            color="primary"
-            @click="createModalOpen = true"
+            color="neutral"
+            variant="outline"
+            icon="i-lucide-file-spreadsheet"
           >
-            Нэмэх
+            Excel-с оруулах
           </UButton>
-        </template>
-      </UDashboardNavbar>
+          <UButton
+            to="/dashboard/products/new"
+            color="primary"
+            icon="i-lucide-plus"
+          >
+            Бараа нэмэх
+          </UButton>
+        </div>
+      </div>
+    </div>
 
-      <UDashboardToolbar>
-        <template #left>
-          <UInput
-            v-model="filter.keyword"
-            placeholder="Хайх..."
-            icon="i-lucide-search"
-            class="w-48"
+    <!-- Filters -->
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+      <div class="flex items-center justify-between gap-4">
+        <UInput
+          v-model="filter.keyword"
+          placeholder="Бараа нэрээр хайх..."
+          icon="i-lucide-search"
+          class="w-80"
+        />
+
+        <div class="flex items-center gap-2">
+          <USelect
+            v-model="filter.stock"
+            :items="stockOptions"
+            class="w-36"
           />
-
           <USelect
             v-model="filter.status"
             :items="statusOptions"
-            placeholder="Төлөв"
-            class="w-36"
+            class="w-32"
           />
-
           <USelect
-            v-if="categories.length > 0"
             v-model="filter.category"
             :items="[{ label: 'Бүх ангилал', value: 'all' }, ...categories.map(c => ({ label: c, value: c }))]"
-            placeholder="Ангилал"
-            class="w-40"
+            class="w-36"
           />
-        </template>
-      </UDashboardToolbar>
-    </template>
+          <UButton
+            color="neutral"
+            variant="outline"
+            icon="i-lucide-sliders-horizontal"
+          >
+            Бусад
+          </UButton>
+        </div>
+      </div>
+    </div>
 
-    <template #body>
+    <!-- Table -->
+    <div class="flex-1 overflow-auto">
       <UTable
         :data="products"
         :columns="columns"
         :loading="loading"
         class="w-full"
         :ui="{
-          tbody: 'divide-y divide-gray-200 dark:divide-gray-800',
-          th: 'text-left rtl:text-right px-4 py-3.5 text-gray-900 dark:text-white font-semibold text-sm',
-          td: 'px-4 py-4 text-gray-500 dark:text-gray-400'
+          thead: 'bg-gray-50 dark:bg-gray-900/50',
+          th: 'text-left px-4 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider',
+          td: 'px-4 py-3',
+          tbody: 'divide-y divide-gray-100 dark:divide-gray-800'
         }"
       >
-        <template #name="{ row }">
+        <template #name-cell="{ row }">
           <div class="flex items-center gap-3">
-            <UAvatar
-              v-if="row.original.images?.length"
-              :src="row.original.images[0]"
-              :alt="row.original.name"
-              size="sm"
-            />
             <div
-              v-else
-              class="w-8 h-8 bg-gray-100 dark:bg-gray-800 rounded flex items-center justify-center"
+              class="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden shrink-0"
             >
+              <img
+                v-if="row.original.images?.length"
+                :src="row.original.images[0]"
+                :alt="row.original.name"
+                class="w-full h-full object-cover"
+              >
               <UIcon
+                v-else
                 name="i-lucide-package"
-                class="text-gray-400"
+                class="w-5 h-5 text-gray-400"
               />
             </div>
-            <div>
-              <NuxtLink
-                :to="`/dashboard/products/${row.original.id}`"
-                class="font-medium hover:text-primary"
-              >
-                {{ row.original.name }}
-              </NuxtLink>
-              <p
-                v-if="row.original.has_variants"
-                class="text-xs text-gray-500"
-              >
-                {{ row.original.variants?.length || 0 }} хувилбар
-              </p>
-            </div>
+            <NuxtLink
+              :to="`/dashboard/products/${row.original.id}`"
+              class="font-medium text-gray-900 dark:text-white hover:text-primary-500"
+            >
+              {{ row.original.name }}
+            </NuxtLink>
           </div>
         </template>
 
-        <template #category="{ row }">
-          <UBadge
-            v-if="row.original.category"
-            color="neutral"
-            variant="subtle"
-          >
-            {{ row.original.category }}
-          </UBadge>
-          <span
-            v-else
-            class="text-gray-400"
-          >-</span>
-        </template>
-
-        <template #base_price="{ row }">
-          <div>
-            <span v-if="row.original.sale_price" class="line-through text-gray-400 text-sm mr-2">
-              {{ formatPrice(row.original.base_price) }}
-            </span>
-            <span :class="row.original.sale_price ? 'text-red-500' : ''">
-              {{ formatPrice(row.original.sale_price || row.original.base_price) }}
-            </span>
-          </div>
-        </template>
-
-        <template #stock="{ row }">
-          <span :class="getStock(row.original) <= 5 ? 'text-red-500' : ''">
-            {{ getStock(row.original) }}
-          </span>
-        </template>
-
-        <template #status="{ row }">
+        <template #status-cell="{ row }">
           <UBadge
             :color="statusColors[row.original.status] || 'neutral'"
             variant="subtle"
+            class="font-medium"
           >
             {{ statusLabels[row.original.status] || row.original.status }}
           </UBadge>
         </template>
 
-        <template #actions="{ row }">
-          <div class="flex justify-end gap-1">
+        <template #base_price-cell="{ row }">
+          <span class="text-gray-900 dark:text-white">
+            {{ formatPrice(row.original.sale_price || row.original.base_price) }}
+          </span>
+        </template>
+
+        <template #stock-cell="{ row }">
+          <span :class="getStock(row.original) <= 5 ? 'text-orange-500' : 'text-gray-600 dark:text-gray-400'">
+            {{ getStockLabel(row.original) }}
+          </span>
+        </template>
+
+        <template #category-cell="{ row }">
+          <span class="text-gray-600 dark:text-gray-400">
+            {{ row.original.category || '-' }}
+          </span>
+        </template>
+
+        <template #actions-cell="{ row }">
+          <div class="flex items-center justify-end gap-1">
             <UButton
               :to="`/dashboard/products/${row.original.id}`"
-              icon="i-lucide-pencil"
+              icon="i-lucide-eye"
               color="neutral"
               variant="ghost"
-              size="xs"
+              size="sm"
             />
-            <UButton
-              icon="i-lucide-trash-2"
-              color="error"
-              variant="ghost"
-              size="xs"
-              @click="openDeleteModal(row.original)"
-            />
+            <UDropdownMenu :items="getActionItems(row.original)">
+              <UButton
+                icon="i-lucide-more-horizontal"
+                color="neutral"
+                variant="ghost"
+                size="sm"
+              />
+            </UDropdownMenu>
           </div>
         </template>
 
         <template #empty>
-          <div class="flex flex-col items-center justify-center py-16 text-center">
-            <div class="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-full mb-4 ring-1 ring-gray-200 dark:ring-gray-800">
+          <div class="flex flex-col items-center justify-center py-20 text-center">
+            <div class="w-20 h-20 rounded-full bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center mb-6">
               <UIcon
                 name="i-lucide-package"
-                class="w-10 h-10 text-gray-400 dark:text-gray-500"
+                class="w-10 h-10 text-primary-500"
               />
             </div>
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               Бүтээгдэхүүн олдсонгүй
             </h3>
             <p class="text-gray-500 dark:text-gray-400 max-w-sm mb-6">
@@ -337,7 +365,6 @@ onMounted(() => {
             <UButton
               to="/dashboard/products/new"
               color="primary"
-              size="md"
               icon="i-lucide-plus"
             >
               Бүтээгдэхүүн нэмэх
@@ -345,21 +372,38 @@ onMounted(() => {
           </div>
         </template>
       </UTable>
+    </div>
 
-      <div
-        v-if="total > filter.size"
-        class="flex justify-center p-4 border-t border-gray-200 dark:border-gray-800"
-      >
-        <UPagination
-          v-model="filter.page"
-          :total="total"
-          :page-count="filter.size"
-        />
+    <!-- Pagination -->
+    <div
+      v-if="total > 0"
+      class="px-6 py-4 border-t border-gray-200 dark:border-gray-800 flex items-center justify-between"
+    >
+      <p class="text-sm text-gray-500 dark:text-gray-400">
+        {{ startItem }}-с {{ endItem }} хүртэл. Нийт: {{ total }}
+      </p>
+      <div class="flex items-center gap-2">
+        <UButton
+          color="neutral"
+          variant="outline"
+          :disabled="filter.page <= 1"
+          @click="prevPage"
+        >
+          Өмнөх
+        </UButton>
+        <UButton
+          color="neutral"
+          variant="outline"
+          :disabled="filter.page >= totalPages"
+          @click="nextPage"
+        >
+          Дараах
+        </UButton>
       </div>
-    </template>
+    </div>
 
     <!-- Delete Modal -->
-    <UModal v-model="deleteModalOpen">
+    <UModal v-model:open="deleteModalOpen">
       <template #content>
         <UCard>
           <template #header>
@@ -368,7 +412,7 @@ onMounted(() => {
                 name="i-lucide-alert-triangle"
                 class="text-red-500"
               />
-              <span>Устгах</span>
+              <span class="font-semibold">Устгах</span>
             </div>
           </template>
 
@@ -400,25 +444,5 @@ onMounted(() => {
         </UCard>
       </template>
     </UModal>
-
-    <!-- Create Modal -->
-    <UModal v-model="createModalOpen">
-      <template #content>
-        <UCard>
-          <template #header>
-            <h3 class="font-semibold">
-              Бүтээгдэхүүн нэмэх
-            </h3>
-          </template>
-
-          <ProductForm
-            :loading="creating"
-            :categories="categories"
-            @submit="onSubmitCreate"
-            @cancel="createModalOpen = false"
-          />
-        </UCard>
-      </template>
-    </UModal>
-  </UDashboardPanel>
+  </div>
 </template>

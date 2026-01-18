@@ -28,7 +28,7 @@ const toggle = () => {
         {{ description }}
       </p>
     </div>
-    <UToggle
+    <USwitch
       :model-value="modelValue"
       @update:model-value="emit('update:modelValue', $event)"
       @click.stop

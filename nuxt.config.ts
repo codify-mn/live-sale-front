@@ -9,6 +9,8 @@ export default defineNuxtConfig({
     'nuxt-og-image'
   ],
 
+  ssr: false,
+
   devtools: {
     enabled: true
   },

@@ -1,8 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss" theme(static);
 @import "@nuxt/ui";
 
 @theme static {
-  --font-sans: 'Public Sans', sans-serif;
+  --font-sans: 'Nunito', sans-serif;
 
   --color-green-50: #EFFDF5;
   --color-green-100: #D9FBE8;
@@ -15,4 +16,60 @@
   --color-green-800: #016538;
   --color-green-900: #0A5331;
   --color-green-950: #052E16;
+}
+
+/* Light mode */
+:root {
+  --app-bg: #f8fafc;
+  --content-bg: #ffffff;
+  --sidebar-bg: #0f1117;
+}
+
+/* Dark mode */
+.dark {
+  --app-bg: #0a0a0f;
+  --content-bg: #12121a;
+  --sidebar-bg: #0f1117;
+}
+
+/* Base styles */
+body {
+  @apply bg-[var(--app-bg)] text-gray-900 dark:text-gray-100;
+}
+
+/* Dashboard content area */
+[data-slot="root"].flex-1 {
+  @apply bg-[var(--app-bg)];
+}
+
+/* Sidebar always dark */
+#default[data-slot="sidebar"] {
+  @apply !bg-[#0f1117] !border-gray-800;
+}
+
+#default[data-slot="sidebar"] * {
+  --tw-text-opacity: 1;
+}
+
+/* Form labels */
+.dark label {
+  @apply text-gray-300;
+}
+
+/* Better scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 dark:bg-gray-700 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400 dark:bg-gray-600;
 }

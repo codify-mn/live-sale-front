@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { z } from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
+import type { VariantData } from '~/components/products/ProductVariantForm.vue'
 
 useSeoMeta({
   title: 'Бараа нэмэх - Singulatim'
@@ -13,6 +14,7 @@ const router = useRouter()
 const loading = ref(false)
 const categories = ref<string[]>([])
 const images = ref<string[]>([])
+const variants = ref<VariantData[]>([])
 
 const schema = z.object({
   name: z.string().min(1, 'Нэр оруулна уу'),
@@ -43,6 +45,32 @@ const state = reactive<Schema>({
   sku: '',
   stock_quantity: 0
 })
+
+// Variant management
+const createEmptyVariant = (): VariantData => ({
+  name: '',
+  sku: '',
+  barcode: '',
+  stock_quantity: 0,
+  price: null,
+  low_stock_alert: 5
+})
+
+const addVariant = () => {
+  variants.value.push(createEmptyVariant())
+  state.has_variants = true
+}
+
+const removeVariant = (index: number) => {
+  variants.value.splice(index, 1)
+  if (variants.value.length === 0) {
+    state.has_variants = false
+  }
+}
+
+const updateVariant = (index: number, data: VariantData) => {
+  variants.value[index] = data
+}
 
 // Product settings
 const settings = reactive({
@@ -81,6 +109,19 @@ watch(() => state.discount_percent, (newVal) => {
 })
 
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
+  // Validate variants if has_variants is true
+  if (state.has_variants && variants.value.length > 0) {
+    const invalidVariants = variants.value.filter(v => !v.name || !v.sku)
+    if (invalidVariants.length > 0) {
+      toast.add({
+        title: 'Алдаа',
+        description: 'Бүх төрлийн нэр болон SKU оруулна уу',
+        color: 'error'
+      })
+      return
+    }
+  }
+
   loading.value = true
 
   try {
@@ -92,7 +133,11 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
       category: event.data.category,
       status: event.data.status,
       track_inventory: event.data.track_inventory,
-      has_variants: event.data.has_variants
+      has_variants: state.has_variants,
+      images: images.value,
+      variants: state.has_variants ? variants.value : undefined,
+      sku: !state.has_variants ? event.data.sku : undefined,
+      stock_quantity: !state.has_variants ? event.data.stock_quantity : undefined
     })
 
     toast.add({
@@ -245,19 +290,9 @@ onMounted(async () => {
                     v-model="state.description"
                     placeholder="Энд тайлбараа бичнэ үү..."
                     :rows="4"
+                    class="w-full"
                     :ui="{ base: 'border-0 focus:ring-0' }"
                   />
-                </div>
-
-                <!-- AI Credits -->
-                <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <div class="flex items-center gap-2">
-                    <span class="text-2xl font-bold text-gray-900 dark:text-white">0</span>
-                    <span class="text-gray-500">кредит</span>
-                  </div>
-                  <UButton color="primary" icon="i-lucide-sparkles">
-                    AI ашиглах
-                  </UButton>
                 </div>
               </ProductFormCard>
 
@@ -325,7 +360,7 @@ onMounted(async () => {
 
                 <!-- Detailed Info Toggle -->
                 <div class="flex items-center gap-3 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <UToggle v-model="showDetailedInfo" />
+                  <USwitch v-model="showDetailedInfo" />
                   <span class="text-sm text-gray-600 dark:text-gray-400">Дэлгэрэнгүй мэдээлэл</span>
                 </div>
 
@@ -340,12 +375,38 @@ onMounted(async () => {
                     Хуулах
                   </UButton>
                   <UButton
-                    type="submit"
+                    type="button"
                     color="primary"
                     icon="i-lucide-plus-circle"
-                    :loading="loading"
+                    @click="addVariant"
                   >
                     Төрөл нэмэх
+                  </UButton>
+                </div>
+              </ProductFormCard>
+
+              <!-- Variants Section -->
+              <ProductFormCard v-if="variants.length > 0" title="Барааны төрлүүд">
+                <div class="space-y-4">
+                  <ProductVariantForm
+                    v-for="(variant, index) in variants"
+                    :key="index"
+                    :model-value="variant"
+                    :index="index"
+                    :can-remove="true"
+                    @update:model-value="updateVariant(index, $event)"
+                    @remove="removeVariant(index)"
+                  />
+
+                  <UButton
+                    type="button"
+                    color="neutral"
+                    variant="outline"
+                    icon="i-lucide-plus"
+                    class="w-full"
+                    @click="addVariant"
+                  >
+                    Өөр төрөл нэмэх
                   </UButton>
                 </div>
               </ProductFormCard>
