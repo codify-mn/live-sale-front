@@ -170,7 +170,9 @@ const addImageUrl = () => {
           />
         </div>
         <div class="flex-1 min-w-0">
-          <p class="text-sm font-medium truncate">{{ item.filename }}</p>
+          <p class="text-sm font-medium truncate">
+            {{ item.filename }}
+          </p>
           <div class="mt-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
             <div
               class="h-full transition-all duration-300"
@@ -184,6 +186,7 @@ const addImageUrl = () => {
 
     <!-- Upload Area -->
     <div
+      v-if="modelValue.length == 0"
       class="relative border-2 border-dashed rounded-xl p-8 text-center transition-colors"
       :class="[
         isDragging
@@ -205,7 +208,9 @@ const addImageUrl = () => {
 
       <div v-if="uploading" class="flex flex-col items-center">
         <UIcon name="i-lucide-loader-2" class="w-8 h-8 text-primary-500 animate-spin mb-3" />
-        <p class="text-sm text-gray-500">Зураг оруулж байна...</p>
+        <p class="text-sm text-gray-500">
+          Зураг оруулж байна...
+        </p>
       </div>
 
       <template v-else>
@@ -213,7 +218,7 @@ const addImageUrl = () => {
           Зөвхөн PNG, JPG, WEBP, GIF ба ихдээ 5 MB оруулах боломжтой
         </p>
 
-        <div class="flex items-center justify-center gap-3">
+        <div class="flex items-center justify-center">
           <UButton
             type="button"
             color="neutral"
@@ -223,17 +228,11 @@ const addImageUrl = () => {
           >
             Зураг оруулах
           </UButton>
-
-          <UButton
-            type="button"
-            color="primary"
-            icon="i-lucide-sparkles"
-          >
-            AI зураг үүсгэх
-          </UButton>
         </div>
 
-        <p class="text-xs text-gray-400 mt-4">эсвэл</p>
+        <p class="text-xs text-gray-400 mt-4">
+          эсвэл
+        </p>
 
         <!-- URL Input -->
         <div v-if="showUrlInput" class="mt-3 flex gap-2 max-w-md mx-auto">

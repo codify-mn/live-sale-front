@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { z } from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
-import type { Product, CreateVariantInput } from '~/composables/useProducts'
+import type { Product } from '~/composables/useProducts'
 import type { VariantData } from '~/components/products/ProductVariantForm.vue'
+import { calculateDiscountPercent, calculateSalePrice } from '~/utils'
 
 const route = useRoute()
 const router = useRouter()
@@ -12,8 +13,8 @@ const {
   fetchProduct,
   updateProduct,
   deleteProduct,
-  fetchCategories,
   createVariant,
+  updateVariant,
   deleteVariant
 } = useProducts()
 
@@ -22,9 +23,11 @@ const productId = computed(() => Number(route.params.id))
 const loading = ref(true)
 const saving = ref(false)
 const product = ref<Product | null>(null)
-const categories = ref<string[]>([])
 const images = ref<string[]>([])
 const variants = ref<VariantData[]>([])
+
+// Track which variants were deleted (to delete from server on save)
+const deletedVariantIds = ref<number[]>([])
 
 useSeoMeta({
   title: () => product.value ? `${product.value.name} - Singulatim` : 'Бүтээгдэхүүн - Singulatim'
@@ -35,12 +38,10 @@ const schema = z.object({
   description: z.string().optional(),
   base_price: z.number().min(1, 'Үнэ оруулна уу'),
   sale_price: z.number().optional().nullable(),
-  discount_percent: z.number().optional().nullable(),
-  category: z.string().optional(),
   status: z.string(),
   track_inventory: z.boolean().default(true),
   has_variants: z.boolean().default(false),
-  sku: z.string().optional(),
+  sku: z.string().optional().nullable(),
   stock_quantity: z.number().optional()
 })
 
@@ -51,8 +52,6 @@ const state = reactive<Schema>({
   description: '',
   base_price: 0,
   sale_price: null,
-  discount_percent: null,
-  category: '',
   status: 'draft',
   track_inventory: true,
   has_variants: false,
@@ -60,17 +59,8 @@ const state = reactive<Schema>({
   stock_quantity: 0
 })
 
-// Product settings
-const settings = reactive({
-  autoCalculateStock: false,
-  isFeatured: false,
-  trackOrders: false,
-  isNew: true,
-  isDigital: false,
-  isLimitedEdition: false
-})
-
-const showDetailedInfo = ref(false)
+// UI-only discount percent
+const discountPercent = ref<number | null>(null)
 
 const statusOptions = [
   { label: 'Идэвхтэй', value: 'active' },
@@ -79,18 +69,16 @@ const statusOptions = [
   { label: 'Архив', value: 'archived' }
 ]
 
-const categoryOptions = computed(() =>
-  categories.value.map(cat => ({ label: cat, value: cat }))
-)
-
 // Variant management
 const createEmptyVariant = (): VariantData => ({
   name: '',
   sku: '',
-  barcode: '',
+  barcode: null,
   stock_quantity: 0,
   price: null,
-  low_stock_alert: 5
+  sale_price: null,
+  low_stock_alert: 5,
+  images: []
 })
 
 const addVariant = () => {
@@ -98,22 +86,12 @@ const addVariant = () => {
   state.has_variants = true
 }
 
-const removeVariant = async (index: number) => {
+const removeVariant = (index: number) => {
   const variant = variants.value[index]
 
-  // If variant has id, delete from server
-  if (variant.id) {
-    try {
-      await deleteVariant(variant.id)
-      toast.add({ title: 'Төрөл устгагдлаа', color: 'success' })
-    } catch (err: any) {
-      toast.add({
-        title: 'Алдаа',
-        description: err.data?.message || 'Устгахад алдаа гарлаа',
-        color: 'error'
-      })
-      return
-    }
+  // Track for server deletion if has id
+  if (variant?.id) {
+    deletedVariantIds.value.push(variant.id)
   }
 
   variants.value.splice(index, 1)
@@ -122,21 +100,26 @@ const removeVariant = async (index: number) => {
   }
 }
 
-const updateVariant = (index: number, data: VariantData) => {
+const handleVariantUpdate = (index: number, data: VariantData) => {
   variants.value[index] = data
 }
 
 // Calculate discount percentage when sale price changes
 watch(() => state.sale_price, (newVal) => {
   if (newVal && state.base_price > 0) {
-    state.discount_percent = Math.round((1 - newVal / state.base_price) * 100)
+    discountPercent.value = calculateDiscountPercent(state.base_price, newVal)
+  } else {
+    discountPercent.value = null
   }
 })
 
 // Calculate sale price when discount percent changes
-watch(() => state.discount_percent, (newVal) => {
+watch(discountPercent, (newVal) => {
   if (newVal && state.base_price > 0) {
-    state.sale_price = Math.round(state.base_price * (1 - newVal / 100))
+    const newSalePrice = calculateSalePrice(state.base_price, newVal)
+    if (newSalePrice > 0) {
+      state.sale_price = newSalePrice
+    }
   }
 })
 
@@ -150,10 +133,14 @@ const loadProduct = async () => {
     state.description = product.value.description || ''
     state.base_price = product.value.base_price
     state.sale_price = product.value.sale_price
-    state.category = product.value.category || ''
     state.status = product.value.status
     state.track_inventory = product.value.track_inventory
     state.has_variants = product.value.has_variants
+
+    // Initialize discount percent
+    if (product.value.sale_price && product.value.base_price) {
+      discountPercent.value = calculateDiscountPercent(product.value.base_price, product.value.sale_price)
+    }
 
     // Load images
     images.value = product.value.images || []
@@ -163,11 +150,13 @@ const loadProduct = async () => {
       variants.value = product.value.variants.map(v => ({
         id: v.id,
         name: v.name,
-        sku: v.sku,
-        barcode: v.barcode || '',
+        sku: v.sku || '',
+        barcode: v.barcode || null,
         stock_quantity: v.stock_quantity,
         price: v.price,
-        low_stock_alert: v.low_stock_alert
+        sale_price: v.sale_price || null,
+        low_stock_alert: v.low_stock_alert || 5,
+        images: v.images || []
       }))
     }
 
@@ -176,12 +165,16 @@ const loadProduct = async () => {
       state.sku = product.value.inventory.sku || ''
       state.stock_quantity = product.value.inventory.stock_quantity || 0
     }
+
+    // Reset deleted variants tracking
+    deletedVariantIds.value = []
   } catch (err: any) {
     toast.add({
       title: 'Алдаа',
       description: 'Бүтээгдэхүүн олдсонгүй',
       color: 'error'
     })
+    console.error('Failed to load product', err)
     router.push('/dashboard/products')
   } finally {
     loading.value = false
@@ -204,7 +197,31 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 
   saving.value = true
   try {
-    // Save new variants
+    // 1. Delete removed variants from server
+    for (const variantId of deletedVariantIds.value) {
+      try {
+        await deleteVariant(variantId)
+      } catch (err) {
+        console.error(`Failed to delete variant ${variantId}`, err)
+      }
+    }
+
+    // 2. Update existing variants
+    const existingVariants = variants.value.filter(v => v.id)
+    for (const variant of existingVariants) {
+      await updateVariant(variant.id!, {
+        name: variant.name,
+        sku: variant.sku,
+        barcode: variant.barcode,
+        stock_quantity: variant.stock_quantity,
+        price: variant.price,
+        sale_price: variant.sale_price,
+        low_stock_alert: variant.low_stock_alert,
+        images: variant.images
+      })
+    }
+
+    // 3. Create new variants
     const newVariants = variants.value.filter(v => !v.id)
     for (const variant of newVariants) {
       await createVariant(productId.value, {
@@ -212,14 +229,23 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
         sku: variant.sku,
         barcode: variant.barcode,
         stock_quantity: variant.stock_quantity,
-        low_stock_alert: variant.low_stock_alert
+        price: variant.price,
+        sale_price: variant.sale_price,
+        low_stock_alert: variant.low_stock_alert,
+        images: variant.images
       })
     }
 
+    // 4. Update product
     await updateProduct(productId.value, {
-      ...event.data,
-      images: images.value,
-      has_variants: state.has_variants
+      name: event.data.name,
+      description: event.data.description,
+      base_price: event.data.base_price,
+      sale_price: event.data.sale_price,
+      status: event.data.status,
+      track_inventory: event.data.track_inventory,
+      has_variants: state.has_variants,
+      images: images.value
     })
 
     toast.add({
@@ -266,12 +292,6 @@ const confirmDelete = async () => {
 
 onMounted(async () => {
   await loadProduct()
-  try {
-    const result = await fetchCategories()
-    categories.value = Array.isArray(result) ? result : []
-  } catch {
-    categories.value = []
-  }
 })
 </script>
 
@@ -343,101 +363,27 @@ onMounted(async () => {
                   placeholder="Барааны гарчгийг оруулна уу"
                   size="lg"
                 />
+                <div class="py-2">
+                  <h3 class="text-sm font-medium text-gray-900 dark:text-white">
+                    Барааны тайлбар
+                  </h3>
+                </div>
+                <UTextarea
+                  v-model="state.description"
+                  placeholder="Энд тайлбараа бичнэ үү..."
+                  :rows="4"
+                />
               </ProductFormCard>
 
-              <!-- Description -->
-              <ProductFormCard title="Барааны тайлбар" required>
-                <div class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-                  <!-- Toolbar -->
-                  <div class="flex items-center gap-1 p-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-                    <UButton
-                      size="xs"
-                      color="neutral"
-                      variant="ghost"
-                      icon="i-lucide-bold"
-                    />
-                    <UButton
-                      size="xs"
-                      color="neutral"
-                      variant="ghost"
-                      icon="i-lucide-italic"
-                    />
-                    <UButton
-                      size="xs"
-                      color="neutral"
-                      variant="ghost"
-                      icon="i-lucide-underline"
-                    />
-                    <UButton
-                      size="xs"
-                      color="neutral"
-                      variant="ghost"
-                      icon="i-lucide-link"
-                    />
-                    <UButton
-                      size="xs"
-                      color="neutral"
-                      variant="ghost"
-                      icon="i-lucide-strikethrough"
-                    />
-                    <UButton
-                      size="xs"
-                      color="neutral"
-                      variant="ghost"
-                      icon="i-lucide-list"
-                    />
-                    <UButton
-                      size="xs"
-                      color="neutral"
-                      variant="ghost"
-                      icon="i-lucide-eraser"
-                    />
-                    <UButton
-                      size="xs"
-                      color="neutral"
-                      variant="ghost"
-                      icon="i-lucide-undo"
-                    />
-                    <UButton
-                      size="xs"
-                      color="neutral"
-                      variant="ghost"
-                      icon="i-lucide-redo"
-                    />
-                  </div>
-                  <!-- Editor -->
-                  <UTextarea
-                    v-model="state.description"
-                    placeholder="Энд тайлбараа бичнэ үү..."
-                    :rows="4"
-                    class="w-full"
-                    :ui="{ base: 'border-0 focus:ring-0' }"
-                  />
-                </div>
-
-                <!-- AI Credits -->
-                <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <div class="flex items-center gap-2">
-                    <span class="text-2xl font-bold text-gray-900 dark:text-white">0</span>
-                    <span class="text-gray-500">кредит</span>
-                  </div>
-                  <UButton color="primary" icon="i-lucide-sparkles">
-                    AI ашиглах
-                  </UButton>
-                </div>
-              </ProductFormCard>
-
-              <!-- Images -->
+              <!-- Images & Pricing -->
               <ProductFormCard title="Барааны мэдээлэл" required>
                 <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                  Барааны төрлийн зураг
+                  Барааны зураг
                 </p>
                 <ProductImageUpload v-model="images" />
-              </ProductFormCard>
 
-              <!-- Price & Stock -->
-              <ProductFormCard>
-                <div class="grid grid-cols-2 gap-4">
+                <!-- Price & Stock -->
+                <div class="grid grid-cols-2 gap-4 mt-6">
                   <UFormField label="Үлдэгдэл" name="stock_quantity" required>
                     <UInput
                       v-model.number="state.stock_quantity"
@@ -469,7 +415,7 @@ onMounted(async () => {
                     <UInput
                       v-model.number="state.sale_price"
                       type="number"
-                      placeholder="5,000"
+                      placeholder="0"
                     >
                       <template #leading>
                         <span class="text-gray-400">₮</span>
@@ -477,11 +423,13 @@ onMounted(async () => {
                     </UInput>
                   </UFormField>
 
-                  <UFormField label="Хямдралын хувь" name="discount_percent">
+                  <UFormField label="Хямдралын хувь">
                     <UInput
-                      v-model.number="state.discount_percent"
+                      v-model.number="discountPercent"
                       type="number"
-                      placeholder="50"
+                      placeholder="0"
+                      :min="0"
+                      :max="99"
                     >
                       <template #leading>
                         <span class="text-gray-400">%</span>
@@ -490,22 +438,8 @@ onMounted(async () => {
                   </UFormField>
                 </div>
 
-                <!-- Detailed Info Toggle -->
-                <div class="flex items-center gap-3 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <USwitch v-model="showDetailedInfo" />
-                  <span class="text-sm text-gray-600 dark:text-gray-400">Дэлгэрэнгүй мэдээлэл</span>
-                </div>
-
-                <!-- Action Buttons -->
+                <!-- Add Variant Button -->
                 <div class="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <UButton
-                    to="/dashboard/products"
-                    color="neutral"
-                    variant="outline"
-                    icon="i-lucide-copy"
-                  >
-                    Хуулах
-                  </UButton>
                   <UButton
                     type="button"
                     color="primary"
@@ -522,11 +456,12 @@ onMounted(async () => {
                 <div class="space-y-4">
                   <ProductVariantForm
                     v-for="(variant, index) in variants"
-                    :key="variant.id || index"
+                    :key="variant.id || `new-${index}`"
                     :model-value="variant"
                     :index="index"
+                    :product-name="state.name"
                     :can-remove="true"
-                    @update:model-value="updateVariant(index, $event)"
+                    @update:model-value="handleVariantUpdate(index, $event)"
                     @remove="removeVariant(index)"
                   />
 
@@ -539,18 +474,6 @@ onMounted(async () => {
                     @click="addVariant"
                   >
                     Өөр төрөл нэмэх
-                  </UButton>
-                </div>
-              </ProductFormCard>
-
-              <!-- Promotions -->
-              <ProductFormCard title="Барааны урамшуулал">
-                <p class="text-sm text-gray-500 dark:text-gray-400">
-                  Дэлгүүрийн ашиглаж буй багцыг ахиулснаар энэхүү бараа дээр 1+1, 1-г авбал 50% хямдралтай, 2-г авбал 1-г үнэгүй гэх мэт урамшуулал үүсгэх боломжтой болно.
-                </p>
-                <div class="flex items-center justify-end mt-4">
-                  <UButton color="neutral" variant="ghost" icon="i-lucide-shopping-cart">
-                    Багц ахиулна уу
                   </UButton>
                 </div>
               </ProductFormCard>
@@ -567,83 +490,14 @@ onMounted(async () => {
                 />
               </ProductFormCard>
 
-              <!-- Category -->
-              <ProductFormCard>
-                <div class="flex items-center justify-between mb-3">
-                  <span class="text-sm font-medium text-gray-900 dark:text-white">
-                    Барааны ангилал <span class="text-red-500">*</span>
-                  </span>
-                  <UButton
-                    color="primary"
-                    variant="link"
-                    size="xs"
-                    to="/dashboard/categories"
-                  >
-                    Удирдах
-                  </UButton>
-                </div>
-                <USelect
-                  v-model="state.category"
-                  :items="categoryOptions"
-                  placeholder="Ангилал сонгох"
-                  size="lg"
-                />
-              </ProductFormCard>
-
               <!-- Product Settings -->
-              <ProductFormCard title="Барааны тохиргоо" required>
+              <ProductFormCard title="Барааны тохиргоо">
                 <div class="divide-y divide-gray-100 dark:divide-gray-800">
                   <ProductSettingToggle
-                    v-model="settings.autoCalculateStock"
+                    v-model="state.track_inventory"
                     label="Үлдэгдэл автоматаар тооцох"
-                    description="Захиалга хийгдсэн үед тухайн барааны үлдэгдэлээс хасч дүссэн үед тухайн бараа авах боломжгүй болно."
+                    description="Захиалга хийгдсэн үед тухайн барааны үлдэгдэлээс хасна."
                   />
-                  <ProductSettingToggle
-                    v-model="settings.isFeatured"
-                    label="Онцлох бараа эсэх"
-                    description="Энэхүү бараагт онцлох барааны ангилал руу оруулан, онцлох хэсэгт харагдана."
-                  />
-                  <ProductSettingToggle
-                    v-model="settings.trackOrders"
-                    label="Захиалгын бараа эсэх"
-                    description="Жишээ нь тодорхой хугацаанд буюу 14-21 хоногт захиалгаар ирнэ гэх харагдана."
-                  />
-                  <ProductSettingToggle
-                    v-model="settings.isNew"
-                    label="Шинэ бараа эсэх"
-                    description="Энэхүү бараагт шинэ барааны ангилал руу оруулан, шинээр нэмэгдсэн хэсэгт харагдана."
-                  />
-                  <ProductSettingToggle
-                    v-model="settings.isDigital"
-                    label="Дижитал бараа эсэх"
-                    description="Энэхүү бараа нь бодит биш дижитал бараа бол сонгоно уу."
-                  />
-                  <ProductSettingToggle
-                    v-model="settings.isLimitedEdition"
-                    label="Limited Edition эсэх"
-                    description="Энэхүү бараа нь ховор загвар буюу Limited Edition бол сонгоно уу."
-                  />
-                </div>
-              </ProductFormCard>
-
-              <!-- Additional Fields -->
-              <ProductFormCard title="Нэмэлт талбарууд">
-                <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
-                  Энэхүү бараа дээр нэмэлтээр текст, тоо, огноо зэрэг мэдээллийг хэрэглэгчээс авах боломжтой.
-                </p>
-                <div class="flex flex-col items-center gap-2 py-4 border-t border-gray-200 dark:border-gray-700">
-                  <UIcon name="i-lucide-plus-circle" class="w-8 h-8 text-gray-300 dark:text-gray-600" />
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    Багц ахиулахад нэмэлт талбар нэмэх боломжтой
-                  </p>
-                  <UButton
-                    color="neutral"
-                    variant="outline"
-                    icon="i-lucide-shopping-cart"
-                    class="mt-2"
-                  >
-                    Багц ахиулах
-                  </UButton>
                 </div>
               </ProductFormCard>
             </div>

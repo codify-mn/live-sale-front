@@ -7,8 +7,6 @@ export interface Shop {
   picture: string
   description: string
   settings: {
-    currency: string
-    timezone: string
     auto_reply: boolean
     reply_message: string
     payment_method: string

@@ -22,11 +22,13 @@ export interface ProductVariant {
   id: number
   product_id: number
   shop_id: number
-  sku: string
-  barcode: string
+  sku: string             // Required - used for live selling SKU matching
+  barcode: string | null
   name: string
   options: Record<string, string>
-  price: number | null
+  price: number | null    // Base price override for this variant
+  sale_price: number | null // Discounted price for this variant
+  images: string[]        // Variant-specific images
   stock_quantity: number
   low_stock_alert: number
   is_active: boolean
@@ -70,10 +72,23 @@ export interface CreateProductInput {
 
 export interface CreateVariantInput {
   name: string
-  sku: string
-  barcode?: string
+  sku: string             // Required for live selling
+  barcode?: string | null
   options?: Record<string, string>
   price?: number | null
+  sale_price?: number | null
+  images?: string[]
+  stock_quantity: number
+  low_stock_alert?: number
+}
+
+export interface UpdateVariantInput {
+  name?: string
+  sku?: string
+  barcode?: string | null
+  price?: number | null
+  sale_price?: number | null
+  images?: string[]
   stock_quantity?: number
   low_stock_alert?: number
 }
@@ -141,7 +156,7 @@ export function useProducts() {
     })
   }
 
-  const updateVariant = async (variantId: number, data: Partial<CreateVariantInput>): Promise<ProductVariant> => {
+  const updateVariant = async (variantId: number, data: UpdateVariantInput): Promise<ProductVariant> => {
     return await $fetch<ProductVariant>(`${apiUrl}/api/variants/${variantId}`, {
       method: 'PUT',
       credentials: 'include',

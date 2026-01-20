@@ -18,6 +18,10 @@ const router = useRouter()
 const isYearly = ref(false)
 const startingTrial = ref<string | null>(null)
 
+// Separate paid plans from free plan
+const paidPlans = computed(() => plans.value.filter(p => p.slug !== 'free'))
+const freePlan = computed(() => plans.value.find(p => p.slug === 'free'))
+
 onMounted(async () => {
   await fetchPlans()
   if (authCheck.value) {
@@ -78,7 +82,11 @@ function getPlanFeatures(plan: Plan): { label: string, included: boolean }[] {
 }
 
 function isPopularPlan(plan: Plan): boolean {
-  return plan.slug === 'ultimate'
+  return plan.slug === 'pro'
+}
+
+function isComingSoon(plan: Plan): boolean {
+  return plan.slug === 'pro-max'
 }
 
 function isCurrentPlan(plan: Plan): boolean {
@@ -86,6 +94,10 @@ function isCurrentPlan(plan: Plan): boolean {
 }
 
 async function handlePlanSelect(plan: Plan) {
+  if (isComingSoon(plan)) {
+    return
+  }
+
   if (!authCheck.value) {
     router.push('/login?redirect=/pricing')
     return
