@@ -41,6 +41,7 @@ export const useDashboardData = () => {
   const customerStats = ref<CustomerStats>({ total: 0, this_month: 0 })
   const isLoading = ref(true)
   const error = ref<string | null>(null)
+  const lives = ref<any[]>([])
 
   const fetchShop = async () => {
     try {
@@ -80,6 +81,17 @@ export const useDashboardData = () => {
     }
   }
 
+  const fetchLives = async () => {
+    try {
+      const data = await $fetch<{ lives: any[], total: number }>(`${config.public.apiUrl}/api/lives?limit=1`, {
+        credentials: 'include'
+      })
+      lives.value = data.lives
+    } catch (err: any) {
+      console.error('Failed to fetch lives:', err)
+    }
+  }
+
   const fetchAll = async () => {
     isLoading.value = true
     error.value = null
@@ -104,9 +116,11 @@ export const useDashboardData = () => {
     customerStats,
     isLoading,
     error,
+    lives,
     fetchAll,
     fetchShop,
     fetchOrderStats,
-    fetchProductStats
+    fetchProductStats,
+    fetchLives
   }
 }

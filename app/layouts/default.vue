@@ -11,6 +11,13 @@ const links = [[{
     open.value = false
   }
 }, {
+  label: 'Facebook Live',
+  icon: 'i-lucide-tv-minimal-play',
+  to: '/app/live',
+  onSelect: () => {
+    open.value = false
+  }
+}, {
   label: 'Бүтээгдэхүүн',
   icon: 'i-lucide-package',
   to: '/dashboard/products',
@@ -54,14 +61,9 @@ const groups = computed(() => [{
 
 <template>
   <UDashboardGroup unit="rem">
-    <UDashboardSidebar
-      id="default"
-      v-model:open="open"
-      collapsible
-      resizable
+    <UDashboardSidebar id="default" v-model:open="open" collapsible resizable
       class="bg-white/75 dark:bg-gray-900/75 backdrop-blur-xl border-r border-gray-200 dark:border-gray-800"
-      :ui="{ footer: 'lg:border-t lg:border-gray-200 dark:lg:border-gray-800' }"
-    >
+      :ui="{ footer: 'lg:border-t lg:border-gray-200 dark:lg:border-gray-800' }">
       <template #header="{ collapsed }">
         <TeamsMenu :collapsed="collapsed" />
       </template>
@@ -69,13 +71,7 @@ const groups = computed(() => [{
       <template #default="{ collapsed }">
         <UDashboardSearchButton :collapsed="collapsed" class="bg-transparent ring-default" />
 
-        <UNavigationMenu
-          :collapsed="collapsed"
-          :items="links[0]"
-          orientation="vertical"
-          tooltip
-          popover
-        />
+        <UNavigationMenu :collapsed="collapsed" :items="links[0]" orientation="vertical" tooltip popover />
       </template>
 
       <template #footer="{ collapsed }">

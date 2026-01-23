@@ -32,7 +32,8 @@ export default defineNuxtConfig({
 
   routeRules: {
     '/api/**': {
-      cors: true
+      cors: true,
+      proxy: 'http://localhost:4000'
     },
     '/docs': {
       redirect: '/docs/getting-started'

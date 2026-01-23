@@ -58,3 +58,14 @@ export interface Range {
   start: Date
   end: Date
 }
+
+export interface LiveSale {
+  id: number
+  shop_id: number
+  ref_id: string
+  status: string
+  created_at: string
+  updated_at: string
+  stream_url: string
+  // comments: LiveSaleComment[]
+}
