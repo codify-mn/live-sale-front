@@ -4,10 +4,10 @@ import { calculateDiscountPercent, calculateSalePrice } from '~/utils'
 export interface VariantData {
   id?: number
   name: string
-  sku: string           // Required for live selling
+  sku: string // Required for live selling
   barcode: string | null
   stock_quantity: number
-  price: number | null    // Override base price
+  price: number | null // Override base price
   sale_price: number | null // Discounted price
   low_stock_alert: number
   images: string[]
@@ -16,7 +16,7 @@ export interface VariantData {
 interface Props {
   modelValue: VariantData
   index: number
-  productName?: string    // For SKU generation
+  productName?: string // For SKU generation
   canRemove?: boolean
 }
 
@@ -178,34 +178,6 @@ onMounted(() => {
       </div>
 
       <!-- Sale Price & Discount Percent -->
-      <div class="grid grid-cols-2 gap-4">
-        <UFormField label="Хямдарсан үнэ">
-          <UInput
-            :model-value="modelValue.sale_price"
-            type="number"
-            placeholder="0"
-            @update:model-value="updateField('sale_price', $event ? Number($event) : null)"
-          >
-            <template #leading>
-              <span class="text-gray-400">₮</span>
-            </template>
-          </UInput>
-        </UFormField>
-
-        <UFormField label="Хямдралын хувь">
-          <UInput
-            v-model.number="discountPercent"
-            type="number"
-            placeholder="0"
-            :min="0"
-            :max="99"
-          >
-            <template #leading>
-              <span class="text-gray-400">%</span>
-            </template>
-          </UInput>
-        </UFormField>
-      </div>
 
       <!-- Details Toggle -->
       <div class="flex items-center gap-3 pt-2 border-t border-gray-200 dark:border-gray-700">
@@ -232,6 +204,32 @@ onMounted(() => {
           >
             <template #trailing>
               <span class="text-gray-400">ш</span>
+            </template>
+          </UInput>
+        </UFormField>
+        <UFormField label="Хямдарсан үнэ">
+          <UInput
+            :model-value="modelValue.sale_price"
+            type="number"
+            placeholder="0"
+            @update:model-value="updateField('sale_price', $event ? Number($event) : null)"
+          >
+            <template #leading>
+              <span class="text-gray-400">₮</span>
+            </template>
+          </UInput>
+        </UFormField>
+
+        <UFormField label="Хямдралын хувь">
+          <UInput
+            v-model.number="discountPercent"
+            type="number"
+            placeholder="0"
+            :min="0"
+            :max="99"
+          >
+            <template #leading>
+              <span class="text-gray-400">%</span>
             </template>
           </UInput>
         </UFormField>

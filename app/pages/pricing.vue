@@ -18,10 +18,6 @@ const router = useRouter()
 const isYearly = ref(false)
 const startingTrial = ref<string | null>(null)
 
-// Separate paid plans from free plan
-const paidPlans = computed(() => plans.value.filter(p => p.slug !== 'free'))
-const freePlan = computed(() => plans.value.find(p => p.slug === 'free'))
-
 onMounted(async () => {
   await fetchPlans()
   if (authCheck.value) {
