@@ -7,6 +7,6 @@ defineProps<{
 <template>
   <NuxtLink to="/" class="flex items-center gap-2" :class="$props.class">
     <UIcon name="i-lucide-zap" class="size-6 text-primary" />
-    <span class="font-bold text-lg">Singulatim</span>
+    <span class="font-bold text-lg">Comment Boost</span>
   </NuxtLink>
 </template>

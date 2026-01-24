@@ -30,7 +30,7 @@ const variants = ref<VariantData[]>([])
 const deletedVariantIds = ref<number[]>([])
 
 useSeoMeta({
-  title: () => product.value ? `${product.value.name} - Singulatim` : 'Бүтээгдэхүүн - Singulatim'
+  title: () => product.value ? `${product.value.name} - Comment Boost` : 'Бүтээгдэхүүн - Comment Boost'
 })
 
 const schema = z.object({
@@ -300,12 +300,7 @@ onMounted(async () => {
     <template #header>
       <UDashboardNavbar>
         <template #leading>
-          <UButton
-            to="/dashboard/products"
-            icon="i-lucide-arrow-left"
-            color="neutral"
-            variant="ghost"
-          />
+          <UButton to="/dashboard/products" icon="i-lucide-arrow-left" color="neutral" variant="ghost" />
         </template>
 
         <template #title>
@@ -321,19 +316,8 @@ onMounted(async () => {
 
         <template #right>
           <div class="flex items-center gap-2">
-            <UButton
-              icon="i-lucide-trash-2"
-              color="error"
-              variant="ghost"
-              @click="deleteModalOpen = true"
-            />
-            <UButton
-              type="submit"
-              form="product-form"
-              color="primary"
-              icon="i-lucide-check"
-              :loading="saving"
-            >
+            <UButton icon="i-lucide-trash-2" color="error" variant="ghost" @click="deleteModalOpen = true" />
+            <UButton type="submit" form="product-form" color="primary" icon="i-lucide-check" :loading="saving">
               Хадгалах
             </UButton>
           </div>
@@ -347,32 +331,19 @@ onMounted(async () => {
       </div>
 
       <div v-else-if="product" class="p-6 overflow-y-auto">
-        <UForm
-          id="product-form"
-          :schema="schema"
-          :state="state"
-          @submit="onSubmit"
-        >
+        <UForm id="product-form" :schema="schema" :state="state" @submit="onSubmit">
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Left Column - Main Form -->
             <div class="lg:col-span-2 space-y-6">
               <!-- Product Title -->
               <ProductFormCard title="Барааны гарчиг" required>
-                <UInput
-                  v-model="state.name"
-                  placeholder="Барааны гарчгийг оруулна уу"
-                  size="lg"
-                />
+                <UInput v-model="state.name" placeholder="Барааны гарчгийг оруулна уу" size="lg" />
                 <div class="py-2">
                   <h3 class="text-sm font-medium text-gray-900 dark:text-white">
                     Барааны тайлбар
                   </h3>
                 </div>
-                <UTextarea
-                  v-model="state.description"
-                  placeholder="Энд тайлбараа бичнэ үү..."
-                  :rows="4"
-                />
+                <UTextarea v-model="state.description" placeholder="Энд тайлбараа бичнэ үү..." :rows="4" />
               </ProductFormCard>
 
               <!-- Images & Pricing -->
@@ -385,12 +356,8 @@ onMounted(async () => {
                 <!-- Price & Stock -->
                 <div class="grid grid-cols-2 gap-4 mt-6">
                   <UFormField label="Үлдэгдэл" name="stock_quantity" required>
-                    <UInput
-                      v-model.number="state.stock_quantity"
-                      type="number"
-                      placeholder="0"
-                      :disabled="state.has_variants"
-                    >
+                    <UInput v-model.number="state.stock_quantity" type="number" placeholder="0"
+                      :disabled="state.has_variants">
                       <template #trailing>
                         <span class="text-gray-400">ш</span>
                       </template>
@@ -398,11 +365,7 @@ onMounted(async () => {
                   </UFormField>
 
                   <UFormField label="Үндсэн үнэ" name="base_price" required>
-                    <UInput
-                      v-model.number="state.base_price"
-                      type="number"
-                      placeholder="0"
-                    >
+                    <UInput v-model.number="state.base_price" type="number" placeholder="0">
                       <template #leading>
                         <span class="text-gray-400">₮</span>
                       </template>
@@ -412,11 +375,7 @@ onMounted(async () => {
 
                 <div class="grid grid-cols-2 gap-4 mt-4">
                   <UFormField label="Хямдарсан үнэ" name="sale_price">
-                    <UInput
-                      v-model.number="state.sale_price"
-                      type="number"
-                      placeholder="0"
-                    >
+                    <UInput v-model.number="state.sale_price" type="number" placeholder="0">
                       <template #leading>
                         <span class="text-gray-400">₮</span>
                       </template>
@@ -424,13 +383,7 @@ onMounted(async () => {
                   </UFormField>
 
                   <UFormField label="Хямдралын хувь">
-                    <UInput
-                      v-model.number="discountPercent"
-                      type="number"
-                      placeholder="0"
-                      :min="0"
-                      :max="99"
-                    >
+                    <UInput v-model.number="discountPercent" type="number" placeholder="0" :min="0" :max="99">
                       <template #leading>
                         <span class="text-gray-400">%</span>
                       </template>
@@ -439,13 +392,9 @@ onMounted(async () => {
                 </div>
 
                 <!-- Add Variant Button -->
-                <div class="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <UButton
-                    type="button"
-                    color="primary"
-                    icon="i-lucide-plus-circle"
-                    @click="addVariant"
-                  >
+                <div
+                  class="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <UButton type="button" color="primary" icon="i-lucide-plus-circle" @click="addVariant">
                     Төрөл нэмэх
                   </UButton>
                 </div>
@@ -454,25 +403,12 @@ onMounted(async () => {
               <!-- Variants Section -->
               <ProductFormCard v-if="variants.length > 0" title="Барааны төрлүүд">
                 <div class="space-y-4">
-                  <ProductVariantForm
-                    v-for="(variant, index) in variants"
-                    :key="variant.id || `new-${index}`"
-                    :model-value="variant"
-                    :index="index"
-                    :product-name="state.name"
-                    :can-remove="true"
-                    @update:model-value="handleVariantUpdate(index, $event)"
-                    @remove="removeVariant(index)"
-                  />
+                  <ProductVariantForm v-for="(variant, index) in variants" :key="variant.id || `new-${index}`"
+                    :model-value="variant" :index="index" :product-name="state.name" :can-remove="true"
+                    @update:model-value="handleVariantUpdate(index, $event)" @remove="removeVariant(index)" />
 
-                  <UButton
-                    type="button"
-                    color="neutral"
-                    variant="outline"
-                    icon="i-lucide-plus"
-                    class="w-full"
-                    @click="addVariant"
-                  >
+                  <UButton type="button" color="neutral" variant="outline" icon="i-lucide-plus" class="w-full"
+                    @click="addVariant">
                     Өөр төрөл нэмэх
                   </UButton>
                 </div>
@@ -483,21 +419,14 @@ onMounted(async () => {
             <div class="space-y-6">
               <!-- Status -->
               <ProductFormCard title="Барааны төлөв" required>
-                <USelect
-                  v-model="state.status"
-                  :items="statusOptions"
-                  size="lg"
-                />
+                <USelect v-model="state.status" :items="statusOptions" size="lg" />
               </ProductFormCard>
 
               <!-- Product Settings -->
               <ProductFormCard title="Барааны тохиргоо">
                 <div class="divide-y divide-gray-100 dark:divide-gray-800">
-                  <ProductSettingToggle
-                    v-model="state.track_inventory"
-                    label="Үлдэгдэл автоматаар тооцох"
-                    description="Захиалга хийгдсэн үед тухайн барааны үлдэгдэлээс хасна."
-                  />
+                  <ProductSettingToggle v-model="state.track_inventory" label="Үлдэгдэл автоматаар тооцох"
+                    description="Захиалга хийгдсэн үед тухайн барааны үлдэгдэлээс хасна." />
                 </div>
               </ProductFormCard>
             </div>
@@ -525,18 +454,10 @@ onMounted(async () => {
 
             <template #footer>
               <div class="flex justify-end gap-2">
-                <UButton
-                  color="neutral"
-                  variant="outline"
-                  @click="deleteModalOpen = false"
-                >
+                <UButton color="neutral" variant="outline" @click="deleteModalOpen = false">
                   Болих
                 </UButton>
-                <UButton
-                  color="error"
-                  :loading="deleting"
-                  @click="confirmDelete"
-                >
+                <UButton color="error" :loading="deleting" @click="confirmDelete">
                   Устгах
                 </UButton>
               </div>

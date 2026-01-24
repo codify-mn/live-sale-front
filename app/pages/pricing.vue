@@ -6,7 +6,7 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: 'Үнийн мэдээлэл - Singulatim',
+  title: 'Үнийн мэдээлэл - Comment Boost',
   description: 'Энгийн, ил тод үнийн бодлого. Бүх хэмжээний бизнест тохирсон багцууд.'
 })
 
@@ -169,20 +169,17 @@ const faq = [
 
           <!-- Billing Toggle -->
           <div class="inline-flex items-center gap-4 p-1.5 bg-gray-100 dark:bg-gray-800 rounded-full">
-            <button
-              class="px-6 py-2.5 rounded-full text-sm font-medium transition-all"
+            <button class="px-6 py-2.5 rounded-full text-sm font-medium transition-all"
               :class="!isYearly ? 'bg-white dark:bg-gray-900 shadow-sm text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'"
-              @click="isYearly = false"
-            >
+              @click="isYearly = false">
               Сараар
             </button>
-            <button
-              class="px-6 py-2.5 rounded-full text-sm font-medium transition-all flex items-center gap-2"
+            <button class="px-6 py-2.5 rounded-full text-sm font-medium transition-all flex items-center gap-2"
               :class="isYearly ? 'bg-white dark:bg-gray-900 shadow-sm text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'"
-              @click="isYearly = true"
-            >
+              @click="isYearly = true">
               Жилээр
-              <span class="bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 text-xs font-semibold px-2 py-0.5 rounded-full">
+              <span
+                class="bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 text-xs font-semibold px-2 py-0.5 rounded-full">
                 Хэмнэлттэй
               </span>
             </button>
@@ -196,33 +193,25 @@ const faq = [
 
         <!-- Pricing Cards -->
         <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-          <div
-            v-for="plan in plans"
-            :key="plan.slug"
-            class="relative flex flex-col rounded-2xl border transition-all duration-300"
-            :class="[
+          <div v-for="plan in plans" :key="plan.slug"
+            class="relative flex flex-col rounded-2xl border transition-all duration-300" :class="[
               isPopularPlan(plan)
                 ? 'border-primary-500 dark:border-primary-400 shadow-xl shadow-primary-500/10 scale-[1.02] z-10'
                 : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-lg',
               isCurrentPlan(plan) ? 'ring-2 ring-green-500' : ''
-            ]"
-          >
+            ]">
             <!-- Popular Badge -->
-            <div
-              v-if="isPopularPlan(plan)"
-              class="absolute -top-3.5 left-1/2 -translate-x-1/2"
-            >
-              <span class="inline-flex items-center gap-1 bg-primary-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
+            <div v-if="isPopularPlan(plan)" class="absolute -top-3.5 left-1/2 -translate-x-1/2">
+              <span
+                class="inline-flex items-center gap-1 bg-primary-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
                 <span>🔥</span> Түгээмэл
               </span>
             </div>
 
             <!-- Current Plan Badge -->
-            <div
-              v-if="isCurrentPlan(plan)"
-              class="absolute -top-3.5 right-4"
-            >
-              <span class="inline-flex items-center gap-1 bg-green-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
+            <div v-if="isCurrentPlan(plan)" class="absolute -top-3.5 right-4">
+              <span
+                class="inline-flex items-center gap-1 bg-green-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
                 <UIcon name="i-lucide-check" class="w-3 h-3" /> Одоогийн багц
               </span>
             </div>
@@ -251,7 +240,8 @@ const faq = [
                   <span class="text-sm text-gray-400 line-through">
                     ₮{{ formatPrice(plan.monthly_price * 12) }}/жил
                   </span>
-                  <span class="text-xs font-semibold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30 px-2 py-0.5 rounded">
+                  <span
+                    class="text-xs font-semibold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30 px-2 py-0.5 rounded">
                     -{{ getYearlyDiscount(plan) }}%
                   </span>
                 </div>
@@ -262,33 +252,22 @@ const faq = [
 
               <!-- Features -->
               <ul class="space-y-3 mb-8 flex-1">
-                <li
-                  v-for="feature in getPlanFeatures(plan)"
-                  :key="feature.label"
-                  class="flex items-start gap-2 text-sm"
-                >
-                  <UIcon
-                    :name="feature.included ? 'i-lucide-check' : 'i-lucide-x'"
-                    class="w-5 h-5 flex-shrink-0 mt-0.5"
-                    :class="feature.included ? 'text-green-500' : 'text-gray-300 dark:text-gray-600'"
-                  />
-                  <span :class="feature.included ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400 dark:text-gray-500'">
+                <li v-for="feature in getPlanFeatures(plan)" :key="feature.label"
+                  class="flex items-start gap-2 text-sm">
+                  <UIcon :name="feature.included ? 'i-lucide-check' : 'i-lucide-x'" class="w-5 h-5 flex-shrink-0 mt-0.5"
+                    :class="feature.included ? 'text-green-500' : 'text-gray-300 dark:text-gray-600'" />
+                  <span
+                    :class="feature.included ? 'text-gray-700 dark:text-gray-300' : 'text-gray-400 dark:text-gray-500'">
                     {{ feature.label }}
                   </span>
                 </li>
               </ul>
 
               <!-- CTA Button -->
-              <UButton
-                :color="isPopularPlan(plan) ? 'primary' : 'neutral'"
+              <UButton :color="isPopularPlan(plan) ? 'primary' : 'neutral'"
                 :variant="plan.slug === 'free' || isCurrentPlan(plan) ? 'outline' : 'solid'"
-                :disabled="isCurrentPlan(plan)"
-                :loading="startingTrial === plan.slug"
-                block
-                size="lg"
-                class="font-semibold"
-                @click="handlePlanSelect(plan)"
-              >
+                :disabled="isCurrentPlan(plan)" :loading="startingTrial === plan.slug" block size="lg"
+                class="font-semibold" @click="handlePlanSelect(plan)">
                 <template v-if="isCurrentPlan(plan)">
                   Одоогийн багц
                 </template>
@@ -337,12 +316,7 @@ const faq = [
           <p class="text-gray-600 dark:text-gray-400 mb-6">
             Томоохон бизнест зориулсан тусгай багц авахыг хүсвэл бидэнтэй холбогдоорой.
           </p>
-          <UButton
-            color="neutral"
-            variant="outline"
-            size="lg"
-            icon="i-lucide-mail"
-          >
+          <UButton color="neutral" variant="outline" size="lg" icon="i-lucide-mail">
             Холбоо барих
           </UButton>
         </div>

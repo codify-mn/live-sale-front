@@ -3,7 +3,7 @@ import type { TableColumn } from '@nuxt/ui'
 import type { Product } from '~/composables/useProducts'
 
 useSeoMeta({
-  title: 'Бүтээгдэхүүн - Singulatim'
+  title: 'Бүтээгдэхүүн - Comment Boost'
 })
 
 const { fetchProducts, deleteProduct, fetchCategories } = useProducts()
@@ -205,18 +205,10 @@ onMounted(() => {
           </p>
         </div>
         <div class="flex items-center gap-3">
-          <UButton
-            color="neutral"
-            variant="outline"
-            icon="i-lucide-file-spreadsheet"
-          >
+          <UButton color="neutral" variant="outline" icon="i-lucide-file-spreadsheet">
             Excel-с оруулах
           </UButton>
-          <UButton
-            to="/dashboard/products/new"
-            color="primary"
-            icon="i-lucide-plus"
-          >
+          <UButton to="/dashboard/products/new" color="primary" icon="i-lucide-plus">
             Бараа нэмэх
           </UButton>
         </div>
@@ -226,34 +218,15 @@ onMounted(() => {
     <!-- Filters -->
     <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
       <div class="flex items-center justify-between gap-4">
-        <UInput
-          v-model="filter.keyword"
-          placeholder="Бараа нэрээр хайх..."
-          icon="i-lucide-search"
-          class="w-80"
-        />
+        <UInput v-model="filter.keyword" placeholder="Бараа нэрээр хайх..." icon="i-lucide-search" class="w-80" />
 
         <div class="flex items-center gap-2">
-          <USelect
-            v-model="filter.stock"
-            :items="stockOptions"
-            class="w-36"
-          />
-          <USelect
-            v-model="filter.status"
-            :items="statusOptions"
-            class="w-32"
-          />
-          <USelect
-            v-model="filter.category"
+          <USelect v-model="filter.stock" :items="stockOptions" class="w-36" />
+          <USelect v-model="filter.status" :items="statusOptions" class="w-32" />
+          <USelect v-model="filter.category"
             :items="[{ label: 'Бүх ангилал', value: 'all' }, ...categories.map(c => ({ label: c, value: c }))]"
-            class="w-36"
-          />
-          <UButton
-            color="neutral"
-            variant="outline"
-            icon="i-lucide-sliders-horizontal"
-          >
+            class="w-36" />
+          <UButton color="neutral" variant="outline" icon="i-lucide-sliders-horizontal">
             Бусад
           </UButton>
         </div>
@@ -262,50 +235,29 @@ onMounted(() => {
 
     <!-- Table -->
     <div class="flex-1 overflow-auto">
-      <UTable
-        :data="products"
-        :columns="columns"
-        :loading="loading"
-        class="w-full"
-        :ui="{
-          thead: 'bg-gray-50 dark:bg-gray-900/50',
-          th: 'text-left px-4 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider',
-          td: 'px-4 py-3',
-          tbody: 'divide-y divide-gray-100 dark:divide-gray-800'
-        }"
-      >
+      <UTable :data="products" :columns="columns" :loading="loading" class="w-full" :ui="{
+        thead: 'bg-gray-50 dark:bg-gray-900/50',
+        th: 'text-left px-4 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider',
+        td: 'px-4 py-3',
+        tbody: 'divide-y divide-gray-100 dark:divide-gray-800'
+      }">
         <template #name-cell="{ row }">
           <div class="flex items-center gap-3">
             <div
-              class="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden shrink-0"
-            >
-              <img
-                v-if="row.original.images?.length"
-                :src="row.original.images[0]"
-                :alt="row.original.name"
-                class="w-full h-full object-cover"
-              >
-              <UIcon
-                v-else
-                name="i-lucide-package"
-                class="w-5 h-5 text-gray-400"
-              />
+              class="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden shrink-0">
+              <img v-if="row.original.images?.length" :src="row.original.images[0]" :alt="row.original.name"
+                class="w-full h-full object-cover">
+              <UIcon v-else name="i-lucide-package" class="w-5 h-5 text-gray-400" />
             </div>
-            <NuxtLink
-              :to="`/dashboard/products/${row.original.id}`"
-              class="font-medium text-gray-900 dark:text-white hover:text-primary-500"
-            >
+            <NuxtLink :to="`/dashboard/products/${row.original.id}`"
+              class="font-medium text-gray-900 dark:text-white hover:text-primary-500">
               {{ row.original.name }}
             </NuxtLink>
           </div>
         </template>
 
         <template #status-cell="{ row }">
-          <UBadge
-            :color="statusColors[row.original.status] || 'neutral'"
-            variant="subtle"
-            class="font-medium"
-          >
+          <UBadge :color="statusColors[row.original.status] || 'neutral'" variant="subtle" class="font-medium">
             {{ statusLabels[row.original.status] || row.original.status }}
           </UBadge>
         </template>
@@ -330,31 +282,19 @@ onMounted(() => {
 
         <template #actions-cell="{ row }">
           <div class="flex items-center justify-end gap-1">
-            <UButton
-              :to="`/dashboard/products/${row.original.id}`"
-              icon="i-lucide-eye"
-              color="neutral"
-              variant="ghost"
-              size="sm"
-            />
+            <UButton :to="`/dashboard/products/${row.original.id}`" icon="i-lucide-eye" color="neutral" variant="ghost"
+              size="md" />
             <UDropdownMenu :items="getActionItems(row.original)">
-              <UButton
-                icon="i-lucide-more-horizontal"
-                color="neutral"
-                variant="ghost"
-                size="sm"
-              />
+              <UButton icon="i-lucide-more-horizontal" color="neutral" variant="ghost" size="md" />
             </UDropdownMenu>
           </div>
         </template>
 
         <template #empty>
           <div class="flex flex-col items-center justify-center py-20 text-center">
-            <div class="w-20 h-20 rounded-full bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center mb-6">
-              <UIcon
-                name="i-lucide-package"
-                class="w-10 h-10 text-primary-500"
-              />
+            <div
+              class="w-20 h-20 rounded-full bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center mb-6">
+              <UIcon name="i-lucide-package" class="w-10 h-10 text-primary-500" />
             </div>
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               Бүтээгдэхүүн олдсонгүй
@@ -362,11 +302,7 @@ onMounted(() => {
             <p class="text-gray-500 dark:text-gray-400 max-w-sm mb-6">
               Одоогоор ямар ч бүтээгдэхүүн байхгүй байна. Шинэ бүтээгдэхүүн нэмж эхлээрэй.
             </p>
-            <UButton
-              to="/dashboard/products/new"
-              color="primary"
-              icon="i-lucide-plus"
-            >
+            <UButton to="/dashboard/products/new" color="primary" icon="i-lucide-plus">
               Бүтээгдэхүүн нэмэх
             </UButton>
           </div>
@@ -375,28 +311,16 @@ onMounted(() => {
     </div>
 
     <!-- Pagination -->
-    <div
-      v-if="total > 0"
-      class="px-6 py-4 border-t border-gray-200 dark:border-gray-800 flex items-center justify-between"
-    >
+    <div v-if="total > 0"
+      class="px-6 py-4 border-t border-gray-200 dark:border-gray-800 flex items-center justify-between">
       <p class="text-sm text-gray-500 dark:text-gray-400">
         {{ startItem }}-с {{ endItem }} хүртэл. Нийт: {{ total }}
       </p>
       <div class="flex items-center gap-2">
-        <UButton
-          color="neutral"
-          variant="outline"
-          :disabled="filter.page <= 1"
-          @click="prevPage"
-        >
+        <UButton color="neutral" variant="outline" :disabled="filter.page <= 1" @click="prevPage">
           Өмнөх
         </UButton>
-        <UButton
-          color="neutral"
-          variant="outline"
-          :disabled="filter.page >= totalPages"
-          @click="nextPage"
-        >
+        <UButton color="neutral" variant="outline" :disabled="filter.page >= totalPages" @click="nextPage">
           Дараах
         </UButton>
       </div>
@@ -408,10 +332,7 @@ onMounted(() => {
         <UCard>
           <template #header>
             <div class="flex items-center gap-2">
-              <UIcon
-                name="i-lucide-alert-triangle"
-                class="text-red-500"
-              />
+              <UIcon name="i-lucide-alert-triangle" class="text-red-500" />
               <span class="font-semibold">Устгах</span>
             </div>
           </template>
@@ -425,18 +346,10 @@ onMounted(() => {
 
           <template #footer>
             <div class="flex justify-end gap-2">
-              <UButton
-                color="neutral"
-                variant="outline"
-                @click="deleteModalOpen = false"
-              >
+              <UButton color="neutral" variant="outline" @click="deleteModalOpen = false">
                 Болих
               </UButton>
-              <UButton
-                color="error"
-                :loading="deleting"
-                @click="confirmDelete"
-              >
+              <UButton color="error" :loading="deleting" @click="confirmDelete">
                 Устгах
               </UButton>
             </div>

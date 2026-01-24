@@ -4,7 +4,7 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: 'Singulatim - Live худалдааны платформ',
+  title: 'Comment Boost - Live худалдааны платформ',
   description: 'Facebook Live борлуулалтаа хялбархан удирдаж, захиалга, бараа, харилцагчаа нэг дороос хянаарай.'
 })
 
@@ -83,19 +83,8 @@ const steps = [
             Facebook Live борлуулалтаа хялбархан удирдаж, захиалга автоматаар хүлээн авч, бизнесээ өсгөөрэй.
           </p>
           <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <UButton
-              to="/dashboard"
-              label="Үнэгүй турших"
-              size="xl"
-              trailing-icon="i-lucide-arrow-right"
-            />
-            <UButton
-              to="/pricing"
-              label="Үнийн мэдээлэл"
-              size="xl"
-              color="neutral"
-              variant="outline"
-            />
+            <UButton to="/dashboard" label="Үнэгүй турших" size="xl" trailing-icon="i-lucide-arrow-right" />
+            <UButton to="/pricing" label="Үнийн мэдээлэл" size="xl" color="neutral" variant="outline" />
           </div>
         </div>
       </UContainer>
@@ -113,12 +102,7 @@ const steps = [
           </p>
         </div>
         <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <UCard
-            v-for="feature in features"
-            :key="feature.title"
-            class="text-center"
-            :ui="{ body: 'p-6' }"
-          >
+          <UCard v-for="feature in features" :key="feature.title" class="text-center" :ui="{ body: 'p-6' }">
             <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
               <UIcon :name="feature.icon" class="w-6 h-6 text-primary" />
             </div>
@@ -138,18 +122,14 @@ const steps = [
       <UContainer>
         <div class="text-center mb-12">
           <h2 class="text-3xl font-bold mb-4">
-            Яагаад Singulatim?
+            Яагаад Comment Boost?
           </h2>
           <p class="text-muted text-lg">
             Бизнесээ өсгөхөд туслах давуу талууд
           </p>
         </div>
         <div class="grid md:grid-cols-3 gap-8">
-          <div
-            v-for="benefit in benefits"
-            :key="benefit.title"
-            class="text-center p-6"
-          >
+          <div v-for="benefit in benefits" :key="benefit.title" class="text-center p-6">
             <div class="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
               <UIcon :name="benefit.icon" class="w-8 h-8 text-primary" />
             </div>
@@ -176,11 +156,7 @@ const steps = [
           </p>
         </div>
         <div class="grid md:grid-cols-3 gap-8">
-          <div
-            v-for="step in steps"
-            :key="step.step"
-            class="relative text-center"
-          >
+          <div v-for="step in steps" :key="step.step" class="relative text-center">
             <div class="text-6xl font-bold text-primary/20 mb-4">
               {{ step.step }}
             </div>
@@ -207,18 +183,8 @@ const steps = [
             Үнэгүй бүртгүүлж, Live борлуулалтаа дараагийн түвшинд гаргаарай.
           </p>
           <div class="flex flex-col sm:flex-row gap-4 justify-center relative">
-            <UButton
-              to="/signup"
-              label="Үнэгүй эхлэх"
-              size="xl"
-            />
-            <UButton
-              to="/docs"
-              label="Дэлгэрэнгүй"
-              size="xl"
-              color="neutral"
-              variant="outline"
-            />
+            <UButton to="/signup" label="Үнэгүй эхлэх" size="xl" />
+            <UButton to="/docs" label="Дэлгэрэнгүй" size="xl" color="neutral" variant="outline" />
           </div>
         </div>
       </UContainer>

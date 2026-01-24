@@ -59,13 +59,23 @@ export interface Range {
   end: Date
 }
 
+
+
 export interface LiveSale {
   id: number
+  title: string
+  description: string
+  page_id: number
+  page: FacebookPage
   shop_id: number
+  shop: Shop
   ref_id: string
+  stream_url: string
+  platform: Platform
+  views: number
+  likes: number
   status: string
   created_at: string
   updated_at: string
-  stream_url: string
-  // comments: LiveSaleComment[]
+  comments: LiveSaleComment[]
 }

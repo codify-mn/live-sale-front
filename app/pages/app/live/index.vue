@@ -24,14 +24,12 @@ const createLive = async () => {
 
         isLoading.value = true
 
-        // 1. Get RTMP URL from API
         const { id } = await $fetch<LiveSale>(`${config.public.apiUrl}/api/live-sales/start-new`, {
             method: 'POST',
             body: liveForm,
             credentials: 'include'
         })
 
-        console.log(`/app/live/${id}`)
         navigateTo(`/app/live/${id}`)
     } catch (error) {
         console.error('Failed to create live:', error)
@@ -41,16 +39,37 @@ const createLive = async () => {
     }
 }
 
-
+const columns = [{
+    accessorKey: 'id',
+    header: 'ID',
+},
+{
+    accessorKey: 'title',
+    header: 'Title',
+},
+{
+    accessorKey: 'description',
+    header: 'Description',
+},
+{
+    accessorKey: 'views',
+    header: 'Views',
+},
+{
+    accessorKey: 'Likes',
+    header: 'Likes',
+},
+{
+    accessorKey: 'status',
+    header: 'Status',
+},
+]
 </script>
 
 <template>
     <UDashboardPanel id="live-sales">
         <UDashboardNavbar title="Facebook Live" />
         <div class="p-6 space-y-6 overflow-y-auto mt-6">
-            <!-- Streaming Interface -->
-
-
             <DashboardSection title="Түргэн үйлдлүүд" description="Түгээмэл хэрэглэгддэг үйлдлүүд">
                 <DashboardQuickAction title="Start Live" description="Start a new live sale stream"
                     icon="i-lucide-video" color="blue" @click="() => {
@@ -59,10 +78,16 @@ const createLive = async () => {
                     }" />
             </DashboardSection>
 
-            <UTable :data="lives" />
+            <UTable :data="lives" :columns="columns">
+                <template #title-cell="{ row }">
+                    <NuxtLink :to="`/app/live/${row.original.id}`"
+                        class="font-medium text-gray-900 dark:text-white hover:text-primary-500">
+                        {{ row.original.title }}
+                    </NuxtLink>
+                </template>
+            </UTable>
         </div>
 
-        <!-- Start Live Modal -->
         <UModal v-model:open="isLiveModalOpen">
             <template #header>
                 <div class="flex-1 flex items-center justify-between">

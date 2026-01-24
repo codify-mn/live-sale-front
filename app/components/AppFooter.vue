@@ -55,25 +55,15 @@ const columns = [
     </template>
 
     <template #right>
-      <UButton
-        to="https://facebook.com"
-        target="_blank"
-        icon="i-simple-icons-facebook"
-        color="neutral"
-        variant="ghost"
-      />
-      <UButton
-        to="https://instagram.com"
-        target="_blank"
-        icon="i-simple-icons-instagram"
-        color="neutral"
-        variant="ghost"
-      />
+      <UButton to="https://facebook.com" target="_blank" icon="i-simple-icons-facebook" color="neutral"
+        variant="ghost" />
+      <UButton to="https://instagram.com" target="_blank" icon="i-simple-icons-instagram" color="neutral"
+        variant="ghost" />
     </template>
 
     <template #bottom>
       <p class="text-muted text-sm">
-        &copy; {{ new Date().getFullYear() }} Singulatim. Бүх эрх хуулиар
+        &copy; {{ new Date().getFullYear() }} Comment Boost. Бүх эрх хуулиар
         хамгаалагдсан.
       </p>
     </template>

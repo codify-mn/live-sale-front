@@ -19,16 +19,13 @@ provide<Ref<ContentNavigationItem[]>>('navigation', navigation as Ref<ContentNav
 
 useSeoMeta({
   title: () => page.value?.title ? `${page.value.title} - Docs` : 'Documentation',
-  description: () => page.value?.description || 'Singulatim documentation'
+  description: () => page.value?.description || 'Comment Boost documentation'
 })
 </script>
 
 <template>
   <UPage v-if="page">
-    <UPageHeader
-      :title="page.title"
-      :description="page.description"
-    />
+    <UPageHeader :title="page.title" :description="page.description" />
 
     <UPageBody>
       <ContentRenderer :value="page" />

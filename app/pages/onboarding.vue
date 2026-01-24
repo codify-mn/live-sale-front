@@ -7,7 +7,7 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: 'Дэлгүүр үүсгэх - Singulatim'
+  title: 'Дэлгүүр үүсгэх - Comment Boost'
 })
 
 const config = useRuntimeConfig()
