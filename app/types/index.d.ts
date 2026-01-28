@@ -78,4 +78,13 @@ export interface LiveSale {
   created_at: string
   updated_at: string
   comments: LiveSaleComment[]
+  products: LiveSaleProduct[]
+}
+
+export interface LiveSaleProduct {
+  id: number
+  live_sale_id: number
+  product_id: number
+  keyword: string
+  product: Product
 }

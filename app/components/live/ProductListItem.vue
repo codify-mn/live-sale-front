@@ -1,13 +1,17 @@
 <script setup lang="ts">
 import type { Product } from '~/composables/useProducts'
+import type { LiveSaleProduct } from '~/types';
 
 const props = defineProps<{
     product: Product
 }>()
 
 const emit = defineEmits<{
+    (e: 'add', product: Product): void
     (e: 'select', product: Product): void
 }>()
+
+const addedProducts = inject<LiveSaleProduct[]>('addedProducts')
 
 const items = computed(() => [
     [{
@@ -53,10 +57,15 @@ const formattedPrice = computed(() => {
             </p>
         </div>
 
-        <div class="opacity-0 group-hover:opacity-100 transition-opacity">
-            <UDropdown :items="items" :popper="{ placement: 'bottom-end' }">
-                <UButton color="neutral" variant="ghost" icon="i-heroicons-ellipsis-vertical" size="xs" />
-            </UDropdown>
+        <div class="opacity-0 group-hover:opacity-100 transition-opacity flex justify-center gap-2">
+            <UButton v-if="addedProducts?.some((p) => p.product_id === props.product.id)" color="success"
+                icon="i-heroicons-eye" size="lg" class="rounded-lg cursor-pointer" />
+            <UButton v-else color="primary" icon="i-heroicons-plus" size="lg" class="rounded-lg cursor-pointer"
+                @click="emit('add', props.product)" />
+
+            <UDropdownMenu :items="items" :popper="{ placement: 'bottom-end' }">
+                <UButton color="error" variant="ghost" icon="i-heroicons-ellipsis-vertical" size="md" />
+            </UDropdownMenu>
         </div>
     </div>
 </template>

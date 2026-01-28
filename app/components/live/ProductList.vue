@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import type { Product } from '~/composables/useProducts'
+import type { LiveSaleProduct } from '~/types'
 
 const { fetchProducts } = useProducts()
 const toast = useToast()
+const route = useRoute()
+const config = useRuntimeConfig()
 
 const props = defineProps<{
     shopId?: number
 }>()
+
+const addedProducts = inject<Ref<LiveSaleProduct[]>>('addedProducts')
 
 const search = ref('')
 const loading = ref(false)
@@ -16,6 +21,15 @@ const hasMore = ref(true)
 
 // Debounce search
 const debouncedSearch = refDebounced(search, 300)
+
+const filter = reactive({
+    keyword: '',
+    category: 'all',
+    status: 'all',
+    stock: 'all',
+    page: 1,
+    size: 10
+})
 
 const loadProducts = async (reset = false) => {
     if (loading.value || (!hasMore.value && !reset)) return
@@ -65,6 +79,43 @@ onMounted(() => {
     loadProducts(true)
 })
 
+const handleAdd = async (product: Product) => {
+    console.log('Added product on live:', product)
+    try {
+        await $fetch(`${config.public.apiUrl}/api/live-sales/${route.params.liveID}/products`, {
+            method: 'POST',
+            body: {
+                product_id: product.id,
+                keyword: "dogshittest"
+            },
+            credentials: 'include'
+        })
+
+        addedProducts?.value.push({
+            id: 0,
+            product_id: product.id,
+            live_sale_id: 1,
+            product: product,
+            keyword: ''
+        })
+
+        toast.add({
+            title: 'Product Added',
+            description: `Added ${product.name} for live stream`,
+            icon: 'i-heroicons-check-circle',
+            color: 'success'
+        })
+    } catch (error) {
+        toast.add({
+            title: 'Error adding product',
+            description: 'Failed to add product',
+            color: 'error'
+        })
+    }
+
+}
+
+
 const handleSelect = (product: Product) => {
     console.log('Selected product on live:', product)
     toast.add({
@@ -73,7 +124,12 @@ const handleSelect = (product: Product) => {
         icon: 'i-heroicons-check-circle',
         color: 'success'
     })
-    // Here we would emit an event or call an API to update the live stream state
+    $fetch(`/api/live-sales/${route.params.liveID}/broadcast/product`, {
+        method: 'POST',
+        body: {
+            product_id: product.id,
+        }
+    })
 }
 </script>
 <template>
@@ -88,6 +144,7 @@ const handleSelect = (product: Product) => {
             </UInput>
         </div>
 
+
         <div
             class="flex-1 overflow-y-auto p-2 space-y-1 scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-700">
             <div v-if="loading && products.length === 0" class="flex justify-center p-4">
@@ -95,7 +152,7 @@ const handleSelect = (product: Product) => {
             </div>
 
             <template v-else>
-                <LiveProductListItem v-for="product in products" :key="product.id" :product="product"
+                <ProductListItem v-for="product in products" :key="product.id" :product="product" @add="handleAdd"
                     @select="handleSelect" />
 
                 <div v-if="loading" class="flex justify-center p-2">
