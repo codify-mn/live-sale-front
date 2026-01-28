@@ -33,7 +33,6 @@ useSeoMeta({
 const schema = z.object({
   name: z.string().min(1, 'Нэр оруулна уу'),
   category: z.string().optional(),
-  tags: z.array(z.string()).optional(),
   base_price: z.number().optional(),
   sale_price: z.number().optional().nullable(),
   status: z.string().default('active'),
@@ -49,7 +48,6 @@ type Schema = z.infer<typeof schema>
 const state = reactive<Schema>({
   name: '',
   category: '',
-  tags: [],
   base_price: 0,
   sale_price: null,
   status: 'active',
@@ -119,7 +117,6 @@ const loadProduct = async () => {
 
     state.name = product.value.name
     state.category = product.value.category || ''
-    state.tags = product.value.tags || []
     state.status = product.value.status
     state.track_inventory = product.value.track_inventory
     state.has_variants = product.value.has_variants
@@ -165,7 +162,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
     if (invalidVariants.length > 0) {
       toast.add({
         title: 'Алдаа',
-        description: 'Бүх төрлийн нэр болон Түлхий үг оруулна уу',
+        description: 'Бүх төрлийн нэр болон Түлхүүр үг оруулна уу',
         color: 'error'
       })
       return
@@ -187,7 +184,6 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
     const payload: any = {
       name: event.data.name,
       category: state.category,
-      tags: state.tags,
       status: event.data.status,
       track_inventory: event.data.track_inventory,
       has_variants: state.has_variants,
@@ -362,18 +358,8 @@ onMounted(async () => {
               </ProductFormCard>
 
               <!-- Category -->
-               <ProductFormCard title="Ангилал">
+              <ProductFormCard title="Ангилал">
                 <UInput v-model="state.category" placeholder="Эмэгтэй хувцас, Гэр ахуй..." size="lg" />
-              </ProductFormCard>
-
-              <!-- Tags -->
-               <ProductFormCard title="Таг (Таслалаар зааглах)">
-                <UInput
-                  :model-value="state.tags?.join(', ')"
-                  placeholder="шинэ, хямдралтай..."
-                  size="lg"
-                  @update:model-value="state.tags = ($event || '').split(',').map(s => s.trim()).filter(s => s)"
-                />
               </ProductFormCard>
 
               <!-- Product Settings -->

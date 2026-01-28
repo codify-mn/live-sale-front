@@ -1,19 +1,25 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
-import type { Product } from '~/composables/useProducts'
+import type { Product, ImportResult } from '~/composables/useProducts'
 
 useSeoMeta({
   title: 'Бүтээгдэхүүн - Comment Boost'
 })
 
-const { fetchProducts, deleteProduct, fetchCategories } = useProducts()
+const { fetchProducts, deleteProduct, updateProduct, fetchCategories } = useProducts()
 const toast = useToast()
 const router = useRouter()
+
+// Bulk import modal
+const bulkImportModalOpen = ref(false)
 
 const loading = ref(true)
 const products = ref<Product[]>([])
 const total = ref(0)
 const categories = ref<string[]>([])
+
+// Selection state
+const selectedRows = ref<Product[]>([])
 
 const filter = reactive({
   keyword: '',
@@ -40,6 +46,7 @@ const stockOptions = [
 ]
 
 const columns: TableColumn<Product>[] = [
+  { accessorKey: 'select', header: '' },
   { accessorKey: 'name', header: 'Бараа бүтээгдэхүүн' },
   { accessorKey: 'status', header: 'Төлөв' },
   { accessorKey: 'base_price', header: 'Үнийн дүн' },
@@ -68,11 +75,14 @@ const loadProducts = async () => {
     const apiFilter = {
       ...filter,
       status: filter.status === 'all' ? '' : filter.status,
-      category: filter.category === 'all' ? '' : filter.category
+      category: filter.category === 'all' ? '' : filter.category,
+      stock: filter.stock === 'all' ? '' : filter.stock
     }
     const res = await fetchProducts(apiFilter)
     products.value = res.products || []
     total.value = res.total || 0
+    // Clear selection when products reload
+    selectedRows.value = []
   } catch (err: any) {
     toast.add({
       title: 'Алдаа',
@@ -121,6 +131,40 @@ const nextPage = () => {
   if (filter.page < totalPages.value) filter.page++
 }
 
+// Selection helpers
+const isSelected = (product: Product) => {
+  return selectedRows.value.some(p => p.id === product.id)
+}
+
+const toggleSelect = (product: Product) => {
+  const index = selectedRows.value.findIndex(p => p.id === product.id)
+  if (index === -1) {
+    selectedRows.value.push(product)
+  } else {
+    selectedRows.value.splice(index, 1)
+  }
+}
+
+const isAllSelected = computed(() => {
+  return products.value.length > 0 && selectedRows.value.length === products.value.length
+})
+
+const isSomeSelected = computed(() => {
+  return selectedRows.value.length > 0 && selectedRows.value.length < products.value.length
+})
+
+const toggleSelectAll = () => {
+  if (isAllSelected.value) {
+    selectedRows.value = []
+  } else {
+    selectedRows.value = [...products.value]
+  }
+}
+
+const clearSelection = () => {
+  selectedRows.value = []
+}
+
 // Delete modal
 const deleteModalOpen = ref(false)
 const productToDelete = ref<Product | null>(null)
@@ -155,22 +199,119 @@ const confirmDelete = async () => {
   }
 }
 
+// Toggle status
+const toggleStatus = async (product: Product) => {
+  const newStatus = product.status === 'active' ? 'draft' : 'active'
+  try {
+    await updateProduct(product.id, {
+      name: product.name,
+      category: product.category,
+      status: newStatus
+    })
+    toast.add({
+      title: 'Амжилттай',
+      description: `Төлөв ${statusLabels[newStatus]} болгож өөрчлөгдлөө`,
+      color: 'success'
+    })
+    await loadProducts()
+  } catch (err: any) {
+    toast.add({
+      title: 'Алдаа',
+      description: err.data?.message || 'Төлөв өөрчлөхөд алдаа гарлаа',
+      color: 'error'
+    })
+  }
+}
+
+// Bulk actions
+const bulkActionLoading = ref(false)
+
+const bulkSetStatus = async (status: 'active' | 'draft' | 'archived') => {
+  if (selectedRows.value.length === 0) return
+
+  bulkActionLoading.value = true
+  try {
+    await Promise.all(
+      selectedRows.value.map(product => updateProduct(product.id, {
+        name: product.name,
+        category: product.category,
+        status
+      }))
+    )
+    toast.add({
+      title: 'Амжилттай',
+      description: `${selectedRows.value.length} бүтээгдэхүүний төлөв ${statusLabels[status]} болгож өөрчлөгдлөө`,
+      color: 'success'
+    })
+    await loadProducts()
+  } catch (err: any) {
+    toast.add({
+      title: 'Алдаа',
+      description: err.data?.message || 'Төлөв өөрчлөхөд алдаа гарлаа',
+      color: 'error'
+    })
+  } finally {
+    bulkActionLoading.value = false
+  }
+}
+
+// Bulk delete modal
+const bulkDeleteModalOpen = ref(false)
+
+const confirmBulkDelete = async () => {
+  if (selectedRows.value.length === 0) return
+
+  bulkActionLoading.value = true
+  try {
+    await Promise.all(
+      selectedRows.value.map(product => deleteProduct(product.id))
+    )
+    toast.add({
+      title: 'Амжилттай',
+      description: `${selectedRows.value.length} бүтээгдэхүүн устгагдлаа`,
+      color: 'success'
+    })
+    bulkDeleteModalOpen.value = false
+    await loadProducts()
+  } catch (err: any) {
+    toast.add({
+      title: 'Алдаа',
+      description: err.data?.message || 'Устгахад алдаа гарлаа',
+      color: 'error'
+    })
+  } finally {
+    bulkActionLoading.value = false
+  }
+}
+
+// Bulk import handlers
+const onImportSuccess = (_result: ImportResult) => {
+  bulkImportModalOpen.value = false
+  loadProducts()
+}
+
+// Row click handler
+const onRowClick = (product: Product) => {
+  router.push(`/dashboard/products/${product.id}`)
+}
+
 // Action menu items
 const getActionItems = (product: Product) => [
   [{
-    label: 'Харах',
-    icon: 'i-lucide-eye',
-    click: () => router.push(`/dashboard/products/${product.id}`)
-  }, {
     label: 'Засах',
     icon: 'i-lucide-pencil',
-    click: () => router.push(`/dashboard/products/${product.id}`)
+    onSelect: () => router.push(`/dashboard/products/${product.id}`)
+  },
+  {
+    label: product.status === 'active' ? 'Ноорог болгох' : 'Идэвхжүүлэх',
+    icon: product.status === 'active' ? 'i-lucide-archive' : 'i-lucide-check-circle',
+    onSelect: () => toggleStatus(product)
   }],
   [{
     label: 'Устгах',
     icon: 'i-lucide-trash-2',
     color: 'error' as const,
-    click: () => openDeleteModal(product)
+    onSelect: () => openDeleteModal(product)
   }]
 ]
 
@@ -202,7 +343,12 @@ onMounted(() => {
           </p>
         </div>
         <div class="flex items-center gap-3">
-          <UButton color="neutral" variant="outline" icon="i-lucide-file-spreadsheet">
+          <UButton
+            color="neutral"
+            variant="outline"
+            icon="i-lucide-file-spreadsheet"
+            @click="bulkImportModalOpen = true"
+          >
             Excel-с оруулах
           </UButton>
           <UButton to="/dashboard/products/new" color="primary" icon="i-lucide-plus">
@@ -212,44 +358,140 @@ onMounted(() => {
       </div>
     </div>
 
+    <!-- Bulk Actions Bar -->
+    <Transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="opacity-0 -translate-y-2"
+      enter-to-class="opacity-100 translate-y-0"
+      leave-active-class="transition duration-150 ease-in"
+      leave-from-class="opacity-100 translate-y-0"
+      leave-to-class="opacity-0 -translate-y-2"
+    >
+      <div
+        v-if="selectedRows.length > 0"
+        class="px-6 py-3 bg-primary-50 dark:bg-primary-900/20 border-b border-primary-200 dark:border-primary-800 flex items-center justify-between"
+      >
+        <div class="flex items-center gap-3">
+          <span class="text-sm font-medium text-primary-700 dark:text-primary-300">
+            {{ selectedRows.length }} бүтээгдэхүүн сонгогдсон
+          </span>
+          <UButton
+            size="xs"
+            variant="ghost"
+            color="primary"
+            @click="clearSelection"
+          >
+            Цуцлах
+          </UButton>
+        </div>
+        <div class="flex items-center gap-2">
+          <UButton
+            size="sm"
+            color="neutral"
+            variant="outline"
+            icon="i-lucide-check-circle"
+            :loading="bulkActionLoading"
+            @click="bulkSetStatus('active')"
+          >
+            Идэвхжүүлэх
+          </UButton>
+          <UButton
+            size="sm"
+            color="neutral"
+            variant="outline"
+            icon="i-lucide-archive"
+            :loading="bulkActionLoading"
+            @click="bulkSetStatus('draft')"
+          >
+            Ноорог болгох
+          </UButton>
+          <UButton
+            size="sm"
+            color="error"
+            variant="outline"
+            icon="i-lucide-trash-2"
+            :loading="bulkActionLoading"
+            @click="bulkDeleteModalOpen = true"
+          >
+            Устгах
+          </UButton>
+        </div>
+      </div>
+    </Transition>
+
     <!-- Filters -->
     <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
       <div class="flex items-center justify-between gap-4">
-        <UInput v-model="filter.keyword" placeholder="Бараа нэрээр хайх..." icon="i-lucide-search" class="w-80" />
+        <UInput
+          v-model="filter.keyword"
+          placeholder="Бараа нэрээр хайх..."
+          icon="i-lucide-search"
+          class="w-80"
+        />
 
         <div class="flex items-center gap-2">
           <USelect v-model="filter.stock" :items="stockOptions" class="w-36" />
           <USelect v-model="filter.status" :items="statusOptions" class="w-32" />
-          <USelect v-model="filter.category"
+          <USelect
+            v-model="filter.category"
             :items="[{ label: 'Бүх ангилал', value: 'all' }, ...categories.map(c => ({ label: c, value: c }))]"
-            class="w-36" />
-          <UButton color="neutral" variant="outline" icon="i-lucide-sliders-horizontal">
-            Бусад
-          </UButton>
+            class="w-36"
+          />
         </div>
       </div>
     </div>
 
     <!-- Table -->
     <div class="flex-1 overflow-auto">
-      <UTable :data="products" :columns="columns" :loading="loading" class="w-full" :ui="{
-        thead: 'bg-gray-50 dark:bg-gray-900/50',
-        th: 'text-left px-4 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider',
-        td: 'px-4 py-3',
-        tbody: 'divide-y divide-gray-100 dark:divide-gray-800'
-      }">
+      <UTable
+        :data="products"
+        :columns="columns"
+        :loading="loading"
+        class="w-full"
+        :ui="{
+          thead: 'bg-gray-50 dark:bg-gray-900/50',
+          th: 'text-left px-4 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider',
+          td: 'px-4 py-3',
+          tbody: 'divide-y divide-gray-100 dark:divide-gray-800',
+          tr: 'hover:bg-gray-50 dark:hover:bg-gray-800/50'
+        }"
+      >
+        <template #select-header>
+          <UCheckbox
+            :model-value="isAllSelected"
+            :indeterminate="isSomeSelected"
+            @update:model-value="toggleSelectAll"
+          />
+        </template>
+
+        <template #select-cell="{ row }">
+          <div @click.stop>
+            <UCheckbox
+              :model-value="isSelected(row.original)"
+              @update:model-value="toggleSelect(row.original)"
+            />
+          </div>
+        </template>
+
         <template #name-cell="{ row }">
-          <div class="flex items-center gap-3">
+          <div
+            class="flex items-center gap-3 cursor-pointer"
+            @click="onRowClick(row.original)"
+          >
             <div
-              class="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden shrink-0">
-              <img v-if="row.original.variants?.[0]?.images?.length" :src="row.original.variants[0].images[0]" :alt="row.original.name"
-                class="w-full h-full object-cover">
+              class="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden shrink-0"
+            >
+              <img
+                v-if="row.original.variants?.[0]?.images?.length"
+                :src="row.original.variants[0].images[0]"
+                :alt="row.original.name"
+                class="w-full h-full object-cover"
+              >
               <UIcon v-else name="i-lucide-package" class="w-5 h-5 text-gray-400" />
             </div>
-            <NuxtLink :to="`/dashboard/products/${row.original.id}`"
-              class="font-medium text-gray-900 dark:text-white hover:text-primary-500">
+            <span class="font-medium text-gray-900 dark:text-white">
               {{ row.original.name }}
-            </NuxtLink>
+            </span>
           </div>
         </template>
 
@@ -278,11 +520,14 @@ onMounted(() => {
         </template>
 
         <template #actions-cell="{ row }">
-          <div class="flex items-center justify-end gap-1">
-            <UButton :to="`/dashboard/products/${row.original.id}`" icon="i-lucide-eye" color="neutral" variant="ghost"
-              size="md" />
+          <div class="flex items-center justify-end gap-1" @click.stop>
             <UDropdownMenu :items="getActionItems(row.original)">
-              <UButton icon="i-lucide-more-horizontal" color="neutral" variant="ghost" size="md" />
+              <UButton
+                icon="i-lucide-more-horizontal"
+                color="neutral"
+                variant="ghost"
+                size="md"
+              />
             </UDropdownMenu>
           </div>
         </template>
@@ -290,7 +535,8 @@ onMounted(() => {
         <template #empty>
           <div class="flex flex-col items-center justify-center py-20 text-center">
             <div
-              class="w-20 h-20 rounded-full bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center mb-6">
+              class="w-20 h-20 rounded-full bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center mb-6"
+            >
               <UIcon name="i-lucide-package" class="w-10 h-10 text-primary-500" />
             </div>
             <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
@@ -308,16 +554,28 @@ onMounted(() => {
     </div>
 
     <!-- Pagination -->
-    <div v-if="total > 0"
-      class="px-6 py-4 border-t border-gray-200 dark:border-gray-800 flex items-center justify-between">
+    <div
+      v-if="total > 0"
+      class="px-6 py-4 border-t border-gray-200 dark:border-gray-800 flex items-center justify-between"
+    >
       <p class="text-sm text-gray-500 dark:text-gray-400">
         {{ startItem }}-с {{ endItem }} хүртэл. Нийт: {{ total }}
       </p>
       <div class="flex items-center gap-2">
-        <UButton color="neutral" variant="outline" :disabled="filter.page <= 1" @click="prevPage">
+        <UButton
+          color="neutral"
+          variant="outline"
+          :disabled="filter.page <= 1"
+          @click="prevPage"
+        >
           Өмнөх
         </UButton>
-        <UButton color="neutral" variant="outline" :disabled="filter.page >= totalPages" @click="nextPage">
+        <UButton
+          color="neutral"
+          variant="outline"
+          :disabled="filter.page >= totalPages"
+          @click="nextPage"
+        >
           Дараах
         </UButton>
       </div>
@@ -354,5 +612,43 @@ onMounted(() => {
         </UCard>
       </template>
     </UModal>
+
+    <!-- Bulk Delete Modal -->
+    <UModal v-model:open="bulkDeleteModalOpen">
+      <template #content>
+        <UCard>
+          <template #header>
+            <div class="flex items-center gap-2">
+              <UIcon name="i-lucide-alert-triangle" class="text-red-500" />
+              <span class="font-semibold">Олноор устгах</span>
+            </div>
+          </template>
+
+          <p>
+            <strong>{{ selectedRows.length }}</strong> бүтээгдэхүүнийг устгахдаа итгэлтэй байна уу?
+          </p>
+          <p class="text-sm text-gray-500 mt-2">
+            Энэ үйлдлийг буцаах боломжгүй.
+          </p>
+
+          <template #footer>
+            <div class="flex justify-end gap-2">
+              <UButton color="neutral" variant="outline" @click="bulkDeleteModalOpen = false">
+                Болих
+              </UButton>
+              <UButton color="error" :loading="bulkActionLoading" @click="confirmBulkDelete">
+                Устгах
+              </UButton>
+            </div>
+          </template>
+        </UCard>
+      </template>
+    </UModal>
+
+    <!-- Bulk Import Modal -->
+    <ProductBulkImportModal
+      v-model:open="bulkImportModalOpen"
+      @success="onImportSuccess"
+    />
   </div>
 </template>

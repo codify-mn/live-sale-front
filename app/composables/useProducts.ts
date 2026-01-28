@@ -41,6 +41,7 @@ export interface ProductFilter {
   keyword?: string
   category?: string
   status?: string
+  stock?: string
   page?: number
   size?: number
 }
@@ -86,6 +87,20 @@ export interface UpdateVariantInput {
   low_stock_alert?: number
 }
 
+export interface ImportError {
+  row: number
+  column: string
+  message: string
+}
+
+export interface ImportResult {
+  success: boolean
+  created: number
+  updated: number
+  skipped: number
+  errors: ImportError[]
+}
+
 export function useProducts() {
   const config = useRuntimeConfig()
   const apiUrl = config.public.apiUrl
@@ -95,6 +110,7 @@ export function useProducts() {
     if (filter.keyword) params.set('keyword', filter.keyword)
     if (filter.category) params.set('category', filter.category)
     if (filter.status) params.set('status', filter.status)
+    if (filter.stock) params.set('stock', filter.stock)
     if (filter.page) params.set('page', filter.page.toString())
     if (filter.size) params.set('size', filter.size.toString())
 
@@ -136,9 +152,10 @@ export function useProducts() {
   }
 
   const fetchCategories = async (): Promise<string[]> => {
-    return await $fetch<string[]>(`${apiUrl}/api/products/categories`, {
+    const res = await $fetch<{ categories: string[] }>(`${apiUrl}/api/products/categories`, {
       credentials: 'include'
     })
+    return res.categories || []
   }
 
   const createVariant = async (productId: number, data: CreateVariantInput): Promise<ProductVariant> => {
@@ -172,6 +189,42 @@ export function useProducts() {
     })
   }
 
+  const downloadImportTemplate = async (): Promise<void> => {
+    const url = `${apiUrl}/api/products/import/template`
+    // Create a temporary link to trigger download
+    const link = document.createElement('a')
+    link.href = url
+    link.setAttribute('download', 'baraa_import_template.xlsx')
+    // For cross-origin requests with credentials, we need to fetch and create blob
+    try {
+      const response = await fetch(url, { credentials: 'include' })
+      const blob = await response.blob()
+      const blobUrl = URL.createObjectURL(blob)
+      link.href = blobUrl
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(blobUrl)
+    } catch {
+      // Fallback: direct link
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
+  }
+
+  const importProducts = async (file: File, defaultStatus: string = 'draft'): Promise<ImportResult> => {
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('default_status', defaultStatus)
+
+    return await $fetch<ImportResult>(`${apiUrl}/api/products/import`, {
+      method: 'POST',
+      credentials: 'include',
+      body: formData
+    })
+  }
+
   return {
     fetchProducts,
     fetchProduct,
@@ -182,6 +235,8 @@ export function useProducts() {
     createVariant,
     updateVariant,
     deleteVariant,
-    updateVariantStock
+    updateVariantStock,
+    downloadImportTemplate,
+    importProducts
   }
 }

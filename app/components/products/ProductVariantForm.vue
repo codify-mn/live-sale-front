@@ -32,13 +32,14 @@ const emit = defineEmits<{
   'duplicate': []
 }>()
 
-const { generateSKU, getSKUError } = useSKU()
-
 // Local state for discount percent (UI-only, not persisted)
 const discountPercent = ref<number | null>(null)
 
 // Show/hide detailed info (barcode, low stock alert)
 const showDetails = ref(false)
+
+// Track if keyword has been manually edited
+const keywordDirty = ref(false)
 
 const updateField = <K extends keyof VariantData>(
   field: K,
@@ -47,16 +48,41 @@ const updateField = <K extends keyof VariantData>(
   emit('update:modelValue', { ...props.modelValue, [field]: value })
 }
 
-// Generate Keyword from product + variant name (optional helper)
-const handleGenerateKeyword = () => {
-  // Simple default: Name
-  updateField('keyword', props.modelValue.name)
+// Generate keyword from product name + variant name
+const generateKeyword = (variantName: string) => {
+  const parts = [props.productName, variantName].filter(Boolean)
+  return parts.join('-').toLowerCase()
 }
 
-// SKU validation
-const skuError = computed(() => {
-  if (!props.modelValue.sku) return undefined
-  return getSKUError(props.modelValue.sku) || undefined
+// Handle name input - auto-update keyword if not dirty
+const handleNameInput = (value: string) => {
+  if (!keywordDirty.value) {
+    // Update both name and keyword together
+    emit('update:modelValue', { ...props.modelValue, name: value, keyword: generateKeyword(value) })
+  } else {
+    updateField('name', value)
+  }
+}
+
+// Handle keyword input - marks as dirty when user types
+const handleKeywordInput = (value: string) => {
+  keywordDirty.value = true
+  updateField('keyword', value)
+}
+
+// Auto-update keyword when productName changes (if not dirty)
+watch(() => props.productName, () => {
+  if (!keywordDirty.value && props.modelValue.name) {
+    updateField('keyword', generateKeyword(props.modelValue.name))
+  }
+})
+
+// Initialize dirty state on mount (if keyword already has value different from expected)
+onMounted(() => {
+  const expectedKeyword = generateKeyword(props.modelValue.name)
+  if (props.modelValue.keyword && props.modelValue.keyword !== expectedKeyword) {
+    keywordDirty.value = true
+  }
 })
 
 // Calculate discount percentage when sale price changes
@@ -128,40 +154,24 @@ onMounted(() => {
         />
       </div>
 
-      <!-- Name & Keyword -->
-      <div class="grid grid-cols-2 gap-4">
+      <!-- Name, Keyword & Stock -->
+      <div class="grid grid-cols-3 gap-4">
         <UFormField label="Төрлийн нэр" required>
           <UInput
             :model-value="modelValue.name"
             placeholder="Улаан / XL"
-            @update:model-value="updateField('name', $event)"
+            @update:model-value="handleNameInput($event)"
           />
         </UFormField>
 
-        <UFormField label="Түлхий үг" required help="Комментоос энэ үгээр барааг танина">
-          <div class="flex gap-2">
-            <UInput
-              :model-value="modelValue.keyword"
-              placeholder="улаан"
-              class="flex-1"
-              @update:model-value="updateField('keyword', $event)"
-            />
-             <UButton
-              type="button"
-              color="neutral"
-              variant="outline"
-              size="sm"
-              icon="i-lucide-wand-2"
-              @click="handleGenerateKeyword"
-            >
-              Үүсгэх
-            </UButton>
-          </div>
+        <UFormField label="Түлхүүр үг" required help="Комментоос энэ үгээр барааг танина">
+          <UInput
+            :model-value="modelValue.keyword"
+            placeholder="улаан"
+            @update:model-value="handleKeywordInput($event)"
+          />
         </UFormField>
-      </div>
 
-      <!-- Stock & Base Price -->
-      <div class="grid grid-cols-2 gap-4">
         <UFormField label="Үлдэгдэл" required>
           <UInput
             :model-value="modelValue.stock_quantity"
@@ -174,7 +184,10 @@ onMounted(() => {
             </template>
           </UInput>
         </UFormField>
+      </div>
 
+      <!-- Base Price, Sale Price & Discount -->
+      <div class="grid grid-cols-3 gap-4">
         <UFormField label="Үндсэн үнэ">
           <UInput
             :model-value="modelValue.price"
@@ -187,6 +200,33 @@ onMounted(() => {
             </template>
           </UInput>
         </UFormField>
+
+        <UFormField label="Хямдарсан үнэ">
+          <UInput
+            :model-value="modelValue.sale_price"
+            type="number"
+            placeholder="0"
+            @update:model-value="updateField('sale_price', $event ? Number($event) : null)"
+          >
+            <template #leading>
+              <span class="text-gray-400">₮</span>
+            </template>
+          </UInput>
+        </UFormField>
+
+        <UFormField label="Хямдралын хувь">
+          <UInput
+            v-model.number="discountPercent"
+            type="number"
+            placeholder="0"
+            :min="0"
+            :max="99"
+          >
+            <template #leading>
+              <span class="text-gray-400">%</span>
+            </template>
+          </UInput>
+        </UFormField>
       </div>
 
       <!-- Details Toggle -->
@@ -195,8 +235,8 @@ onMounted(() => {
         <span class="text-sm text-gray-600 dark:text-gray-400 font-medium">Дэлгэрэнгүй тохиргоо</span>
       </div>
 
-      <!-- Barcode & Low Stock Alert (shown when details enabled) -->
-      <div v-if="showDetails" class="grid grid-cols-2 gap-4">
+      <!-- Barcode, SKU & Low Stock Alert (shown when details enabled) -->
+      <div v-if="showDetails" class="grid grid-cols-3 gap-4">
         <UFormField label="Баркод">
           <UInput
             :model-value="modelValue.barcode"
@@ -227,33 +267,20 @@ onMounted(() => {
             </template>
           </UInput>
         </UFormField>
-        <UFormField label="Хямдарсан үнэ">
-          <UInput
-            :model-value="modelValue.sale_price"
-            type="number"
-            placeholder="0"
-            @update:model-value="updateField('sale_price', $event ? Number($event) : null)"
-          >
-            <template #leading>
-              <span class="text-gray-400">₮</span>
-            </template>
-          </UInput>
-        </UFormField>
-
-        <UFormField label="Хямдралын хувь">
-          <UInput
-            v-model.number="discountPercent"
-            type="number"
-            placeholder="0"
-            :min="0"
-            :max="99"
-          >
-            <template #leading>
-              <span class="text-gray-400">%</span>
-            </template>
-          </UInput>
-        </UFormField>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Hide number input arrows/spinners */
+:deep(input[type="number"])::-webkit-outer-spin-button,
+:deep(input[type="number"])::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+:deep(input[type="number"]) {
+  -moz-appearance: textfield;
+}
+</style>

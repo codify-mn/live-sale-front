@@ -7,7 +7,7 @@ useSeoMeta({
   title: 'Бараа нэмэх - Comment Boost'
 })
 
-const { createProduct, createVariant } = useProducts()
+const { createProduct } = useProducts()
 const toast = useToast()
 const router = useRouter()
 
@@ -16,9 +16,8 @@ const images = ref<string[]>([])
 const variants = ref<VariantData[]>([])
 
 const schema = z.object({
-  name: z.string().min(1, 'Нэр оруулна уу'),
+  name: z.string().min(1, 'Нэр оруулна у|'),
   category: z.string().optional(),
-  tags: z.array(z.string()).optional(),
   base_price: z.number().optional(),
   sale_price: z.number().optional().nullable(),
   status: z.string().default('active'),
@@ -34,7 +33,6 @@ type Schema = z.infer<typeof schema>
 const state = reactive<Schema>({
   name: '',
   category: '',
-  tags: [],
   base_price: 0,
   sale_price: null,
   status: 'active',
@@ -76,7 +74,7 @@ const duplicateVariant = (index: number) => {
   delete copy.id
   if (copy.sku) copy.sku = `${copy.sku}-COPY`
   if (copy.barcode) copy.barcode = `${copy.barcode}-COPY`
-  
+
   variants.value.splice(index + 1, 0, copy)
 }
 
@@ -97,7 +95,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
     if (invalidVariants.length > 0) {
       toast.add({
         title: 'Алдаа',
-        description: 'Бүх төрлийн нэр болон Түлхий үг оруулна уу',
+        description: 'Бүх төрлийн нэр болон Түлхүүр үг оруулна уу',
         color: 'error'
       })
       return
@@ -111,7 +109,6 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
     const product = await createProduct({
       name: event.data.name,
       category: state.category,
-      tags: state.tags,
       base_price: event.data.base_price || 0,
       sale_price: event.data.sale_price,
       status: event.data.status,
@@ -250,18 +247,8 @@ onMounted(() => {
               </ProductFormCard>
 
               <!-- Category -->
-               <ProductFormCard title="Ангилал">
+              <ProductFormCard title="Ангилал">
                 <UInput v-model="state.category" placeholder="Эмэгтэй хувцас, Гэр ахуй..." size="lg" />
-              </ProductFormCard>
-
-              <!-- Tags -->
-               <ProductFormCard title="Таг (Таслалаар зааглах)">
-                <UInput
-                  :model-value="state.tags?.join(', ')"
-                  placeholder="шинэ, хямдралтай..."
-                  size="lg"
-                  @update:model-value="state.tags = ($event || '').split(',').map(s => s.trim()).filter(s => s)"
-                />
               </ProductFormCard>
 
               <!-- Product Settings -->
