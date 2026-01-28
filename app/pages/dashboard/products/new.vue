@@ -17,10 +17,15 @@ const variants = ref<VariantData[]>([])
 
 const schema = z.object({
   name: z.string().min(1, 'Нэр оруулна уу'),
+  category: z.string().optional(),
+  tags: z.array(z.string()).optional(),
+  base_price: z.number().optional(),
+  sale_price: z.number().optional().nullable(),
   status: z.string().default('active'),
   track_inventory: z.boolean().default(true),
   has_variants: z.boolean().default(false),
-  sku: z.string().optional(),
+  sku: z.string().optional().nullable(),
+  keyword: z.string().optional(),
   stock_quantity: z.number().optional()
 })
 
@@ -28,6 +33,10 @@ type Schema = z.infer<typeof schema>
 
 const state = reactive<Schema>({
   name: '',
+  category: '',
+  tags: [],
+  base_price: 0,
+  sale_price: null,
   status: 'active',
   track_inventory: true,
   has_variants: false,
@@ -38,10 +47,11 @@ const state = reactive<Schema>({
 // Variant management
 const createEmptyVariant = (): VariantData => ({
   name: '',
+  keyword: '',
   sku: '',
   barcode: null,
   stock_quantity: 0,
-  price: null,
+  price: state.base_price || 0,
   sale_price: null,
   low_stock_alert: 5,
   images: []
@@ -59,6 +69,17 @@ const removeVariant = (index: number) => {
   }
 }
 
+const duplicateVariant = (index: number) => {
+  const original = variants.value[index]
+  const copy = JSON.parse(JSON.stringify(original))
+  // Clear ID and unique fields
+  delete copy.id
+  if (copy.sku) copy.sku = `${copy.sku}-COPY`
+  if (copy.barcode) copy.barcode = `${copy.barcode}-COPY`
+  
+  variants.value.splice(index + 1, 0, copy)
+}
+
 const handleVariantUpdate = (index: number, data: VariantData) => {
   variants.value[index] = data
 }
@@ -72,11 +93,11 @@ const statusOptions = [
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   // Validate variants if has_variants is true
   if (state.has_variants && variants.value.length > 0) {
-    const invalidVariants = variants.value.filter(v => !v.name || !v.sku)
+    const invalidVariants = variants.value.filter(v => !v.name || !v.keyword)
     if (invalidVariants.length > 0) {
       toast.add({
         title: 'Алдаа',
-        description: 'Бүх төрлийн нэр болон SKU оруулна уу',
+        description: 'Бүх төрлийн нэр болон Түлхий үг оруулна уу',
         color: 'error'
       })
       return
@@ -86,33 +107,19 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   loading.value = true
 
   try {
-    // 1. Create the product
+    // 1. Create the product with all its variants in one request
     const product = await createProduct({
       name: event.data.name,
-      description: event.data.description,
-      base_price: event.data.base_price,
+      category: state.category,
+      tags: state.tags,
+      base_price: event.data.base_price || 0,
       sale_price: event.data.sale_price,
       status: event.data.status,
       track_inventory: event.data.track_inventory,
       has_variants: state.has_variants,
-      images: images.value
+      images: images.value,
+      variants: variants.value
     })
-
-    // 2. Create variants if any
-    if (state.has_variants && variants.value.length > 0) {
-      for (const variant of variants.value) {
-        await createVariant(product.id, {
-          name: variant.name,
-          sku: variant.sku,
-          barcode: variant.barcode,
-          stock_quantity: variant.stock_quantity,
-          price: variant.price,
-          sale_price: variant.sale_price,
-          low_stock_alert: variant.low_stock_alert,
-          images: variant.images
-        })
-      }
-    }
 
     toast.add({
       title: 'Амжилттай',
@@ -204,9 +211,10 @@ onMounted(() => {
                     :model-value="variant"
                     :index="index"
                     :product-name="state.name"
-                    :can-remove="variants.length > 1"
+                    :can-remove="variants.length > 0"
                     @update:model-value="handleVariantUpdate(index, $event)"
                     @remove="removeVariant(index)"
+                    @duplicate="duplicateVariant(index)"
                   />
                   <div class="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
                     <UButton
@@ -239,6 +247,21 @@ onMounted(() => {
               <!-- Status -->
               <ProductFormCard title="Барааны төлөв" required>
                 <USelect v-model="state.status" :items="statusOptions" size="lg" />
+              </ProductFormCard>
+
+              <!-- Category -->
+               <ProductFormCard title="Ангилал">
+                <UInput v-model="state.category" placeholder="Эмэгтэй хувцас, Гэр ахуй..." size="lg" />
+              </ProductFormCard>
+
+              <!-- Tags -->
+               <ProductFormCard title="Таг (Таслалаар зааглах)">
+                <UInput
+                  :model-value="state.tags?.join(', ')"
+                  placeholder="шинэ, хямдралтай..."
+                  size="lg"
+                  @update:model-value="state.tags = ($event || '').split(',').map(s => s.trim()).filter(s => s)"
+                />
               </ProductFormCard>
 
               <!-- Product Settings -->

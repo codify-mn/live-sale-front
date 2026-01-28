@@ -2,18 +2,13 @@ export interface Product {
   id: number
   shop_id: number
   name: string
-  description: string
   status: 'draft' | 'active' | 'out_of_stock' | 'archived'
-  base_price: number
-  sale_price: number | null
-  images: string[]
   category: string
   tags: string[]
   track_inventory: boolean
   has_variants: boolean
   search_keywords: string
   variants: ProductVariant[]
-  inventory: Inventory | null
   created_at: string
   updated_at: string
 }
@@ -22,27 +17,20 @@ export interface ProductVariant {
   id: number
   product_id: number
   shop_id: number
-  sku: string             // Required - used for live selling SKU matching
+  keyword: string         // Required for comment identification
+  sku?: string            // Optional
   barcode: string | null
   name: string
   options: Record<string, string>
-  price: number | null    // Base price override for this variant
-  sale_price: number | null // Discounted price for this variant
+  price: number           // Required for all variants now
+  sale_price: number | null
   images: string[]        // Variant-specific images
   stock_quantity: number
   low_stock_alert: number
   is_active: boolean
+  is_main: boolean        // Marks the main variant for listing
 }
 
-export interface Inventory {
-  id: number
-  product_id: number
-  shop_id: number
-  sku: string
-  barcode: string
-  stock_quantity: number
-  low_stock_alert: number
-}
 
 export interface ProductsResponse {
   products: Product[]
@@ -62,17 +50,20 @@ export interface CreateProductInput {
   description?: string
   base_price: number
   sale_price?: number | null
-  category?: string
   images?: string[]
+  category?: string
   tags?: string[]
   track_inventory?: boolean
   has_variants?: boolean
   status?: string
+  variants?: CreateVariantInput[]
 }
 
 export interface CreateVariantInput {
+  id?: number             // Required for updates
   name: string
-  sku: string             // Required for live selling
+  keyword: string
+  sku?: string            // Optional
   barcode?: string | null
   options?: Record<string, string>
   price?: number | null
@@ -80,10 +71,12 @@ export interface CreateVariantInput {
   images?: string[]
   stock_quantity: number
   low_stock_alert?: number
+  is_main?: boolean       // Marks the main variant
 }
 
 export interface UpdateVariantInput {
   name?: string
+  keyword?: string
   sku?: string
   barcode?: string | null
   price?: number | null
@@ -179,14 +172,6 @@ export function useProducts() {
     })
   }
 
-  const updateInventory = async (productId: number, data: Partial<Inventory>): Promise<Inventory> => {
-    return await $fetch<Inventory>(`${apiUrl}/api/products/${productId}/inventory`, {
-      method: 'PUT',
-      credentials: 'include',
-      body: data
-    })
-  }
-
   return {
     fetchProducts,
     fetchProduct,
@@ -197,7 +182,6 @@ export function useProducts() {
     createVariant,
     updateVariant,
     deleteVariant,
-    updateVariantStock,
-    updateInventory
+    updateVariantStock
   }
 }

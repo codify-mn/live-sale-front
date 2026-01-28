@@ -4,7 +4,8 @@ import { calculateDiscountPercent, calculateSalePrice } from '~/utils'
 export interface VariantData {
   id?: number
   name: string
-  sku: string // Required for live selling
+  keyword: string // Required for comment identification
+  sku?: string // Optional now
   barcode: string | null
   stock_quantity: number
   price: number | null // Override base price
@@ -28,6 +29,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   'update:modelValue': [value: VariantData]
   'remove': []
+  'duplicate': []
 }>()
 
 const { generateSKU, getSKUError } = useSKU()
@@ -45,10 +47,10 @@ const updateField = <K extends keyof VariantData>(
   emit('update:modelValue', { ...props.modelValue, [field]: value })
 }
 
-// Generate SKU from product + variant name
-const handleGenerateSKU = () => {
-  const sku = generateSKU(props.productName || 'PRODUCT', props.modelValue.name)
-  updateField('sku', sku)
+// Generate Keyword from product + variant name (optional helper)
+const handleGenerateKeyword = () => {
+  // Simple default: Name
+  updateField('keyword', props.modelValue.name)
 }
 
 // SKU validation
@@ -89,18 +91,29 @@ onMounted(() => {
     class="p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800/50"
   >
     <!-- Header -->
-    <div class="flex items-center justify-between mb-4">
-      <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">
+    <div class="flex items-center justify-between mb-4 pb-3 border-b border-gray-100 dark:border-gray-800">
+      <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
+        <UIcon name="i-lucide-layers" class="w-4 h-4 text-primary" />
         Төрөл #{{ index + 1 }}
       </h4>
-      <UButton
-        v-if="canRemove"
-        color="error"
-        variant="ghost"
-        size="xs"
-        icon="i-lucide-trash-2"
-        @click="emit('remove')"
-      />
+      <div class="flex items-center gap-1">
+        <UButton
+          color="primary"
+          variant="ghost"
+          size="xs"
+          icon="i-lucide-copy"
+          label="Хувилах"
+          @click="emit('duplicate')"
+        />
+        <UButton
+          v-if="canRemove"
+          color="error"
+          variant="ghost"
+          size="xs"
+          icon="i-lucide-trash-2"
+          @click="emit('remove')"
+        />
+      </div>
     </div>
 
     <div class="space-y-4">
@@ -115,7 +128,7 @@ onMounted(() => {
         />
       </div>
 
-      <!-- Name & SKU (SKU is always visible for live selling) -->
+      <!-- Name & Keyword -->
       <div class="grid grid-cols-2 gap-4">
         <UFormField label="Төрлийн нэр" required>
           <UInput
@@ -125,22 +138,21 @@ onMounted(() => {
           />
         </UFormField>
 
-        <UFormField label="SKU" required :error="skuError">
+        <UFormField label="Түлхий үг" required help="Комментоос энэ үгээр барааг танина">
           <div class="flex gap-2">
             <UInput
-              :model-value="modelValue.sku"
-              placeholder="SKU-001"
-              class="flex-1 font-mono uppercase"
-              :ui="{ base: 'uppercase' }"
-              @update:model-value="updateField('sku', ($event || '').toUpperCase())"
+              :model-value="modelValue.keyword"
+              placeholder="улаан"
+              class="flex-1"
+              @update:model-value="updateField('keyword', $event)"
             />
-            <UButton
+             <UButton
               type="button"
               color="neutral"
               variant="outline"
               size="sm"
               icon="i-lucide-wand-2"
-              @click="handleGenerateSKU"
+              @click="handleGenerateKeyword"
             >
               Үүсгэх
             </UButton>
@@ -177,12 +189,10 @@ onMounted(() => {
         </UFormField>
       </div>
 
-      <!-- Sale Price & Discount Percent -->
-
       <!-- Details Toggle -->
       <div class="flex items-center gap-3 pt-2 border-t border-gray-200 dark:border-gray-700">
         <USwitch v-model="showDetails" size="sm" />
-        <span class="text-sm text-gray-600 dark:text-gray-400">Дэлгэрэнгүй</span>
+        <span class="text-sm text-gray-600 dark:text-gray-400 font-medium">Дэлгэрэнгүй тохиргоо</span>
       </div>
 
       <!-- Barcode & Low Stock Alert (shown when details enabled) -->
@@ -192,6 +202,16 @@ onMounted(() => {
             :model-value="modelValue.barcode"
             placeholder="1234567890123"
             @update:model-value="updateField('barcode', $event || null)"
+          />
+        </UFormField>
+
+        <UFormField label="SKU">
+          <UInput
+            :model-value="modelValue.sku"
+            placeholder="SKU-001"
+            class="font-mono uppercase"
+            :ui="{ base: 'uppercase' }"
+            @update:model-value="updateField('sku', ($event || '').toUpperCase())"
           />
         </UFormField>
 
