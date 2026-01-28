@@ -14,9 +14,6 @@ const duration = ref('00:00:00')
 let timerInterval: NodeJS.Timeout | null = null
 let startTime: number | null = null
 
-const formattedRevenue = computed(() => {
-    return new Intl.NumberFormat('mn-MN', { style: 'currency', currency: 'MNT' }).format(revenue.value)
-})
 
 const updateTimer = () => {
     if (!startTime) return
@@ -52,10 +49,8 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-        <DashboardStatCard label="Орлого" :value="formattedRevenue" icon="i-heroicons-banknotes" icon-color="success" />
+    <div class="grid grid-cols-2 gap-4 mt-4 mx-2">
         <DashboardStatCard label="Захиалга" :value="orders" icon="i-heroicons-shopping-bag" icon-color="primary" />
         <DashboardStatCard label="Үзэгч" :value="viewers" icon="i-heroicons-users" icon-color="info" />
-        <DashboardStatCard label="Хугацаа" :value="duration" icon="i-heroicons-clock" icon-color="warning" />
     </div>
 </template>
