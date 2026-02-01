@@ -1,15 +1,24 @@
 <script setup lang="ts">
-const { subscription, usage, loading, daysRemaining, isTrialing, isActive, formatLimit, formatStorage, fetchSubscription, fetchUsage, cancelSubscription } = useSubscription()
+const {
+  subscription,
+  usage,
+  loading,
+  daysRemaining,
+  isTrialing,
+  isActive,
+  formatLimit,
+  formatStorage,
+  fetchSubscription,
+  fetchUsage,
+  cancelSubscription
+} = useSubscription()
 const toast = useToast()
 
 const showCancelModal = ref(false)
 const canceling = ref(false)
 
 onMounted(async () => {
-  await Promise.all([
-    fetchSubscription(),
-    fetchUsage()
-  ])
+  await Promise.all([fetchSubscription(), fetchUsage()])
 })
 
 const statusColor = computed(() => {
@@ -135,11 +144,7 @@ async function handleCancel() {
 
   <template v-else-if="subscription">
     <!-- Current Plan -->
-    <UPageCard
-      title="Одоогийн багц"
-      description="Таны захиалгын мэдээлэл"
-      variant="subtle"
-    >
+    <UPageCard title="Одоогийн багц" description="Таны захиалгын мэдээлэл" variant="subtle">
       <div class="flex flex-col gap-4">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
@@ -147,8 +152,12 @@ async function handleCancel() {
               <UIcon name="i-lucide-crown" class="w-6 h-6 text-primary-600 dark:text-primary-400" />
             </div>
             <div>
-              <h3 class="text-lg font-semibold">{{ subscription.plan?.name }}</h3>
-              <p class="text-sm text-gray-500">{{ subscription.plan?.description }}</p>
+              <h3 class="text-lg font-semibold">
+                {{ subscription.plan?.name }}
+              </h3>
+              <p class="text-sm text-gray-500">
+                {{ subscription.plan?.description }}
+              </p>
             </div>
           </div>
           <UBadge :color="statusColor" variant="subtle">
@@ -161,12 +170,8 @@ async function handleCancel() {
           <span v-if="isTrialing">
             Туршилтын хугацаа дуусах: {{ daysRemaining }} хоног үлдсэн
           </span>
-          <span v-else-if="isActive">
-            Дараагийн төлбөр: {{ daysRemaining }} хоногийн дараа
-          </span>
-          <span v-else>
-            Хугацаа дууссан
-          </span>
+          <span v-else-if="isActive"> Дараагийн төлбөр: {{ daysRemaining }} хоногийн дараа </span>
+          <span v-else> Хугацаа дууссан </span>
         </div>
 
         <div class="flex items-center gap-2 text-sm">
@@ -179,7 +184,11 @@ async function handleCancel() {
         <div class="flex items-center gap-2 text-sm">
           <span class="text-gray-600 dark:text-gray-400">Үнэ:</span>
           <span class="font-semibold text-lg">
-            {{ subscription.billing_cycle === 'monthly' ? subscription.plan?.monthly_price?.toLocaleString() : subscription.plan?.yearly_price?.toLocaleString() }}₮
+            {{
+              subscription.billing_cycle === 'monthly'
+                ? subscription.plan?.monthly_price?.toLocaleString()
+                : subscription.plan?.yearly_price?.toLocaleString()
+            }}₮
             <span class="text-sm font-normal text-gray-500">
               / {{ subscription.billing_cycle === 'monthly' ? 'сар' : 'жил' }}
             </span>
@@ -189,11 +198,7 @@ async function handleCancel() {
 
       <template #footer>
         <div class="flex gap-2">
-          <UButton
-            label="Багц өөрчлөх"
-            color="primary"
-            to="/pricing"
-          />
+          <UButton label="Багц өөрчлөх" color="primary" to="/pricing" />
           <UButton
             v-if="isActive && subscription.plan?.slug !== 'free'"
             label="Цуцлах"
@@ -206,17 +211,9 @@ async function handleCancel() {
     </UPageCard>
 
     <!-- Usage Statistics -->
-    <UPageCard
-      title="Хэрэглээ"
-      description="Таны одоогийн хэрэглээний статистик"
-      variant="subtle"
-    >
+    <UPageCard title="Хэрэглээ" description="Таны одоогийн хэрэглээний статистик" variant="subtle">
       <div class="space-y-4">
-        <div
-          v-for="item in usageItems"
-          :key="item.label"
-          class="flex flex-col gap-2"
-        >
+        <div v-for="item in usageItems" :key="item.label" class="flex flex-col gap-2">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <UIcon :name="item.icon" class="w-4 h-4 text-gray-500" />
@@ -224,10 +221,12 @@ async function handleCancel() {
             </div>
             <span class="text-sm text-gray-600 dark:text-gray-400">
               <template v-if="item.isStorage">
-                {{ formatStorage(item.current) }} / {{ formatStorage(item.max) }}
+                {{ formatStorage(item.current) }} /
+                {{ formatStorage(item.max) }}
               </template>
               <template v-else>
-                {{ item.current.toLocaleString() }} / {{ formatLimit(item.max) }}
+                {{ item.current.toLocaleString() }} /
+                {{ formatLimit(item.max) }}
               </template>
             </span>
           </div>
@@ -241,17 +240,9 @@ async function handleCancel() {
     </UPageCard>
 
     <!-- Features -->
-    <UPageCard
-      title="Боломжууд"
-      description="Таны багцад орсон боломжууд"
-      variant="subtle"
-    >
+    <UPageCard title="Боломжууд" description="Таны багцад орсон боломжууд" variant="subtle">
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div
-          v-for="item in featureItems"
-          :key="item.label"
-          class="flex items-center gap-2"
-        >
+        <div v-for="item in featureItems" :key="item.label" class="flex items-center gap-2">
           <UIcon
             :name="item.enabled ? 'i-lucide-check-circle' : 'i-lucide-x-circle'"
             :class="item.enabled ? 'text-success-500' : 'text-gray-400'"
@@ -281,7 +272,8 @@ async function handleCancel() {
           </template>
 
           <p class="text-gray-600 dark:text-gray-400">
-            Та захиалгаа цуцлахдаа итгэлтэй байна уу? Таны одоогийн хугацааны төгсгөл хүртэл үйлчилгээг ашиглах боломжтой хэвээр байна.
+            Та захиалгаа цуцлахдаа итгэлтэй байна уу? Таны одоогийн хугацааны төгсгөл хүртэл
+            үйлчилгээг ашиглах боломжтой хэвээр байна.
           </p>
 
           <template #footer>
@@ -292,12 +284,7 @@ async function handleCancel() {
                 variant="outline"
                 @click="showCancelModal = false"
               />
-              <UButton
-                label="Цуцлах"
-                color="error"
-                :loading="canceling"
-                @click="handleCancel"
-              />
+              <UButton label="Цуцлах" color="error" :loading="canceling" @click="handleCancel" />
             </div>
           </template>
         </UCard>
@@ -314,14 +301,8 @@ async function handleCancel() {
     >
       <div class="flex flex-col items-center justify-center py-8 gap-4">
         <UIcon name="i-lucide-credit-card" class="w-16 h-16 text-gray-300" />
-        <p class="text-gray-500 text-center">
-          Бүх боломжуудыг ашиглахын тулд багц сонгоно уу.
-        </p>
-        <UButton
-          label="Багц сонгох"
-          color="primary"
-          to="/pricing"
-        />
+        <p class="text-gray-500 text-center">Бүх боломжуудыг ашиглахын тулд багц сонгоно уу.</p>
+        <UButton label="Багц сонгох" color="primary" to="/pricing" />
       </div>
     </UPageCard>
   </template>

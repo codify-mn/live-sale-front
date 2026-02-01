@@ -98,9 +98,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         <USelect v-model="state.timezone" :items="timezones" value-key="value" />
       </UFormField>
 
-      <UButton type="submit" block size="lg" :loading="isSubmitting">
-        Дэлгүүр үүсгэх
-      </UButton>
+      <UButton type="submit" block size="lg" :loading="isSubmitting"> Дэлгүүр үүсгэх </UButton>
     </UForm>
   </UCard>
 </template>

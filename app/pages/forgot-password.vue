@@ -37,12 +37,8 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
     <template #header>
       <div class="text-center">
         <UIcon name="i-lucide-key-round" class="w-12 h-12 text-primary mx-auto mb-4" />
-        <h1 class="text-2xl font-bold">
-          Нууц үг сэргээх
-        </h1>
-        <p class="text-gray-500 dark:text-gray-400 mt-2">
-          Имэйл хаягаа оруулна уу
-        </p>
+        <h1 class="text-2xl font-bold">Нууц үг сэргээх</h1>
+        <p class="text-gray-500 dark:text-gray-400 mt-2">Имэйл хаягаа оруулна уу</p>
       </div>
     </template>
 
@@ -56,20 +52,36 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
         <p class="text-sm text-gray-500">
           Имэйлээ шалгана уу. Spam хавтсыг мөн шалгахаа мартуузай.
         </p>
-        <UButton to="/login" variant="outline" block>
-          Нэвтрэх хуудас руу буцах
-        </UButton>
+        <UButton to="/login" variant="outline" block> Нэвтрэх хуудас руу буцах </UButton>
       </div>
 
       <!-- Form -->
       <template v-else>
         <!-- Error Alert -->
-        <UAlert v-if="authError" color="error" variant="subtle" :title="authError" icon="i-lucide-alert-circle"
-          :close-button="{ icon: 'i-lucide-x', color: 'error', variant: 'link', padded: false }" @close="clearError" />
+        <UAlert
+          v-if="authError"
+          color="error"
+          variant="subtle"
+          :title="authError"
+          icon="i-lucide-alert-circle"
+          :close-button="{
+            icon: 'i-lucide-x',
+            color: 'error',
+            variant: 'link',
+            padded: false
+          }"
+          @close="clearError"
+        />
 
         <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
           <UFormField label="Имэйл" name="email">
-            <UInput v-model="state.email" type="email" placeholder="you@example.com" icon="i-lucide-mail" size="lg" />
+            <UInput
+              v-model="state.email"
+              type="email"
+              placeholder="you@example.com"
+              icon="i-lucide-mail"
+              size="lg"
+            />
           </UFormField>
 
           <UButton type="submit" block size="lg" :loading="isLoading">

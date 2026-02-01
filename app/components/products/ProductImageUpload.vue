@@ -126,8 +126,10 @@ const addImageUrl = () => {
         :key="index"
         class="relative aspect-square rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 group ring-1 ring-gray-200 dark:ring-gray-700"
       >
-        <img :src="img" class="w-full h-full object-cover" alt="">
-        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+        <img :src="img" class="w-full h-full object-cover" alt="" />
+        <div
+          class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+        >
           <button
             type="button"
             class="w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-colors"
@@ -163,11 +165,7 @@ const addImageUrl = () => {
             name="i-lucide-x"
             class="w-4 h-4 text-red-500"
           />
-          <UIcon
-            v-else
-            name="i-lucide-loader-2"
-            class="w-4 h-4 text-gray-500 animate-spin"
-          />
+          <UIcon v-else name="i-lucide-loader-2" class="w-4 h-4 text-gray-500 animate-spin" />
         </div>
         <div class="flex-1 min-w-0">
           <p class="text-sm font-medium truncate">
@@ -204,13 +202,11 @@ const addImageUrl = () => {
         multiple
         class="hidden"
         @change="handleFileSelect"
-      >
+      />
 
       <div v-if="uploading" class="flex flex-col items-center">
         <UIcon name="i-lucide-loader-2" class="w-8 h-8 text-primary-500 animate-spin mb-3" />
-        <p class="text-sm text-gray-500">
-          Зураг оруулж байна...
-        </p>
+        <p class="text-sm text-gray-500">Зураг оруулж байна...</p>
       </div>
 
       <template v-else>
@@ -230,9 +226,7 @@ const addImageUrl = () => {
           </UButton>
         </div>
 
-        <p class="text-xs text-gray-400 mt-4">
-          эсвэл
-        </p>
+        <p class="text-xs text-gray-400 mt-4">эсвэл</p>
 
         <!-- URL Input -->
         <div v-if="showUrlInput" class="mt-3 flex gap-2 max-w-md mx-auto">
@@ -242,13 +236,7 @@ const addImageUrl = () => {
             class="flex-1"
             @keyup.enter="addImageUrl"
           />
-          <UButton
-            type="button"
-            color="primary"
-            @click="addImageUrl"
-          >
-            Нэмэх
-          </UButton>
+          <UButton type="button" color="primary" @click="addImageUrl"> Нэмэх </UButton>
           <UButton
             type="button"
             color="neutral"

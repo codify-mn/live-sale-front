@@ -91,7 +91,7 @@ const statusOptions = [
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   // Validate variants if has_variants is true
   if (state.has_variants && variants.value.length > 0) {
-    const invalidVariants = variants.value.filter(v => !v.name || !v.keyword)
+    const invalidVariants = variants.value.filter((v) => !v.name || !v.keyword)
     if (invalidVariants.length > 0) {
       toast.add({
         title: 'Алдаа',
@@ -156,9 +156,7 @@ onMounted(() => {
 
         <template #title>
           <div>
-            <h1 class="text-lg font-semibold text-gray-900 dark:text-white">
-              Бараа нэмэх
-            </h1>
+            <h1 class="text-lg font-semibold text-gray-900 dark:text-white">Бараа нэмэх</h1>
             <p class="text-sm text-gray-500 dark:text-gray-400">
               Бараа бүтээгдэхүүний мэдээллийг оруулан шинээр нэмэх
             </p>
@@ -181,22 +179,13 @@ onMounted(() => {
 
     <template #body>
       <div class="p-6 overflow-y-auto">
-        <UForm
-          id="product-form"
-          :schema="schema"
-          :state="state"
-          @submit="onSubmit"
-        >
+        <UForm id="product-form" :schema="schema" :state="state" @submit="onSubmit">
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Left Column - Main Form -->
             <div class="lg:col-span-2 space-y-6">
               <!-- Product Title -->
               <ProductFormCard title="Барааны гарчиг" required>
-                <UInput
-                  v-model="state.name"
-                  placeholder="Барааны гарчгийг оруулна уу"
-                  size="lg"
-                />
+                <UInput v-model="state.name" placeholder="Барааны гарчгийг оруулна уу" size="lg" />
               </ProductFormCard>
 
               <!-- Variants Section -->
@@ -213,7 +202,9 @@ onMounted(() => {
                     @remove="removeVariant(index)"
                     @duplicate="duplicateVariant(index)"
                   />
-                  <div class="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <div
+                    class="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700"
+                  >
                     <UButton
                       type="button"
                       color="primary"
@@ -225,7 +216,7 @@ onMounted(() => {
                   </div>
                 </div>
               </ProductFormCard>
-              <div class="flex items-center justify-end  ">
+              <div class="flex items-center justify-end">
                 <UButton
                   type="submit"
                   form="product-form"
@@ -248,7 +239,11 @@ onMounted(() => {
 
               <!-- Category -->
               <ProductFormCard title="Ангилал">
-                <UInput v-model="state.category" placeholder="Эмэгтэй хувцас, Гэр ахуй..." size="lg" />
+                <UInput
+                  v-model="state.category"
+                  placeholder="Эмэгтэй хувцас, Гэр ахуй..."
+                  size="lg"
+                />
               </ProductFormCard>
 
               <!-- Product Settings -->

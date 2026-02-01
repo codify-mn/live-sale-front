@@ -44,9 +44,7 @@ const columns = [
     <template #left>
       <div>
         <AppLogo class="mb-2" />
-        <p class="text-muted text-sm">
-          Live худалдааны ухаалаг платформ
-        </p>
+        <p class="text-muted text-sm">Live худалдааны ухаалаг платформ</p>
       </div>
     </template>
 
@@ -55,16 +53,25 @@ const columns = [
     </template>
 
     <template #right>
-      <UButton to="https://facebook.com" target="_blank" icon="i-simple-icons-facebook" color="neutral"
-        variant="ghost" />
-      <UButton to="https://instagram.com" target="_blank" icon="i-simple-icons-instagram" color="neutral"
-        variant="ghost" />
+      <UButton
+        to="https://facebook.com"
+        target="_blank"
+        icon="i-simple-icons-facebook"
+        color="neutral"
+        variant="ghost"
+      />
+      <UButton
+        to="https://instagram.com"
+        target="_blank"
+        icon="i-simple-icons-instagram"
+        color="neutral"
+        variant="ghost"
+      />
     </template>
 
     <template #bottom>
       <p class="text-muted text-sm">
-        &copy; {{ new Date().getFullYear() }} Comment Boost. Бүх эрх хуулиар
-        хамгаалагдсан.
+        &copy; {{ new Date().getFullYear() }} Comment Boost. Бүх эрх хуулиар хамгаалагдсан.
       </p>
     </template>
   </UFooter>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const stars = ref<{ x: number, y: number, size: number, opacity: number }[]>([])
+const stars = ref<{ x: number; y: number; size: number; opacity: number }[]>([])
 
 onMounted(() => {
   stars.value = Array.from({ length: 100 }, () => ({

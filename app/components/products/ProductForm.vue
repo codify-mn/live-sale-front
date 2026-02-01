@@ -51,61 +51,26 @@ const onSubmit = (event: FormSubmitEvent<Schema>) => {
 </script>
 
 <template>
-  <UForm
-    :schema="schema"
-    :state="state"
-    class="space-y-6"
-    @submit="onSubmit"
-  >
-    <UFormField
-      label="Нэр"
-      name="name"
-      required
-    >
-      <UInput
-        v-model="state.name"
-        placeholder="Бүтээгдэхүүний нэр"
-        autofocus
-      />
+  <UForm :schema="schema" :state="state" class="space-y-6" @submit="onSubmit">
+    <UFormField label="Нэр" name="name" required>
+      <UInput v-model="state.name" placeholder="Бүтээгдэхүүний нэр" autofocus />
     </UFormField>
 
-    <UFormField
-      label="Тайлбар"
-      name="description"
-    >
-      <UTextarea
-        v-model="state.description"
-        placeholder="Бүтээгдэхүүний тайлбар"
-        :rows="3"
-      />
+    <UFormField label="Тайлбар" name="description">
+      <UTextarea v-model="state.description" placeholder="Бүтээгдэхүүний тайлбар" :rows="3" />
     </UFormField>
 
     <div class="grid grid-cols-2 gap-4">
-      <UFormField
-        label="Үндсэн үнэ"
-        name="base_price"
-        required
-      >
-        <UInput
-          v-model.number="state.base_price"
-          type="number"
-          placeholder="0"
-        >
+      <UFormField label="Үндсэн үнэ" name="base_price" required>
+        <UInput v-model.number="state.base_price" type="number" placeholder="0">
           <template #trailing>
             <span class="text-gray-500">₮</span>
           </template>
         </UInput>
       </UFormField>
 
-      <UFormField
-        label="Хямдралтай үнэ"
-        name="sale_price"
-      >
-        <UInput
-          v-model.number="state.sale_price"
-          type="number"
-          placeholder="0"
-        >
+      <UFormField label="Хямдралтай үнэ" name="sale_price">
+        <UInput v-model.number="state.sale_price" type="number" placeholder="0">
           <template #trailing>
             <span class="text-gray-500">₮</span>
           </template>
@@ -114,32 +79,15 @@ const onSubmit = (event: FormSubmitEvent<Schema>) => {
     </div>
 
     <div class="grid grid-cols-2 gap-4">
-      <UFormField
-        label="Ангилал"
-        name="category"
-      >
-        <UInput
-          v-model="state.category"
-          placeholder="Ангилал оруулах"
-          list="product-categories"
-        />
+      <UFormField label="Ангилал" name="category">
+        <UInput v-model="state.category" placeholder="Ангилал оруулах" list="product-categories" />
         <datalist id="product-categories">
-          <option
-            v-for="cat in categories"
-            :key="cat"
-            :value="cat"
-          />
+          <option v-for="cat in categories" :key="cat" :value="cat" />
         </datalist>
       </UFormField>
 
-      <UFormField
-        label="Төлөв"
-        name="status"
-      >
-        <USelect
-          v-model="state.status"
-          :items="statusOptions"
-        />
+      <UFormField label="Төлөв" name="status">
+        <USelect v-model="state.status" :items="statusOptions" />
       </UFormField>
     </div>
 
@@ -167,43 +115,18 @@ const onSubmit = (event: FormSubmitEvent<Schema>) => {
       v-if="state.track_inventory && !state.has_variants"
       class="grid grid-cols-2 gap-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg"
     >
-      <UFormField
-        label="SKU"
-        name="sku"
-      >
-        <UInput
-          v-model="state.sku"
-          placeholder="SKU-001"
-        />
+      <UFormField label="SKU" name="sku">
+        <UInput v-model="state.sku" placeholder="SKU-001" />
       </UFormField>
 
-      <UFormField
-        label="Үлдэгдэл"
-        name="stock_quantity"
-      >
-        <UInput
-          v-model.number="state.stock_quantity"
-          type="number"
-          placeholder="0"
-        />
+      <UFormField label="Үлдэгдэл" name="stock_quantity">
+        <UInput v-model.number="state.stock_quantity" type="number" placeholder="0" />
       </UFormField>
     </div>
 
     <div class="flex justify-end gap-2 pt-4">
-      <UButton
-        color="neutral"
-        variant="outline"
-        @click="emit('cancel')"
-      >
-        Болих
-      </UButton>
-      <UButton
-        type="submit"
-        color="primary"
-        :loading="loading"
-      >
-        Хадгалах
-      </UButton>
+      <UButton color="neutral" variant="outline" @click="emit('cancel')"> Болих </UButton>
+      <UButton type="submit" color="primary" :loading="loading"> Хадгалах </UButton>
     </div>
   </UForm>
 </template>

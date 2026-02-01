@@ -1,5 +1,5 @@
-@import "tailwindcss" theme(static);
-@import "@nuxt/ui";
+@import 'tailwindcss' theme(static);
+@import '@nuxt/ui';
 
 /* Gilroy Font */
 @font-face {
@@ -53,17 +53,17 @@
 @theme static {
   --font-sans: 'Gilroy', sans-serif;
 
-  --color-green-50: #EFFDF5;
-  --color-green-100: #D9FBE8;
-  --color-green-200: #B3F5D1;
-  --color-green-300: #75EDAE;
-  --color-green-400: #00DC82;
-  --color-green-500: #00C16A;
-  --color-green-600: #00A155;
-  --color-green-700: #007F45;
+  --color-green-50: #effdf5;
+  --color-green-100: #d9fbe8;
+  --color-green-200: #b3f5d1;
+  --color-green-300: #75edae;
+  --color-green-400: #00dc82;
+  --color-green-500: #00c16a;
+  --color-green-600: #00a155;
+  --color-green-700: #007f45;
   --color-green-800: #016538;
-  --color-green-900: #0A5331;
-  --color-green-950: #052E16;
+  --color-green-900: #0a5331;
+  --color-green-950: #052e16;
 }
 
 /* Light mode */
@@ -86,16 +86,16 @@ body {
 }
 
 /* Dashboard content area */
-[data-slot="root"].flex-1 {
+[data-slot='root'].flex-1 {
   @apply bg-[var(--app-bg)];
 }
 
 /* Sidebar always dark */
-#default[data-slot="sidebar"] {
+#default[data-slot='sidebar'] {
   @apply !bg-[#0f1117] !border-gray-800;
 }
 
-#default[data-slot="sidebar"] * {
+#default[data-slot='sidebar'] * {
   --tw-text-opacity: 1;
 }
 

@@ -33,17 +33,22 @@ export function useUpload() {
     return result
   }
 
-  const uploadMultiple = async (files: File[]): Promise<{ uploaded: UploadResult[], errors: string[] }> => {
+  const uploadMultiple = async (
+    files: File[]
+  ): Promise<{ uploaded: UploadResult[]; errors: string[] }> => {
     const formData = new FormData()
-    files.forEach(file => {
+    files.forEach((file) => {
       formData.append('files', file)
     })
 
-    const result = await $fetch<{ uploaded: UploadResult[], errors: string[] }>(`${apiUrl}/api/upload/multiple`, {
-      method: 'POST',
-      credentials: 'include',
-      body: formData
-    })
+    const result = await $fetch<{ uploaded: UploadResult[]; errors: string[] }>(
+      `${apiUrl}/api/upload/multiple`,
+      {
+        method: 'POST',
+        credentials: 'include',
+        body: formData
+      }
+    )
 
     return result
   }
@@ -52,7 +57,7 @@ export function useUpload() {
     if (files.length === 0) return []
 
     uploading.value = true
-    progress.value = files.map(f => ({
+    progress.value = files.map((f) => ({
       filename: f.name,
       progress: 0,
       status: 'pending' as const

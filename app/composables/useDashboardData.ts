@@ -69,9 +69,12 @@ export const useDashboardData = () => {
 
   const fetchProductStats = async () => {
     try {
-      const data = await $fetch<{ products: any[], total: number }>(`${config.public.apiUrl}/api/products?limit=1`, {
-        credentials: 'include'
-      })
+      const data = await $fetch<{ products: any[]; total: number }>(
+        `${config.public.apiUrl}/api/products?limit=1`,
+        {
+          credentials: 'include'
+        }
+      )
       productStats.value = {
         total: data.total || 0,
         active: data.total || 0
@@ -83,9 +86,12 @@ export const useDashboardData = () => {
 
   const fetchLives = async () => {
     try {
-      const data = await $fetch<{ lives: any[], total: number }>(`${config.public.apiUrl}/api/lives?limit=1`, {
-        credentials: 'include'
-      })
+      const data = await $fetch<{ lives: any[]; total: number }>(
+        `${config.public.apiUrl}/api/lives?limit=1`,
+        {
+          credentials: 'include'
+        }
+      )
       lives.value = data.lives
     } catch (err: any) {
       console.error('Failed to fetch lives:', err)
@@ -97,11 +103,7 @@ export const useDashboardData = () => {
     error.value = null
 
     try {
-      await Promise.all([
-        fetchShop(),
-        fetchOrderStats(),
-        fetchProductStats()
-      ])
+      await Promise.all([fetchShop(), fetchOrderStats(), fetchProductStats()])
     } catch (err: any) {
       error.value = 'Failed to load dashboard data'
     } finally {

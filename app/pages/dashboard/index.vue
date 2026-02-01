@@ -68,7 +68,7 @@ onMounted(() => {
     </div>
 
     <!-- Content -->
-    <div v-else class="  space-y-6 mt-4">
+    <div v-else class="space-y-6 mt-4">
       <!-- Shop & Plan Row -->
       <div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
         <div class="lg:col-span-3">
@@ -139,10 +139,7 @@ onMounted(() => {
       </div>
 
       <!-- Quick Actions -->
-      <DashboardSection
-        title="Түргэн үйлдлүүд"
-        description="Түгээмэл хэрэглэгддэг үйлдлүүд"
-      >
+      <DashboardSection title="Түргэн үйлдлүүд" description="Түгээмэл хэрэглэгддэг үйлдлүүд">
         <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
           <DashboardQuickAction
             title="Бараа нэмэх"

@@ -17,20 +17,19 @@ export interface ProductVariant {
   id: number
   product_id: number
   shop_id: number
-  keyword: string         // Required for comment identification
-  sku?: string            // Optional
+  keyword: string // Required for comment identification
+  sku?: string // Optional
   barcode: string | null
   name: string
   options: Record<string, string>
-  price: number           // Required for all variants now
+  price: number // Required for all variants now
   sale_price: number | null
-  images: string[]        // Variant-specific images
+  images: string[] // Variant-specific images
   stock_quantity: number
   low_stock_alert: number
   is_active: boolean
-  is_main: boolean        // Marks the main variant for listing
+  is_main: boolean // Marks the main variant for listing
 }
-
 
 export interface ProductsResponse {
   products: Product[]
@@ -61,10 +60,10 @@ export interface CreateProductInput {
 }
 
 export interface CreateVariantInput {
-  id?: number             // Required for updates
+  id?: number // Required for updates
   name: string
   keyword: string
-  sku?: string            // Optional
+  sku?: string // Optional
   barcode?: string | null
   options?: Record<string, string>
   price?: number | null
@@ -72,7 +71,7 @@ export interface CreateVariantInput {
   images?: string[]
   stock_quantity: number
   low_stock_alert?: number
-  is_main?: boolean       // Marks the main variant
+  is_main?: boolean // Marks the main variant
 }
 
 export interface UpdateVariantInput {
@@ -158,7 +157,10 @@ export function useProducts() {
     return res.categories || []
   }
 
-  const createVariant = async (productId: number, data: CreateVariantInput): Promise<ProductVariant> => {
+  const createVariant = async (
+    productId: number,
+    data: CreateVariantInput
+  ): Promise<ProductVariant> => {
     return await $fetch<ProductVariant>(`${apiUrl}/api/products/${productId}/variants`, {
       method: 'POST',
       credentials: 'include',
@@ -166,7 +168,10 @@ export function useProducts() {
     })
   }
 
-  const updateVariant = async (variantId: number, data: UpdateVariantInput): Promise<ProductVariant> => {
+  const updateVariant = async (
+    variantId: number,
+    data: UpdateVariantInput
+  ): Promise<ProductVariant> => {
     return await $fetch<ProductVariant>(`${apiUrl}/api/variants/${variantId}`, {
       method: 'PUT',
       credentials: 'include',
@@ -181,7 +186,10 @@ export function useProducts() {
     })
   }
 
-  const updateVariantStock = async (variantId: number, adjustment: number): Promise<ProductVariant> => {
+  const updateVariantStock = async (
+    variantId: number,
+    adjustment: number
+  ): Promise<ProductVariant> => {
     return await $fetch<ProductVariant>(`${apiUrl}/api/variants/${variantId}/stock`, {
       method: 'PATCH',
       credentials: 'include',
@@ -213,7 +221,10 @@ export function useProducts() {
     }
   }
 
-  const importProducts = async (file: File, defaultStatus: string = 'draft'): Promise<ImportResult> => {
+  const importProducts = async (
+    file: File,
+    defaultStatus: string = 'draft'
+  ): Promise<ImportResult> => {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('default_status', defaultStatus)

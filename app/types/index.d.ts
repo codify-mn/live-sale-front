@@ -59,8 +59,6 @@ export interface Range {
   end: Date
 }
 
-
-
 export interface LiveSale {
   id: number
   title: string

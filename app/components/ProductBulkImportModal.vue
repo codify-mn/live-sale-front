@@ -7,7 +7,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
-  'success': [result: ImportResult]
+  success: [result: ImportResult]
 }>()
 
 const { downloadImportTemplate, importProducts } = useProducts()
@@ -180,12 +180,18 @@ watch(isOpen, (newVal) => {
 
         <div class="space-y-6">
           <!-- Info box -->
-          <div class="rounded-lg bg-amber-50 dark:bg-amber-900/20 p-4 border border-amber-200 dark:border-amber-800">
+          <div
+            class="rounded-lg bg-amber-50 dark:bg-amber-900/20 p-4 border border-amber-200 dark:border-amber-800"
+          >
             <div class="flex gap-3">
-              <UIcon name="i-lucide-info" class="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+              <UIcon
+                name="i-lucide-info"
+                class="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5"
+              />
               <div class="text-sm text-amber-800 dark:text-amber-200 space-y-2">
                 <p>
-                  <strong>Олон төрөлтэй бараа:</strong> Нэг барааны олон төрлийг нэмэхийн тулд дараагийн мөрүүдэд барааны нэрийг хоосон орхиж, зөвхөн төрлийн мэдээллийг бөглөнө.
+                  <strong>Олон төрөлтэй бараа:</strong> Нэг барааны олон төрлийг нэмэхийн тулд
+                  дараагийн мөрүүдэд барааны нэрийг хоосон орхиж, зөвхөн төрлийн мэдээллийг бөглөнө.
                 </p>
                 <p>
                   <strong>Ангилал:</strong> Ангилалын нэрийг шууд бичнэ. Байхгүй бол шинээр үүсгэнэ.
@@ -197,7 +203,10 @@ watch(isOpen, (newVal) => {
           <!-- Step 1: Download template -->
           <div>
             <div class="flex items-center gap-2 mb-3">
-              <span class="flex items-center justify-center w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 text-sm font-medium">1</span>
+              <span
+                class="flex items-center justify-center w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 text-sm font-medium"
+                >1</span
+              >
               <span class="font-medium text-gray-900 dark:text-white">Загвар файл татаж авах</span>
             </div>
             <UButton
@@ -215,14 +224,21 @@ watch(isOpen, (newVal) => {
           <!-- Step 2: Upload file -->
           <div>
             <div class="flex items-center gap-2 mb-3">
-              <span class="flex items-center justify-center w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 text-sm font-medium">2</span>
-              <span class="font-medium text-gray-900 dark:text-white">Бөглөсөн файл байршуулах</span>
+              <span
+                class="flex items-center justify-center w-6 h-6 rounded-full bg-primary-100 dark:bg-primary-900 text-primary-600 dark:text-primary-400 text-sm font-medium"
+                >2</span
+              >
+              <span class="font-medium text-gray-900 dark:text-white"
+                >Бөглөсөн файл байршуулах</span
+              >
             </div>
 
             <div
               class="relative border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer"
               :class="[
-                isDragging ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20' : 'border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600',
+                isDragging
+                  ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
+                  : 'border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600',
                 file ? 'bg-gray-50 dark:bg-gray-800/50' : ''
               ]"
               @drop="handleDrop"
@@ -236,7 +252,7 @@ watch(isOpen, (newVal) => {
                 accept=".xlsx,.xls"
                 class="hidden"
                 @change="handleFileSelect"
-              >
+              />
 
               <div v-if="file" class="flex flex-col items-center gap-2">
                 <UIcon name="i-lucide-file-spreadsheet" class="w-10 h-10 text-green-500" />
@@ -246,7 +262,10 @@ watch(isOpen, (newVal) => {
                   size="xs"
                   color="neutral"
                   variant="ghost"
-                  @click.stop="file = null; importResult = null"
+                  @click.stop="
+                    file = null
+                    importResult = null
+                  "
                 >
                   Өөр файл сонгох
                 </UButton>
@@ -265,15 +284,19 @@ watch(isOpen, (newVal) => {
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Импортлосон бараануудын эхний төлөв
             </label>
-            <USelect
-              v-model="selectedStatus"
-              :items="statusOptions"
-              class="w-full"
-            />
+            <USelect v-model="selectedStatus" :items="statusOptions" class="w-full" />
           </div>
 
           <!-- Import result -->
-          <div v-if="importResult" class="rounded-lg p-4 border" :class="importResult.success ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'">
+          <div
+            v-if="importResult"
+            class="rounded-lg p-4 border"
+            :class="
+              importResult.success
+                ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+                : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+            "
+          >
             <div class="flex items-start gap-3">
               <UIcon
                 :name="importResult.success ? 'i-lucide-check-circle' : 'i-lucide-alert-circle'"
@@ -281,20 +304,44 @@ watch(isOpen, (newVal) => {
                 class="w-5 h-5 shrink-0 mt-0.5"
               />
               <div class="flex-1">
-                <h4 class="font-medium" :class="importResult.success ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'">
+                <h4
+                  class="font-medium"
+                  :class="
+                    importResult.success
+                      ? 'text-green-800 dark:text-green-200'
+                      : 'text-red-800 dark:text-red-200'
+                  "
+                >
                   {{ importResult.success ? 'Амжилттай' : 'Алдаа гарлаа' }}
                 </h4>
-                <div class="mt-2 text-sm space-y-1" :class="importResult.success ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'">
+                <div
+                  class="mt-2 text-sm space-y-1"
+                  :class="
+                    importResult.success
+                      ? 'text-green-700 dark:text-green-300'
+                      : 'text-red-700 dark:text-red-300'
+                  "
+                >
                   <p v-if="importResult.created > 0">{{ importResult.created }} бараа нэмэгдлээ</p>
-                  <p v-if="importResult.updated > 0">{{ importResult.updated }} бараа шинэчлэгдлээ</p>
-                  <p v-if="importResult.skipped > 0">{{ importResult.skipped }} бараа алгасагдлаа</p>
+                  <p v-if="importResult.updated > 0">
+                    {{ importResult.updated }} бараа шинэчлэгдлээ
+                  </p>
+                  <p v-if="importResult.skipped > 0">
+                    {{ importResult.skipped }} бараа алгасагдлаа
+                  </p>
                 </div>
 
                 <!-- Error details -->
                 <div v-if="importResult.errors.length > 0" class="mt-3">
                   <p class="text-sm font-medium text-red-800 dark:text-red-200 mb-2">Алдаанууд:</p>
-                  <ul class="text-sm text-red-700 dark:text-red-300 space-y-1 max-h-32 overflow-y-auto">
-                    <li v-for="(error, index) in importResult.errors" :key="index" class="flex items-start gap-1">
+                  <ul
+                    class="text-sm text-red-700 dark:text-red-300 space-y-1 max-h-32 overflow-y-auto"
+                  >
+                    <li
+                      v-for="(error, index) in importResult.errors"
+                      :key="index"
+                      class="flex items-start gap-1"
+                    >
                       <span class="shrink-0">Мөр {{ error.row }}:</span>
                       <span>{{ error.message }}</span>
                     </li>
@@ -307,19 +354,8 @@ watch(isOpen, (newVal) => {
 
         <template #footer>
           <div class="flex justify-end gap-3">
-            <UButton
-              color="neutral"
-              variant="outline"
-              @click="handleClose"
-            >
-              Цуцлах
-            </UButton>
-            <UButton
-              color="primary"
-              :loading="isImporting"
-              :disabled="!file"
-              @click="handleImport"
-            >
+            <UButton color="neutral" variant="outline" @click="handleClose"> Цуцлах </UButton>
+            <UButton color="primary" :loading="isImporting" :disabled="!file" @click="handleImport">
               Импортлох
             </UButton>
           </div>

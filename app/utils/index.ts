@@ -24,7 +24,14 @@ export function calculateDiscountPercent(basePrice: number, salePrice: number): 
  * @returns Calculated sale price or 0 if invalid
  */
 export function calculateSalePrice(basePrice: number, discountPercent: number): number {
-  if (!basePrice || !discountPercent || basePrice <= 0 || discountPercent <= 0 || discountPercent >= 100) return 0
+  if (
+    !basePrice ||
+    !discountPercent ||
+    basePrice <= 0 ||
+    discountPercent <= 0 ||
+    discountPercent >= 100
+  )
+    return 0
   return Math.round(basePrice * (1 - discountPercent / 100))
 }
 

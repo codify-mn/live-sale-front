@@ -8,12 +8,7 @@ const route = useRoute()
 const router = useRouter()
 const toast = useToast()
 
-const {
-  fetchProduct,
-  updateProduct,
-  deleteProduct,
-  deleteVariant
-} = useProducts()
+const { fetchProduct, updateProduct, deleteProduct, deleteVariant } = useProducts()
 
 const productId = computed(() => Number(route.params.id))
 
@@ -27,7 +22,8 @@ const variants = ref<VariantData[]>([])
 const deletedVariantIds = ref<number[]>([])
 
 useSeoMeta({
-  title: () => product.value ? `${product.value.name} - Comment Boost` : 'Бүтээгдэхүүн - Comment Boost'
+  title: () =>
+    product.value ? `${product.value.name} - Comment Boost` : 'Бүтээгдэхүүн - Comment Boost'
 })
 
 const schema = z.object({
@@ -123,7 +119,7 @@ const loadProduct = async () => {
 
     // Load variants
     if (product.value.variants && product.value.variants.length > 0) {
-      variants.value = product.value.variants.map(v => ({
+      variants.value = product.value.variants.map((v) => ({
         id: v.id,
         name: v.name,
         keyword: v.keyword || '',
@@ -158,7 +154,7 @@ const loadProduct = async () => {
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   // Validate variants if has_variants is true
   if (state.has_variants && variants.value.length > 0) {
-    const invalidVariants = variants.value.filter(v => !v.name || !v.keyword)
+    const invalidVariants = variants.value.filter((v) => !v.name || !v.keyword)
     if (invalidVariants.length > 0) {
       toast.add({
         title: 'Алдаа',
@@ -292,22 +288,13 @@ onMounted(async () => {
       </div>
 
       <div v-else-if="product" class="p-6 overflow-y-auto">
-        <UForm
-          id="product-form"
-          :schema="schema"
-          :state="state"
-          @submit="onSubmit"
-        >
+        <UForm id="product-form" :schema="schema" :state="state" @submit="onSubmit">
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- Left Column - Main Form -->
             <div class="lg:col-span-2 space-y-6">
               <!-- Product Title -->
               <ProductFormCard title="Барааны гарчиг" required>
-                <UInput
-                  v-model="state.name"
-                  placeholder="Барааны гарчгийг оруулна уу"
-                  size="lg"
-                />
+                <UInput v-model="state.name" placeholder="Барааны гарчгийг оруулна уу" size="lg" />
               </ProductFormCard>
 
               <!-- Variants Section -->
@@ -324,7 +311,9 @@ onMounted(async () => {
                     @remove="removeVariant(index)"
                     @duplicate="duplicateVariant(index)"
                   />
-                  <div class="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <div
+                    class="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700"
+                  >
                     <UButton
                       type="button"
                       color="primary"
@@ -336,7 +325,7 @@ onMounted(async () => {
                   </div>
                 </div>
               </ProductFormCard>
-              <div class="flex items-center justify-end  ">
+              <div class="flex items-center justify-end">
                 <UButton
                   type="submit"
                   form="product-form"
@@ -359,7 +348,11 @@ onMounted(async () => {
 
               <!-- Category -->
               <ProductFormCard title="Ангилал">
-                <UInput v-model="state.category" placeholder="Эмэгтэй хувцас, Гэр ахуй..." size="lg" />
+                <UInput
+                  v-model="state.category"
+                  placeholder="Эмэгтэй хувцас, Гэр ахуй..."
+                  size="lg"
+                />
               </ProductFormCard>
 
               <!-- Product Settings -->
@@ -391,18 +384,14 @@ onMounted(async () => {
             <p>
               <strong>{{ product?.name }}</strong> бүтээгдэхүүнийг устгахдаа итгэлтэй байна уу?
             </p>
-            <p class="text-sm text-gray-500 mt-2">
-              Энэ үйлдлийг буцаах боломжгүй.
-            </p>
+            <p class="text-sm text-gray-500 mt-2">Энэ үйлдлийг буцаах боломжгүй.</p>
 
             <template #footer>
               <div class="flex justify-end gap-2">
                 <UButton color="neutral" variant="outline" @click="deleteModalOpen = false">
                   Болих
                 </UButton>
-                <UButton color="error" :loading="deleting" @click="confirmDelete">
-                  Устгах
-                </UButton>
+                <UButton color="error" :loading="deleting" @click="confirmDelete"> Устгах </UButton>
               </div>
             </template>
           </UCard>

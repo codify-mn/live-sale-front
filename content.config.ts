@@ -6,7 +6,9 @@ const linkSchema = z.object({
   to: z.string().optional(),
   icon: z.string().optional(),
   target: z.string().optional(),
-  color: z.enum(['primary', 'secondary', 'neutral', 'error', 'warning', 'success', 'info']).optional(),
+  color: z
+    .enum(['primary', 'secondary', 'neutral', 'error', 'warning', 'success', 'info'])
+    .optional(),
   variant: z.enum(['solid', 'outline', 'soft', 'subtle', 'ghost', 'link']).optional(),
   size: z.enum(['xs', 'sm', 'md', 'lg', 'xl']).optional()
 })
@@ -32,35 +34,49 @@ export default defineContentConfig({
       schema: z.object({
         title: z.string(),
         description: z.string(),
-        hero: z.object({
-          title: z.string(),
-          description: z.string(),
-          links: z.array(linkSchema).optional()
-        }).optional(),
-        sections: z.array(z.object({
-          title: z.string(),
-          description: z.string().optional(),
-          features: z.array(featureSchema).optional(),
-          orientation: z.enum(['horizontal', 'vertical']).optional()
-        })).optional(),
-        features: z.array(featureSchema).optional(),
-        testimonials: z.object({
-          title: z.string(),
-          description: z.string().optional(),
-          items: z.array(z.object({
-            quote: z.string(),
-            user: z.object({
-              name: z.string(),
+        hero: z
+          .object({
+            title: z.string(),
+            description: z.string(),
+            links: z.array(linkSchema).optional()
+          })
+          .optional(),
+        sections: z
+          .array(
+            z.object({
+              title: z.string(),
               description: z.string().optional(),
-              avatar: imageSchema.optional()
+              features: z.array(featureSchema).optional(),
+              orientation: z.enum(['horizontal', 'vertical']).optional()
             })
-          })).optional()
-        }).optional(),
-        cta: z.object({
-          title: z.string(),
-          description: z.string().optional(),
-          links: z.array(linkSchema).optional()
-        }).optional()
+          )
+          .optional(),
+        features: z.array(featureSchema).optional(),
+        testimonials: z
+          .object({
+            title: z.string(),
+            description: z.string().optional(),
+            items: z
+              .array(
+                z.object({
+                  quote: z.string(),
+                  user: z.object({
+                    name: z.string(),
+                    description: z.string().optional(),
+                    avatar: imageSchema.optional()
+                  })
+                })
+              )
+              .optional()
+          })
+          .optional(),
+        cta: z
+          .object({
+            title: z.string(),
+            description: z.string().optional(),
+            links: z.array(linkSchema).optional()
+          })
+          .optional()
       })
     }),
 
@@ -71,25 +87,35 @@ export default defineContentConfig({
       schema: z.object({
         title: z.string(),
         description: z.string(),
-        plans: z.array(z.object({
-          title: z.string(),
-          description: z.string().optional(),
-          price: z.object({
-            month: z.string(),
-            year: z.string()
-          }),
-          features: z.array(z.string()).optional(),
-          button: linkSchema.optional(),
-          highlight: z.boolean().optional()
-        })).optional(),
-        faq: z.object({
-          title: z.string(),
-          description: z.string().optional(),
-          items: z.array(z.object({
-            label: z.string(),
-            content: z.string()
-          })).optional()
-        }).optional()
+        plans: z
+          .array(
+            z.object({
+              title: z.string(),
+              description: z.string().optional(),
+              price: z.object({
+                month: z.string(),
+                year: z.string()
+              }),
+              features: z.array(z.string()).optional(),
+              button: linkSchema.optional(),
+              highlight: z.boolean().optional()
+            })
+          )
+          .optional(),
+        faq: z
+          .object({
+            title: z.string(),
+            description: z.string().optional(),
+            items: z
+              .array(
+                z.object({
+                  label: z.string(),
+                  content: z.string()
+                })
+              )
+              .optional()
+          })
+          .optional()
       })
     }),
 

@@ -28,8 +28,8 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   'update:modelValue': [value: VariantData]
-  'remove': []
-  'duplicate': []
+  remove: []
+  duplicate: []
 }>()
 
 // Local state for discount percent (UI-only, not persisted)
@@ -41,10 +41,7 @@ const showDetails = ref(false)
 // Track if keyword has been manually edited
 const keywordDirty = ref(false)
 
-const updateField = <K extends keyof VariantData>(
-  field: K,
-  value: VariantData[K]
-) => {
+const updateField = <K extends keyof VariantData>(field: K, value: VariantData[K]) => {
   emit('update:modelValue', { ...props.modelValue, [field]: value })
 }
 
@@ -58,7 +55,11 @@ const generateKeyword = (variantName: string) => {
 const handleNameInput = (value: string) => {
   if (!keywordDirty.value) {
     // Update both name and keyword together
-    emit('update:modelValue', { ...props.modelValue, name: value, keyword: generateKeyword(value) })
+    emit('update:modelValue', {
+      ...props.modelValue,
+      name: value,
+      keyword: generateKeyword(value)
+    })
   } else {
     updateField('name', value)
   }
@@ -71,11 +72,14 @@ const handleKeywordInput = (value: string) => {
 }
 
 // Auto-update keyword when productName changes (if not dirty)
-watch(() => props.productName, () => {
-  if (!keywordDirty.value && props.modelValue.name) {
-    updateField('keyword', generateKeyword(props.modelValue.name))
+watch(
+  () => props.productName,
+  () => {
+    if (!keywordDirty.value && props.modelValue.name) {
+      updateField('keyword', generateKeyword(props.modelValue.name))
+    }
   }
-})
+)
 
 // Initialize dirty state on mount (if keyword already has value different from expected)
 onMounted(() => {
@@ -86,13 +90,16 @@ onMounted(() => {
 })
 
 // Calculate discount percentage when sale price changes
-watch(() => props.modelValue.sale_price, (newVal) => {
-  if (newVal && props.modelValue.price && props.modelValue.price > 0) {
-    discountPercent.value = calculateDiscountPercent(props.modelValue.price, newVal)
-  } else {
-    discountPercent.value = null
+watch(
+  () => props.modelValue.sale_price,
+  (newVal) => {
+    if (newVal && props.modelValue.price && props.modelValue.price > 0) {
+      discountPercent.value = calculateDiscountPercent(props.modelValue.price, newVal)
+    } else {
+      discountPercent.value = null
+    }
   }
-})
+)
 
 // Calculate sale price when discount percent changes
 watch(discountPercent, (newVal) => {
@@ -107,7 +114,10 @@ watch(discountPercent, (newVal) => {
 // Initialize discount percent on mount
 onMounted(() => {
   if (props.modelValue.sale_price && props.modelValue.price) {
-    discountPercent.value = calculateDiscountPercent(props.modelValue.price, props.modelValue.sale_price)
+    discountPercent.value = calculateDiscountPercent(
+      props.modelValue.price,
+      props.modelValue.sale_price
+    )
   }
 })
 </script>
@@ -117,7 +127,9 @@ onMounted(() => {
     class="p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800/50"
   >
     <!-- Header -->
-    <div class="flex items-center justify-between mb-4 pb-3 border-b border-gray-100 dark:border-gray-800">
+    <div
+      class="flex items-center justify-between mb-4 pb-3 border-b border-gray-100 dark:border-gray-800"
+    >
       <h4 class="text-sm font-semibold text-gray-800 dark:text-gray-200 flex items-center gap-2">
         <UIcon name="i-lucide-layers" class="w-4 h-4 text-primary" />
         Төрөл #{{ index + 1 }}
@@ -215,13 +227,7 @@ onMounted(() => {
         </UFormField>
 
         <UFormField label="Хямдралын хувь">
-          <UInput
-            v-model.number="discountPercent"
-            type="number"
-            placeholder="0"
-            :min="0"
-            :max="99"
-          >
+          <UInput v-model.number="discountPercent" type="number" placeholder="0" :min="0" :max="99">
             <template #leading>
               <span class="text-gray-400">%</span>
             </template>
@@ -232,7 +238,9 @@ onMounted(() => {
       <!-- Details Toggle -->
       <div class="flex items-center gap-3 pt-2 border-t border-gray-200 dark:border-gray-700">
         <USwitch v-model="showDetails" size="sm" />
-        <span class="text-sm text-gray-600 dark:text-gray-400 font-medium">Дэлгэрэнгүй тохиргоо</span>
+        <span class="text-sm text-gray-600 dark:text-gray-400 font-medium"
+          >Дэлгэрэнгүй тохиргоо</span
+        >
       </div>
 
       <!-- Barcode, SKU & Low Stock Alert (shown when details enabled) -->
@@ -274,13 +282,13 @@ onMounted(() => {
 
 <style scoped>
 /* Hide number input arrows/spinners */
-:deep(input[type="number"])::-webkit-outer-spin-button,
-:deep(input[type="number"])::-webkit-inner-spin-button {
+:deep(input[type='number'])::-webkit-outer-spin-button,
+:deep(input[type='number'])::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-:deep(input[type="number"]) {
+:deep(input[type='number']) {
   -moz-appearance: textfield;
 }
 </style>

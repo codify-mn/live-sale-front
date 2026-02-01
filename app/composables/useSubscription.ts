@@ -156,10 +156,9 @@ const _useSubscription = () => {
 
   const checkFeature = async (feature: string): Promise<boolean> => {
     try {
-      const data = await $fetch<FeatureResponse>(
-        `${apiUrl}/api/subscription/feature/${feature}`,
-        { credentials: 'include' }
-      )
+      const data = await $fetch<FeatureResponse>(`${apiUrl}/api/subscription/feature/${feature}`, {
+        credentials: 'include'
+      })
       return data.enabled
     } catch {
       return false
@@ -226,10 +225,7 @@ const _useSubscription = () => {
 
   // Initialize data
   const init = async () => {
-    await Promise.all([
-      fetchSubscription(),
-      fetchUsage()
-    ])
+    await Promise.all([fetchSubscription(), fetchUsage()])
   }
 
   return {

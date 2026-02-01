@@ -1,11 +1,20 @@
 <script setup lang="ts">
-const { subscription, usage, loading, daysRemaining, isTrialing, isActive, hasSubscription, productUsagePercent, fetchSubscription, fetchUsage, formatLimit } = useSubscription()
+const {
+  subscription,
+  usage,
+  loading,
+  daysRemaining,
+  isTrialing,
+  isActive,
+  hasSubscription,
+  productUsagePercent,
+  fetchSubscription,
+  fetchUsage,
+  formatLimit
+} = useSubscription()
 
 onMounted(async () => {
-  await Promise.all([
-    fetchSubscription(),
-    fetchUsage()
-  ])
+  await Promise.all([fetchSubscription(), fetchUsage()])
 })
 
 const statusColor = computed(() => {
@@ -75,11 +84,7 @@ const daysColor = computed(() => {
           <h3 class="text-xl font-bold text-gray-900 dark:text-white">
             {{ subscription.plan?.name || 'Үнэгүй' }}
           </h3>
-          <UBadge
-            :color="statusColor"
-            variant="subtle"
-            size="sm"
-          >
+          <UBadge :color="statusColor" variant="subtle" size="sm">
             {{ statusLabel }}
           </UBadge>
         </div>
@@ -88,12 +93,8 @@ const daysColor = computed(() => {
         <div v-if="isTrialing || isActive" class="flex items-center gap-1.5 mt-2 text-sm">
           <span class="w-2 h-2 rounded-full" :class="daysColor" />
           <span class="text-gray-600 dark:text-gray-400">
-            <template v-if="isTrialing">
-              Туршилт дуусахад {{ daysRemaining }} хоног
-            </template>
-            <template v-else>
-              Дуусахад {{ daysRemaining }} хоног
-            </template>
+            <template v-if="isTrialing"> Туршилт дуусахад {{ daysRemaining }} хоног </template>
+            <template v-else> Дуусахад {{ daysRemaining }} хоног </template>
           </span>
         </div>
 
@@ -102,12 +103,19 @@ const daysColor = computed(() => {
           <div class="flex justify-between text-xs text-gray-500">
             <span>Бүтээгдэхүүн</span>
             <span>
-              {{ usage.product_count }} / {{ formatLimit(subscription.plan.limits.max_products) }}
+              {{ usage.product_count }} /
+              {{ formatLimit(subscription.plan.limits.max_products) }}
             </span>
           </div>
           <UProgress
             :value="productUsagePercent"
-            :color="productUsagePercent >= 90 ? 'error' : productUsagePercent >= 70 ? 'warning' : 'primary'"
+            :color="
+              productUsagePercent >= 90
+                ? 'error'
+                : productUsagePercent >= 70
+                  ? 'warning'
+                  : 'primary'
+            "
             size="xs"
           />
         </div>
@@ -143,22 +151,13 @@ const daysColor = computed(() => {
         </div>
 
         <div class="flex items-center gap-2 mt-2">
-          <h3 class="text-xl font-bold text-gray-900 dark:text-white">
-            Багц байхгүй
-          </h3>
+          <h3 class="text-xl font-bold text-gray-900 dark:text-white">Багц байхгүй</h3>
         </div>
 
-        <p class="text-sm text-gray-500 mt-2">
-          Бүх боломжуудыг ашиглахын тулд багц сонгоорой.
-        </p>
+        <p class="text-sm text-gray-500 mt-2">Бүх боломжуудыг ашиглахын тулд багц сонгоорой.</p>
 
         <div class="mt-auto pt-4">
-          <UButton
-            to="/pricing"
-            color="primary"
-            block
-            icon="i-lucide-shopping-cart"
-          >
+          <UButton to="/pricing" color="primary" block icon="i-lucide-shopping-cart">
             Багц авах
           </UButton>
         </div>

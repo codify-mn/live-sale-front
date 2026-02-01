@@ -16,12 +16,11 @@ const toggle = () => {
 </script>
 
 <template>
-  <div
-    class="flex items-start justify-between gap-4 py-3 cursor-pointer group"
-    @click="toggle"
-  >
+  <div class="flex items-start justify-between gap-4 py-3 cursor-pointer group" @click="toggle">
     <div class="flex-1 min-w-0">
-      <p class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+      <p
+        class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
+      >
         {{ label }}
       </p>
       <p v-if="description" class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-2">

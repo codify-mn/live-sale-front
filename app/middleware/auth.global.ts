@@ -3,7 +3,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   // Skip middleware for public pages
   const publicPages = ['/login', '/signup', '/auth/callback', '/', '/docs']
-  const isPublicPage = publicPages.some(page => to.path === page || to.path.startsWith('/docs'))
+  const isPublicPage = publicPages.some((page) => to.path === page || to.path.startsWith('/docs'))
 
   // Fetch user if not loaded yet
   if (isLoading.value) {

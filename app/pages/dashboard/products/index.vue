@@ -133,11 +133,11 @@ const nextPage = () => {
 
 // Selection helpers
 const isSelected = (product: Product) => {
-  return selectedRows.value.some(p => p.id === product.id)
+  return selectedRows.value.some((p) => p.id === product.id)
 }
 
 const toggleSelect = (product: Product) => {
-  const index = selectedRows.value.findIndex(p => p.id === product.id)
+  const index = selectedRows.value.findIndex((p) => p.id === product.id)
   if (index === -1) {
     selectedRows.value.push(product)
   } else {
@@ -232,11 +232,13 @@ const bulkSetStatus = async (status: 'active' | 'draft' | 'archived') => {
   bulkActionLoading.value = true
   try {
     await Promise.all(
-      selectedRows.value.map(product => updateProduct(product.id, {
-        name: product.name,
-        category: product.category,
-        status
-      }))
+      selectedRows.value.map((product) =>
+        updateProduct(product.id, {
+          name: product.name,
+          category: product.category,
+          status
+        })
+      )
     )
     toast.add({
       title: 'Амжилттай',
@@ -263,9 +265,7 @@ const confirmBulkDelete = async () => {
 
   bulkActionLoading.value = true
   try {
-    await Promise.all(
-      selectedRows.value.map(product => deleteProduct(product.id))
-    )
+    await Promise.all(selectedRows.value.map((product) => deleteProduct(product.id)))
     toast.add({
       title: 'Амжилттай',
       description: `${selectedRows.value.length} бүтээгдэхүүн устгагдлаа`,
@@ -297,29 +297,37 @@ const onRowClick = (product: Product) => {
 
 // Action menu items
 const getActionItems = (product: Product) => [
-  [{
-    label: 'Засах',
-    icon: 'i-lucide-pencil',
-    onSelect: () => router.push(`/dashboard/products/${product.id}`)
-  },
-  {
-    label: product.status === 'active' ? 'Ноорог болгох' : 'Идэвхжүүлэх',
-    icon: product.status === 'active' ? 'i-lucide-archive' : 'i-lucide-check-circle',
-    onSelect: () => toggleStatus(product)
-  }],
-  [{
-    label: 'Устгах',
-    icon: 'i-lucide-trash-2',
-    color: 'error' as const,
-    onSelect: () => openDeleteModal(product)
-  }]
+  [
+    {
+      label: 'Засах',
+      icon: 'i-lucide-pencil',
+      onSelect: () => router.push(`/dashboard/products/${product.id}`)
+    },
+    {
+      label: product.status === 'active' ? 'Ноорог болгох' : 'Идэвхжүүлэх',
+      icon: product.status === 'active' ? 'i-lucide-archive' : 'i-lucide-check-circle',
+      onSelect: () => toggleStatus(product)
+    }
+  ],
+  [
+    {
+      label: 'Устгах',
+      icon: 'i-lucide-trash-2',
+      color: 'error' as const,
+      onSelect: () => openDeleteModal(product)
+    }
+  ]
 ]
 
 // Watch filters
-watch([() => filter.keyword, () => filter.category, () => filter.status, () => filter.stock], () => {
-  filter.page = 1
-  loadProducts()
-}, { debounce: 300 } as any)
+watch(
+  [() => filter.keyword, () => filter.category, () => filter.status, () => filter.stock],
+  () => {
+    filter.page = 1
+    loadProducts()
+  },
+  { debounce: 300 } as any
+)
 
 watch(() => filter.page, loadProducts)
 
@@ -335,9 +343,7 @@ onMounted(() => {
     <div class="px-6 py-5 border-b border-gray-200 dark:border-gray-800">
       <div class="flex items-start justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-            Бараа бүтээгдэхүүн
-          </h1>
+          <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Бараа бүтээгдэхүүн</h1>
           <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
             Бараа бүтээгдэхүүний нийт жагсаалт
           </p>
@@ -375,12 +381,7 @@ onMounted(() => {
           <span class="text-sm font-medium text-primary-700 dark:text-primary-300">
             {{ selectedRows.length }} бүтээгдэхүүн сонгогдсон
           </span>
-          <UButton
-            size="xs"
-            variant="ghost"
-            color="primary"
-            @click="clearSelection"
-          >
+          <UButton size="xs" variant="ghost" color="primary" @click="clearSelection">
             Цуцлах
           </UButton>
         </div>
@@ -434,7 +435,10 @@ onMounted(() => {
           <USelect v-model="filter.status" :items="statusOptions" class="w-32" />
           <USelect
             v-model="filter.category"
-            :items="[{ label: 'Бүх ангилал', value: 'all' }, ...categories.map(c => ({ label: c, value: c }))]"
+            :items="[
+              { label: 'Бүх ангилал', value: 'all' },
+              ...categories.map((c) => ({ label: c, value: c }))
+            ]"
             class="w-36"
           />
         </div>
@@ -474,10 +478,7 @@ onMounted(() => {
         </template>
 
         <template #name-cell="{ row }">
-          <div
-            class="flex items-center gap-3 cursor-pointer"
-            @click="onRowClick(row.original)"
-          >
+          <div class="flex items-center gap-3 cursor-pointer" @click="onRowClick(row.original)">
             <div
               class="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden shrink-0"
             >
@@ -486,7 +487,7 @@ onMounted(() => {
                 :src="row.original.variants[0].images[0]"
                 :alt="row.original.name"
                 class="w-full h-full object-cover"
-              >
+              />
               <UIcon v-else name="i-lucide-package" class="w-5 h-5 text-gray-400" />
             </div>
             <span class="font-medium text-gray-900 dark:text-white">
@@ -496,19 +497,31 @@ onMounted(() => {
         </template>
 
         <template #status-cell="{ row }">
-          <UBadge :color="statusColors[row.original.status] || 'neutral'" variant="subtle" class="font-medium">
+          <UBadge
+            :color="statusColors[row.original.status] || 'neutral'"
+            variant="subtle"
+            class="font-medium"
+          >
             {{ statusLabels[row.original.status] || row.original.status }}
           </UBadge>
         </template>
 
         <template #base_price-cell="{ row }">
           <span class="text-gray-900 dark:text-white">
-            {{ formatPrice(row.original.variants?.[0]?.sale_price || row.original.variants?.[0]?.price || 0) }}
+            {{
+              formatPrice(
+                row.original.variants?.[0]?.sale_price || row.original.variants?.[0]?.price || 0
+              )
+            }}
           </span>
         </template>
 
         <template #stock-cell="{ row }">
-          <span :class="getStock(row.original) <= 5 ? 'text-orange-500' : 'text-gray-600 dark:text-gray-400'">
+          <span
+            :class="
+              getStock(row.original) <= 5 ? 'text-orange-500' : 'text-gray-600 dark:text-gray-400'
+            "
+          >
             {{ getStockLabel(row.original) }}
           </span>
         </template>
@@ -522,12 +535,7 @@ onMounted(() => {
         <template #actions-cell="{ row }">
           <div class="flex items-center justify-end gap-1" @click.stop>
             <UDropdownMenu :items="getActionItems(row.original)">
-              <UButton
-                icon="i-lucide-more-horizontal"
-                color="neutral"
-                variant="ghost"
-                size="md"
-              />
+              <UButton icon="i-lucide-more-horizontal" color="neutral" variant="ghost" size="md" />
             </UDropdownMenu>
           </div>
         </template>
@@ -562,12 +570,7 @@ onMounted(() => {
         {{ startItem }}-с {{ endItem }} хүртэл. Нийт: {{ total }}
       </p>
       <div class="flex items-center gap-2">
-        <UButton
-          color="neutral"
-          variant="outline"
-          :disabled="filter.page <= 1"
-          @click="prevPage"
-        >
+        <UButton color="neutral" variant="outline" :disabled="filter.page <= 1" @click="prevPage">
           Өмнөх
         </UButton>
         <UButton
@@ -593,20 +596,17 @@ onMounted(() => {
           </template>
 
           <p>
-            <strong>{{ productToDelete?.name }}</strong> бүтээгдэхүүнийг устгахдаа итгэлтэй байна уу?
+            <strong>{{ productToDelete?.name }}</strong> бүтээгдэхүүнийг устгахдаа итгэлтэй байна
+            уу?
           </p>
-          <p class="text-sm text-gray-500 mt-2">
-            Энэ үйлдлийг буцаах боломжгүй.
-          </p>
+          <p class="text-sm text-gray-500 mt-2">Энэ үйлдлийг буцаах боломжгүй.</p>
 
           <template #footer>
             <div class="flex justify-end gap-2">
               <UButton color="neutral" variant="outline" @click="deleteModalOpen = false">
                 Болих
               </UButton>
-              <UButton color="error" :loading="deleting" @click="confirmDelete">
-                Устгах
-              </UButton>
+              <UButton color="error" :loading="deleting" @click="confirmDelete"> Устгах </UButton>
             </div>
           </template>
         </UCard>
@@ -627,9 +627,7 @@ onMounted(() => {
           <p>
             <strong>{{ selectedRows.length }}</strong> бүтээгдэхүүнийг устгахдаа итгэлтэй байна уу?
           </p>
-          <p class="text-sm text-gray-500 mt-2">
-            Энэ үйлдлийг буцаах боломжгүй.
-          </p>
+          <p class="text-sm text-gray-500 mt-2">Энэ үйлдлийг буцаах боломжгүй.</p>
 
           <template #footer>
             <div class="flex justify-end gap-2">
@@ -646,9 +644,6 @@ onMounted(() => {
     </UModal>
 
     <!-- Bulk Import Modal -->
-    <ProductBulkImportModal
-      v-model:open="bulkImportModalOpen"
-      @success="onImportSuccess"
-    />
+    <ProductBulkImportModal v-model:open="bulkImportModalOpen" @success="onImportSuccess" />
   </div>
 </template>

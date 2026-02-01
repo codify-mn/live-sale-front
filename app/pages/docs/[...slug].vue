@@ -18,7 +18,7 @@ const { data: page } = await useAsyncData(`docs-${route.path}`, () =>
 provide<Ref<ContentNavigationItem[]>>('navigation', navigation as Ref<ContentNavigationItem[]>)
 
 useSeoMeta({
-  title: () => page.value?.title ? `${page.value.title} - Docs` : 'Documentation',
+  title: () => (page.value?.title ? `${page.value.title} - Docs` : 'Documentation'),
   description: () => page.value?.description || 'Comment Boost documentation'
 })
 </script>
@@ -37,6 +37,9 @@ useSeoMeta({
   </UPage>
 
   <UPage v-else>
-    <UPageHeader title="Page not found" description="The documentation page you're looking for doesn't exist." />
+    <UPageHeader
+      title="Page not found"
+      description="The documentation page you're looking for doesn't exist."
+    />
   </UPage>
 </template>
