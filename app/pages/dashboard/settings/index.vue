@@ -5,9 +5,9 @@ import type { FormSubmitEvent } from '@nuxt/ui'
 const fileRef = ref<HTMLInputElement>()
 
 const profileSchema = z.object({
-  name: z.string().min(2, 'Too short'),
-  email: z.string().email('Invalid email'),
-  username: z.string().min(2, 'Too short'),
+  name: z.string().min(2, 'Нэр хэт богино байна'),
+  email: z.string().email('Имэйл хаяг буруу байна'),
+  username: z.string().min(2, 'Хэрэглэгчийн нэр хэт богино байна'),
   avatar: z.string().optional(),
   bio: z.string().optional()
 })
@@ -24,8 +24,8 @@ const profile = reactive<Partial<ProfileSchema>>({
 const toast = useToast()
 async function onSubmit(event: FormSubmitEvent<ProfileSchema>) {
   toast.add({
-    title: 'Success',
-    description: 'Your settings have been updated.',
+    title: 'Амжилттай',
+    description: 'Тохиргоо хадгалагдлаа.',
     icon: 'i-lucide-check',
     color: 'success'
   })
@@ -50,15 +50,15 @@ function onFileClick() {
 <template>
   <UForm id="settings" :schema="profileSchema" :state="profile" @submit="onSubmit">
     <UPageCard
-      title="Profile"
-      description="These informations will be displayed publicly."
+      title="Хувийн мэдээлэл"
+      description="Энэ мэдээлэл олон нийтэд харагдах болно."
       variant="naked"
       orientation="horizontal"
       class="mb-4"
     >
       <UButton
         form="settings"
-        label="Save changes"
+        label="Хадгалах"
         color="neutral"
         type="submit"
         class="w-fit lg:ms-auto"
@@ -68,8 +68,8 @@ function onFileClick() {
     <UPageCard variant="subtle">
       <UFormField
         name="name"
-        label="Name"
-        description="Will appear on receipts, invoices, and other communication."
+        label="Нэр"
+        description="Баримт, нэхэмжлэх болон бусад харилцаанд харагдана."
         required
         class="flex max-sm:flex-col justify-between items-start gap-4"
       >
@@ -78,8 +78,8 @@ function onFileClick() {
       <USeparator />
       <UFormField
         name="email"
-        label="Email"
-        description="Used to sign in, for email receipts and product updates."
+        label="Имэйл"
+        description="Нэвтрэх, имэйл мэдэгдэл болон шинэчлэлт хүлээн авахад ашиглагдана."
         required
         class="flex max-sm:flex-col justify-between items-start gap-4"
       >
@@ -88,8 +88,8 @@ function onFileClick() {
       <USeparator />
       <UFormField
         name="username"
-        label="Username"
-        description="Your unique username for logging in and your profile URL."
+        label="Хэрэглэгчийн нэр"
+        description="Нэвтрэх болон профайл URL-д ашиглагдах өвөрмөц нэр."
         required
         class="flex max-sm:flex-col justify-between items-start gap-4"
       >
@@ -98,13 +98,13 @@ function onFileClick() {
       <USeparator />
       <UFormField
         name="avatar"
-        label="Avatar"
-        description="JPG, GIF or PNG. 1MB Max."
+        label="Зураг"
+        description="JPG, GIF эсвэл PNG. Хамгийн ихдээ 1MB."
         class="flex max-sm:flex-col justify-between sm:items-center gap-4"
       >
         <div class="flex flex-wrap items-center gap-3">
           <UAvatar :src="profile.avatar" :alt="profile.name" size="lg" />
-          <UButton label="Choose" color="neutral" @click="onFileClick" />
+          <UButton label="Сонгох" color="neutral" @click="onFileClick" />
           <input
             ref="fileRef"
             type="file"
@@ -117,8 +117,8 @@ function onFileClick() {
       <USeparator />
       <UFormField
         name="bio"
-        label="Bio"
-        description="Brief description for your profile. URLs are hyperlinked."
+        label="Танилцуулга"
+        description="Профайлын товч танилцуулга."
         class="flex max-sm:flex-col justify-between items-start gap-4"
         :ui="{ container: 'w-full' }"
       >

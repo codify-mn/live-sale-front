@@ -101,6 +101,9 @@
   --gradient-start: #f97316;
   --gradient-mid: #ec4899;
   --gradient-end: #a855f7;
+  --glass-bg: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-shadow: rgba(0, 0, 0, 0.04);
 }
 
 /* Dark mode */
@@ -111,6 +114,9 @@
   --gradient-start: #fb923c;
   --gradient-mid: #f472b6;
   --gradient-end: #c084fc;
+  --glass-bg: rgba(17, 17, 27, 0.6);
+  --glass-border: rgba(55, 55, 75, 0.3);
+  --glass-shadow: rgba(0, 0, 0, 0.2);
 }
 
 /* Base styles */
@@ -264,6 +270,34 @@ body {
 .glass-card {
   @apply bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl;
   @apply border border-white/20 dark:border-gray-700/30;
+}
+
+/* Elevated glass card with layered shadows */
+.glass-card-elevated {
+  @apply bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl;
+  @apply border border-white/20 dark:border-gray-700/30;
+  box-shadow:
+    0 1px 2px var(--glass-shadow),
+    0 4px 12px var(--glass-shadow),
+    0 8px 24px var(--glass-shadow);
+}
+
+.glass-card-elevated:hover {
+  box-shadow:
+    0 2px 4px var(--glass-shadow),
+    0 8px 20px var(--glass-shadow),
+    0 12px 32px var(--glass-shadow);
+}
+
+/* Glass sidebar nav active indicator */
+.glass-nav-active {
+  @apply relative;
+}
+
+.glass-nav-active::before {
+  content: '';
+  @apply absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-full;
+  background: linear-gradient(180deg, var(--gradient-start), var(--gradient-end));
 }
 
 /* Button shine effect */

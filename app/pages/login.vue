@@ -99,9 +99,17 @@ const features = [
       <!-- Content overlay -->
       <div class="relative z-10 flex flex-col justify-between p-12 xl:p-16 text-white">
         <!-- Logo -->
-        <NuxtLink to="/" class="flex items-center gap-3 group">
-          <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center group-hover:bg-white/30 transition-colors">
-            <UIcon name="i-lucide-zap" class="w-5 h-5 text-white" />
+        <NuxtLink
+          to="/"
+          class="flex items-center gap-3 group"
+        >
+          <div
+            class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center group-hover:bg-white/30 transition-colors"
+          >
+            <UIcon
+              name="i-lucide-zap"
+              class="w-5 h-5 text-white"
+            />
           </div>
           <span class="font-bold text-xl">CommentBoost</span>
         </NuxtLink>
@@ -110,12 +118,12 @@ const features = [
         <div class="max-w-lg">
           <h1 class="text-4xl xl:text-5xl font-bold mb-6 leading-tight">
             Live худалдааг
-            <br />
+            <br>
             автоматжуулаарай
           </h1>
           <p class="text-lg text-white/80 mb-10">
-            Мянга мянган худалдаачид итгэдэг платформ.
-            Захиалга автоматаар хүлээн авч, бизнесээ өсгөөрэй.
+            Мянга мянган худалдаачид итгэдэг платформ. Захиалга автоматаар хүлээн авч, бизнесээ
+            өсгөөрэй.
           </p>
 
           <!-- Feature list -->
@@ -125,12 +133,21 @@ const features = [
               :key="feature.title"
               class="flex items-start gap-4"
             >
-              <div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur flex items-center justify-center flex-shrink-0">
-                <UIcon :name="feature.icon" class="w-5 h-5" />
+              <div
+                class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur flex items-center justify-center flex-shrink-0"
+              >
+                <UIcon
+                  :name="feature.icon"
+                  class="w-5 h-5"
+                />
               </div>
               <div>
-                <h3 class="font-semibold mb-1">{{ feature.title }}</h3>
-                <p class="text-sm text-white/70">{{ feature.description }}</p>
+                <h3 class="font-semibold mb-1">
+                  {{ feature.title }}
+                </h3>
+                <p class="text-sm text-white/70">
+                  {{ feature.description }}
+                </p>
               </div>
             </div>
           </div>
@@ -139,13 +156,18 @@ const features = [
         <!-- Bottom testimonial -->
         <div class="glass-card rounded-2xl p-6 max-w-md bg-white/10 border-white/20">
           <p class="text-white/90 mb-4 leading-relaxed">
-            "CommentBoost ашиглаж эхэлснээс хойш захиалгын боловсруулалтанд зарцуулах цаг 80%-иар багассан."
+            "CommentBoost ашиглаж эхэлснээс хойш захиалгын боловсруулалтанд зарцуулах цаг 80%-иар
+            багассан."
           </p>
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-full bg-white/20" />
             <div>
-              <div class="font-medium text-sm">Б. Сарангэрэл</div>
-              <div class="text-xs text-white/60">Гоо сайхны дэлгүүр эзэмшигч</div>
+              <div class="font-medium text-sm">
+                Б. Сарангэрэл
+              </div>
+              <div class="text-xs text-white/60">
+                Гоо сайхны дэлгүүр эзэмшигч
+              </div>
             </div>
           </div>
         </div>
@@ -153,17 +175,29 @@ const features = [
 
       <!-- Decorative floating shapes -->
       <div class="absolute top-20 right-20 w-32 h-32 rounded-full bg-white/5 float" />
-      <div class="absolute bottom-40 right-40 w-20 h-20 rounded-2xl bg-white/5 float-delay-1 rotate-12" />
-      <div class="absolute top-1/2 right-10 w-16 h-16 rounded-xl bg-white/5 float-delay-2 -rotate-6" />
+      <div
+        class="absolute bottom-40 right-40 w-20 h-20 rounded-2xl bg-white/5 float-delay-1 rotate-12"
+      />
+      <div
+        class="absolute top-1/2 right-10 w-16 h-16 rounded-xl bg-white/5 float-delay-2 -rotate-6"
+      />
     </div>
 
     <!-- Right side - Form -->
     <div class="flex-1 flex items-center justify-center p-6 md:p-12 bg-white dark:bg-gray-950">
       <div class="w-full max-w-md">
         <!-- Mobile logo -->
-        <NuxtLink to="/" class="flex lg:hidden items-center gap-2.5 mb-8 justify-center">
-          <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-pink-500 flex items-center justify-center">
-            <UIcon name="i-lucide-zap" class="w-5 h-5 text-white" />
+        <NuxtLink
+          to="/"
+          class="flex lg:hidden items-center gap-2.5 mb-8 justify-center"
+        >
+          <div
+            class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-pink-500 flex items-center justify-center"
+          >
+            <UIcon
+              name="i-lucide-zap"
+              class="w-5 h-5 text-white"
+            />
           </div>
           <span class="font-bold text-lg text-gray-900 dark:text-white">
             Comment<span class="text-gradient">Boost</span>
@@ -181,7 +215,7 @@ const features = [
         </div>
 
         <!-- OAuth Buttons -->
-        <div class="space-y-3 mb-6">
+        <!-- <div class="space-y-3 mb-6">
           <UButton
             block
             size="lg"
@@ -191,7 +225,10 @@ const features = [
             class="hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
             @click="loginWithGoogle"
           >
-            <UIcon name="i-simple-icons-google" class="w-5 h-5 mr-3" />
+            <UIcon
+              name="i-simple-icons-google"
+              class="w-5 h-5 mr-3"
+            />
             Google-ээр үргэлжлүүлэх
           </UButton>
 
@@ -204,12 +241,14 @@ const features = [
             class="hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
             @click="loginWithFacebook"
           >
-            <UIcon name="i-simple-icons-facebook" class="w-5 h-5 mr-3 text-blue-600" />
+            <UIcon
+              name="i-simple-icons-facebook"
+              class="w-5 h-5 mr-3 text-blue-600"
+            />
             Facebook-ээр үргэлжлүүлэх
           </UButton>
         </div>
 
-        <!-- Divider -->
         <div class="relative my-8">
           <div class="absolute inset-0 flex items-center">
             <div class="w-full border-t border-gray-200 dark:border-gray-800" />
@@ -217,7 +256,7 @@ const features = [
           <div class="relative flex justify-center">
             <span class="px-4 text-sm text-gray-500 bg-white dark:bg-gray-950">эсвэл</span>
           </div>
-        </div>
+        </div> -->
 
         <!-- Error Alert -->
         <Transition
@@ -253,7 +292,10 @@ const features = [
           class="space-y-5"
           @submit="onLoginSubmit"
         >
-          <UFormField label="Имэйл хаяг" name="email">
+          <UFormField
+            label="Имэйл хаяг"
+            name="email"
+          >
             <UInput
               v-model="loginState.email"
               type="email"
@@ -263,7 +305,10 @@ const features = [
             />
           </UFormField>
 
-          <UFormField label="Нууц үг" name="password">
+          <UFormField
+            label="Нууц үг"
+            name="password"
+          >
             <UInput
               v-model="loginState.password"
               type="password"
@@ -302,7 +347,10 @@ const features = [
           @submit="onRegisterSubmit"
         >
           <div class="grid grid-cols-2 gap-4">
-            <UFormField label="Овог" name="last_name">
+            <UFormField
+              label="Овог"
+              name="last_name"
+            >
               <UInput
                 v-model="registerState.last_name"
                 placeholder="Овог"
@@ -311,7 +359,10 @@ const features = [
               />
             </UFormField>
 
-            <UFormField label="Нэр" name="first_name">
+            <UFormField
+              label="Нэр"
+              name="first_name"
+            >
               <UInput
                 v-model="registerState.first_name"
                 placeholder="Нэр"
@@ -321,7 +372,10 @@ const features = [
             </UFormField>
           </div>
 
-          <UFormField label="Имэйл хаяг" name="email">
+          <UFormField
+            label="Имэйл хаяг"
+            name="email"
+          >
             <UInput
               v-model="registerState.email"
               type="email"
@@ -331,7 +385,10 @@ const features = [
             />
           </UFormField>
 
-          <UFormField label="Нууц үг" name="password">
+          <UFormField
+            label="Нууц үг"
+            name="password"
+          >
             <UInput
               v-model="registerState.password"
               type="password"
@@ -359,7 +416,7 @@ const features = [
           </span>
           <button
             type="button"
-            class="ml-2 text-primary-500 hover:text-primary-600 font-semibold transition-colors"
+            class="ml-2 text-primary-500 hover:text-primary-600 font-semibold transition-colors cursor-pointer"
             @click="toggleMode"
           >
             {{ isRegisterMode ? 'Нэвтрэх' : 'Бүртгүүлэх' }}
@@ -369,10 +426,15 @@ const features = [
         <!-- Terms -->
         <p class="text-center text-xs text-gray-400 dark:text-gray-500 mt-8">
           Үргэлжлүүлснээр та манай
-          <NuxtLink to="/terms" class="text-primary-500 hover:underline">Үйлчилгээний нөхцөл</NuxtLink>
+          <NuxtLink
+            to="/terms"
+            class="text-primary-500 hover:underline"
+          >Үйлчилгээний нөхцөл</NuxtLink>
           болон
-          <NuxtLink to="/privacy" class="text-primary-500 hover:underline">Нууцлалын бодлого</NuxtLink>-г
-          зөвшөөрч байна.
+          <NuxtLink
+            to="/privacy"
+            class="text-primary-500 hover:underline"
+          >Нууцлалын бодлого</NuxtLink>-г зөвшөөрч байна.
         </p>
       </div>
     </div>

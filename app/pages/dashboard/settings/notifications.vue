@@ -9,39 +9,39 @@ const state = reactive<{ [key: string]: boolean }>({
 
 const sections = [
   {
-    title: 'Notification channels',
-    description: 'Where can we notify you?',
+    title: 'Мэдэгдлийн суваг',
+    description: 'Бид танд хаана мэдэгдэл илгээх вэ?',
     fields: [
       {
         name: 'email',
-        label: 'Email',
-        description: 'Receive a daily email digest.'
+        label: 'Имэйл',
+        description: 'Өдөр бүрийн имэйл мэдэгдэл хүлээн авах.'
       },
       {
         name: 'desktop',
-        label: 'Desktop',
-        description: 'Receive desktop notifications.'
+        label: 'Ширээний',
+        description: 'Ширээний мэдэгдэл хүлээн авах.'
       }
     ]
   },
   {
-    title: 'Account updates',
-    description: 'Receive updates about Nuxt UI.',
+    title: 'Бүртгэлийн шинэчлэлт',
+    description: 'Системийн шинэчлэлтийн талаар мэдэгдэл авах.',
     fields: [
       {
         name: 'weekly_digest',
-        label: 'Weekly digest',
-        description: 'Receive a weekly digest of news.'
+        label: 'Долоо хоногийн тойм',
+        description: 'Долоо хоног бүрийн мэдээний тойм хүлээн авах.'
       },
       {
         name: 'product_updates',
-        label: 'Product updates',
-        description: 'Receive a monthly email with all new features and updates.'
+        label: 'Бүтээгдэхүүний шинэчлэлт',
+        description: 'Сар бүрийн шинэ боломжууд болон шинэчлэлтийн талаар имэйл хүлээн авах.'
       },
       {
         name: 'important_updates',
-        label: 'Important updates',
-        description: 'Receive emails about important updates like security fixes, maintenance, etc.'
+        label: 'Чухал шинэчлэлт',
+        description: 'Аюулгүй байдлын засвар, засвар үйлчилгээ гэх мэт чухал шинэчлэлтийн талаар мэдэгдэл авах.'
       }
     ]
   }

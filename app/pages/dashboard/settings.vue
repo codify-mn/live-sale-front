@@ -4,47 +4,35 @@ import type { NavigationMenuItem } from '@nuxt/ui'
 const links = [
   [
     {
-      label: 'General',
+      label: 'Ерөнхий',
       icon: 'i-lucide-user',
-      to: '/settings',
+      to: '/dashboard/settings',
       exact: true
     },
     {
-      label: 'Members',
-      icon: 'i-lucide-users',
-      to: '/settings/members'
-    },
-    {
-      label: 'Notifications',
+      label: 'Мэдэгдэл',
       icon: 'i-lucide-bell',
-      to: '/settings/notifications'
+      to: '/dashboard/settings/notifications'
     },
     {
-      label: 'Billing',
+      label: 'Төлбөр',
       icon: 'i-lucide-credit-card',
-      to: '/settings/billing'
+      to: '/dashboard/settings/billing'
     },
     {
-      label: 'Security',
+      label: 'Нууцлал',
       icon: 'i-lucide-shield',
-      to: '/settings/security'
-    }
-  ],
-  [
-    {
-      label: 'Documentation',
-      icon: 'i-lucide-book-open',
-      to: 'https://ui.nuxt.com/docs/getting-started/installation/nuxt',
-      target: '_blank'
+      to: '/dashboard/settings/security'
     }
   ]
 ] satisfies NavigationMenuItem[][]
 </script>
 
 <template>
+  <div>
   <UDashboardPanel id="settings" :ui="{ body: 'lg:py-12' }">
     <template #header>
-      <UDashboardNavbar title="Settings">
+      <UDashboardNavbar title="Тохиргоо">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -62,4 +50,5 @@ const links = [
       </div>
     </template>
   </UDashboardPanel>
+  </div>
 </template>

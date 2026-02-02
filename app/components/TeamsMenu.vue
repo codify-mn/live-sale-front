@@ -1,87 +1,32 @@
 <script setup lang="ts">
-import type { DropdownMenuItem } from '@nuxt/ui'
-
 defineProps<{
   collapsed?: boolean
 }>()
 
 const shop = useShop()
-
-const items = ref<DropdownMenuItem[][]>([
-  [
-    {
-      label: shop.value?.name,
-      avatar: {
-        src: shop.value?.picture,
-        alt: shop.value?.name
-      }
-    }
-  ],
-  [
-    {
-      label: 'Create team',
-      icon: 'i-lucide-circle-plus'
-    },
-
-    {
-      label: 'Manage teams',
-      icon: 'i-lucide-cog'
-    }
-  ]
-])
-
-// const teams = ref([{
-//   label: 'Nuxt',
-//   avatar: {
-//     src: 'https://github.com/nuxt.png',
-//     alt: 'Nuxt'
-//   }
-// }, {
-//   label: 'NuxtHub',
-//   avatar: {
-//     src: 'https://github.com/nuxt-hub.png',
-//     alt: 'NuxtHub'
-//   }
-// }, {
-//   label: 'NuxtLabs',
-//   avatar: {
-//     src: 'https://github.com/nuxtlabs.png',
-//     alt: 'NuxtLabs'
-//   }
-// }])
-// const selectedTeam = ref(teams.value[0])
-
-// const items = computed<DropdownMenuItem[][]>(() => {
-//   return [teams.value.map(team => ({
-//     ...team,
-//     onSelect() {
-//       selectedTeam.value = team
-//     }
-//   })), [{
-//     label: 'Create team',
-//     icon: 'i-lucide-circle-plus'
-//   }, {
-//     label: 'Manage teams',
-//     icon: 'i-lucide-cog'
-//   }]]
-// })
 </script>
 
 <template>
-  <UDropdownMenu
-    :items="items"
-    :content="{ align: 'center', collisionPadding: 12 }"
-    :ui="{
-      content: collapsed ? 'w-40' : 'w-(--reka-dropdown-menu-trigger-width)'
-    }"
-  >
-    <!-- <UButton v-bind="{
-      ...selectedTeam,
-      label: collapsed ? undefined : selectedTeam?.label,
-      trailingIcon: collapsed ? undefined : 'i-lucide-chevrons-up-down'
-    }" color="neutral" variant="ghost" block :square="collapsed" class="data-[state=open]:bg-elevated"
-      :class="[!collapsed && 'py-2']" :ui="{
-        trailingIcon: 'text-dimmed'
-      }" /> -->
-  </UDropdownMenu>
+  <div class="flex items-center gap-3 px-2 py-1.5" :class="collapsed ? 'justify-center' : ''">
+    <div
+      class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center flex-shrink-0 shadow-sm"
+    >
+      <img
+        v-if="shop?.picture"
+        :src="shop.picture"
+        :alt="shop?.name"
+        class="w-full h-full rounded-xl object-cover"
+      />
+      <UIcon v-else name="i-lucide-store" class="w-4.5 h-4.5 text-white" />
+    </div>
+
+    <div v-if="!collapsed" class="flex-1 min-w-0">
+      <p class="text-sm font-semibold text-gray-900 dark:text-white truncate">
+        {{ shop?.name || 'Миний дэлгүүр' }}
+      </p>
+      <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
+        Үнэгүй багц
+      </p>
+    </div>
+  </div>
 </template>

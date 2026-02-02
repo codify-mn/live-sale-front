@@ -82,7 +82,10 @@ const columns = [
   <UDashboardPanel id="live-sales">
     <UDashboardNavbar title="Facebook Live" />
     <div class="p-6 space-y-6 overflow-y-auto mt-6">
-      <DashboardSection title="Түргэн үйлдлүүд" description="Түгээмэл хэрэглэгддэг үйлдлүүд">
+      <DashboardSection
+        title="Түргэн үйлдлүүд"
+        description="Түгээмэл хэрэглэгддэг үйлдлүүд"
+      >
         <DashboardQuickAction
           title="Start Live"
           description="Start a new live sale stream"
@@ -97,7 +100,10 @@ const columns = [
         />
       </DashboardSection>
 
-      <UTable :data="lives" :columns="columns">
+      <UTable
+        :data="lives"
+        :columns="columns"
+      >
         <template #title-cell="{ row }">
           <NuxtLink
             :to="`/app/live/${row.original.id}`"
@@ -127,22 +133,40 @@ const columns = [
 
       <template #body>
         <div class="space-y-4">
-          <UFormGroup label="Title" required>
-            <UInput v-model="liveForm.title" placeholder="Enter stream title..." />
-          </UFormGroup>
-          <UFormGroup label="Description">
-            <UTextarea v-model="liveForm.description" placeholder="Enter stream description..." />
-          </UFormGroup>
+          <UFormField
+            label="Title"
+            required
+          >
+            <UInput
+              v-model="liveForm.title"
+              placeholder="Enter stream title..."
+            />
+          </UFormField>
+          <UFormField label="Description">
+            <UTextarea
+              v-model="liveForm.description"
+              placeholder="Enter stream description..."
+            />
+          </UFormField>
         </div>
       </template>
 
       <template #footer>
-        <USpacer />
         <div class="flex justify-end gap-2">
-          <UButton color="secondary" variant="ghost" @click="isLiveModalOpen = false"
-            >Cancel</UButton
+          <UButton
+            color="secondary"
+            variant="ghost"
+            @click="isLiveModalOpen = false"
           >
-          <UButton color="primary" :loading="isLoading" @click="createLive">Go Live</UButton>
+            Cancel
+          </UButton>
+          <UButton
+            color="primary"
+            :loading="isLoading"
+            @click="createLive"
+          >
+            Go Live
+          </UButton>
         </div>
       </template>
     </UModal>

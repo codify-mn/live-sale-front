@@ -177,7 +177,8 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 </script>
 
 <template>
-  <UDashboardPanel id="new-order">
+  <div>
+    <UDashboardPanel id="new-order">
     <template #header>
       <UDashboardNavbar>
         <template #leading>
@@ -426,5 +427,6 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
         @select="handleVariantSelect"
       />
     </template>
-  </UDashboardPanel>
+    </UDashboardPanel>
+  </div>
 </template>

@@ -5,7 +5,7 @@ interface Props {
   clickable?: boolean
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   padding: 'md',
   hover: false,
   clickable: false
@@ -21,11 +21,10 @@ const paddingClasses = {
 
 <template>
   <div
-    class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm"
+    class="bg-white/60 dark:bg-gray-900/60 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-gray-700/30 shadow-sm shadow-gray-200/50 dark:shadow-gray-950/50"
     :class="[
       paddingClasses[padding],
-      hover &&
-        'hover:shadow-md hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200',
+      hover && 'hover:shadow-md hover:shadow-gray-200/60 dark:hover:shadow-gray-950/60 hover:border-white/30 dark:hover:border-gray-700/40 transition-all duration-300',
       clickable && 'cursor-pointer'
     ]"
   >

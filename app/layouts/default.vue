@@ -87,15 +87,17 @@ const groups = computed(() => [
       v-model:open="open"
       collapsible
       resizable
-      class="bg-white/75 dark:bg-gray-900/75 backdrop-blur-xl border-r border-gray-200 dark:border-gray-800"
-      :ui="{ footer: 'lg:border-t lg:border-gray-200 dark:lg:border-gray-800' }"
+      class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-2xl border-r border-gray-200/50 dark:border-gray-800/50"
+      :ui="{
+        footer: 'lg:border-t lg:border-gray-200/50 dark:lg:border-gray-800/50'
+      }"
     >
       <template #header="{ collapsed }">
         <TeamsMenu :collapsed="collapsed" />
       </template>
 
       <template #default="{ collapsed }">
-        <UDashboardSearchButton :collapsed="collapsed" class="bg-transparent ring-default" />
+        <UDashboardSearchButton :collapsed="collapsed" class="bg-gray-50/50 dark:bg-gray-800/30 ring-gray-200/60 dark:ring-gray-700/40 backdrop-blur-sm" />
 
         <UNavigationMenu
           :collapsed="collapsed"
@@ -114,7 +116,5 @@ const groups = computed(() => [
     <UDashboardSearch :groups="groups" />
 
     <slot />
-
-    <!-- <NotificationsSlideover /> -->
   </UDashboardGroup>
 </template>

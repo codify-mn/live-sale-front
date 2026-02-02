@@ -237,7 +237,8 @@ onMounted(async () => {
 </script>
 
 <template>
-  <UDashboardPanel id="product-detail">
+  <div>
+    <UDashboardPanel id="product-detail">
     <template #header>
       <UDashboardNavbar>
         <template #leading>
@@ -398,5 +399,6 @@ onMounted(async () => {
         </template>
       </UModal>
     </template>
-  </UDashboardPanel>
+    </UDashboardPanel>
+  </div>
 </template>

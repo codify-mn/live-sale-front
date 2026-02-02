@@ -142,7 +142,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <UDashboardPanel id="new-product">
+  <div>
+    <UDashboardPanel id="new-product">
     <template #header>
       <UDashboardNavbar>
         <template #leading>
@@ -261,5 +262,6 @@ onMounted(() => {
         </UForm>
       </div>
     </template>
-  </UDashboardPanel>
+    </UDashboardPanel>
+  </div>
 </template>
