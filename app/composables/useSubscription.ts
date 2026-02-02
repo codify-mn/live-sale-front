@@ -43,7 +43,7 @@ const _useSubscription = () => {
         loading.value = true
         error.value = null
         try {
-            const data = await $fetch<PlansResponse>(`${apiUrl}/pub/plans`)
+            const data = await $fetch<PlansResponse>(`${apiUrl}/plans`)
             plans.value = data.plans
         } catch (e: any) {
             error.value = e.data?.error || 'Failed to fetch plans'

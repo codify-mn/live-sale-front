@@ -160,7 +160,7 @@ const faq = [
 
 const trustPoints = [
     { icon: 'i-lucide-shield-check', label: 'Аюулгүй төлбөр' },
-    { icon: 'i-lucide-clock', label: '14 хоног үнэгүй' },
+    { icon: 'i-lucide-clock', label: '30 хоног үнэгүй' },
     { icon: 'i-lucide-rotate-ccw', label: 'Хүссэн үед цуцлах' },
     { icon: 'i-lucide-credit-card', label: 'Карт шаардлагагүй' }
 ]

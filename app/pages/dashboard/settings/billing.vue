@@ -102,16 +102,14 @@ const featureItems = computed(() => {
     ]
 })
 
-function getUsagePercent(current: number, max: number): number {
-    if (max === -1) return 0
-    return Math.min(100, (current / max) * 100)
-}
-
-function getUsageColor(percent: number): 'error' | 'warning' | 'primary' {
-    if (percent >= 90) return 'error'
-    if (percent >= 70) return 'warning'
-    return 'primary'
-}
+const usagePercent = computed(() => {
+    if (!usage.value || !subscription.value?.plan) return 0
+    if (subscription.value.plan.limits.max_products === -1) return 0
+    return Math.min(
+        100,
+        (usage.value.product_count / subscription.value.plan.limits.max_products) * 100
+    )
+})
 
 async function handleCancel() {
     canceling.value = true
@@ -241,8 +239,14 @@ async function handleCancel() {
                             </span>
                         </div>
                         <UProgress
-                            :value="getUsagePercent(item.current, item.max)"
-                            :color="getUsageColor(getUsagePercent(item.current, item.max))"
+                            v-model="usagePercent"
+                            :color="
+                                usagePercent >= 90
+                                    ? 'error'
+                                    : usagePercent >= 70
+                                      ? 'warning'
+                                      : 'primary'
+                            "
                             size="sm"
                         />
                     </div>

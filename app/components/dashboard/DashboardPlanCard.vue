@@ -110,7 +110,7 @@ const daysColor = computed(() => {
                         </span>
                     </div>
                     <UProgress
-                        :value="productUsagePercent"
+                        v-model="productUsagePercent"
                         :color="
                             productUsagePercent >= 90
                                 ? 'error'

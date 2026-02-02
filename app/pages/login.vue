@@ -11,15 +11,7 @@ useSeoMeta({
 })
 
 const route = useRoute()
-const {
-    loginWithFacebook,
-    loginWithGoogle,
-    loginWithEmail,
-    register,
-    isLoading,
-    authError,
-    clearError
-} = useAuth()
+const { loginWithEmail, register, isLoading, authError, clearError } = useAuth()
 
 // Check for mode in URL query
 const isRegisterMode = ref(route.query.mode === 'register')

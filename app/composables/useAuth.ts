@@ -63,14 +63,6 @@ const _useAuth = () => {
         }
     }
 
-    const loginWithFacebook = () => {
-        window.location.href = `${config.public.apiUrl}/auth/facebook/login`
-    }
-
-    const loginWithGoogle = () => {
-        window.location.href = `${config.public.apiUrl}/auth/google/login`
-    }
-
     const loginWithEmail = async (credentials: LoginCredentials): Promise<boolean> => {
         isLoading.value = true
         authError.value = null
@@ -192,8 +184,6 @@ const _useAuth = () => {
         needsOnboarding,
         authError,
         fetchUser,
-        loginWithFacebook,
-        loginWithGoogle,
         loginWithEmail,
         register,
         forgotPassword,

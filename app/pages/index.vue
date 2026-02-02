@@ -212,7 +212,7 @@ onMounted(() => {
                             </div>
                             <div class="trust-badge">
                                 <UIcon name="i-lucide-clock" class="w-4 h-4 text-primary-500" />
-                                <span>14 хоног үнэгүй</span>
+                                <span>30 хоног үнэгүй</span>
                             </div>
                             <div class="trust-badge">
                                 <UIcon
