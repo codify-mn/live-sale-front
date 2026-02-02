@@ -138,11 +138,12 @@ async function handleCancel() {
 </script>
 
 <template>
-  <div v-if="loading" class="flex justify-center items-center py-12">
-    <UIcon name="i-lucide-loader-2" class="w-8 h-8 animate-spin text-gray-400" />
-  </div>
+  <div>
+    <div v-if="loading" class="flex justify-center items-center py-12">
+      <UIcon name="i-lucide-loader-2" class="w-8 h-8 animate-spin text-gray-400" />
+    </div>
 
-  <template v-else-if="subscription">
+    <template v-else-if="subscription">
     <!-- Current Plan -->
     <UPageCard title="Одоогийн багц" description="Таны захиалгын мэдээлэл" variant="subtle">
       <div class="flex flex-col gap-4">
@@ -305,5 +306,6 @@ async function handleCancel() {
         <UButton label="Багц сонгох" color="primary" to="/pricing" />
       </div>
     </UPageCard>
-  </template>
+    </template>
+  </div>
 </template>

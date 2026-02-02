@@ -10,6 +10,14 @@ export interface Shop {
     auto_reply: boolean
     reply_message: string
     payment_method: string
+    comment_prefix: string
+    allow_overselling: boolean
+    delivery_fee: number
+    delivery_note: string
+    free_delivery_over: number
+    bank_name: string
+    bank_account_number: string
+    bank_account_name: string
   }
 }
 

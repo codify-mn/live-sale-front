@@ -10,6 +10,11 @@ const links = [
       exact: true
     },
     {
+      label: 'Дэлгүүр',
+      icon: 'i-lucide-store',
+      to: '/dashboard/settings/shop'
+    },
+    {
       label: 'Мэдэгдэл',
       icon: 'i-lucide-bell',
       to: '/dashboard/settings/notifications'

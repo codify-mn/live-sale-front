@@ -79,96 +79,98 @@ const columns = [
 </script>
 
 <template>
-  <UDashboardPanel id="live-sales">
-    <UDashboardNavbar title="Facebook Live" />
-    <div class="p-6 space-y-6 overflow-y-auto mt-6">
-      <DashboardSection
-        title="Түргэн үйлдлүүд"
-        description="Түгээмэл хэрэглэгддэг үйлдлүүд"
-      >
-        <DashboardQuickAction
-          title="Start Live"
-          description="Start a new live sale stream"
-          icon="i-lucide-video"
-          color="blue"
-          @click="
-            () => {
-              console.log('Start live clicked')
-              isLiveModalOpen = true
-            }
-          "
-        />
-      </DashboardSection>
-
-      <UTable
-        :data="lives"
-        :columns="columns"
-      >
-        <template #title-cell="{ row }">
-          <NuxtLink
-            :to="`/app/live/${row.original.id}`"
-            class="font-medium text-gray-900 dark:text-white hover:text-primary-500"
-          >
-            {{ row.original.title }}
-          </NuxtLink>
-        </template>
-      </UTable>
-    </div>
-
-    <UModal v-model:open="isLiveModalOpen">
-      <template #header>
-        <div class="flex-1 flex items-center justify-between">
-          <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
-            Start Live Sale
-          </h3>
-          <UButton
-            color="neutral"
-            variant="ghost"
-            icon="i-heroicons-x-mark-20-solid"
-            class="-my-1"
-            @click="isLiveModalOpen = false"
+  <div class="w-full h-full">
+    <UDashboardPanel id="live-sales">
+      <UDashboardNavbar title="Facebook Live" />
+      <div class="p-6 space-y-6 overflow-y-auto mt-6">
+        <DashboardSection
+          title="Түргэн үйлдлүүд"
+          description="Түгээмэл хэрэглэгддэг үйлдлүүд"
+        >
+          <DashboardQuickAction
+            title="Start Live"
+            description="Start a new live sale stream"
+            icon="i-lucide-video"
+            color="blue"
+            @click="
+              () => {
+                console.log('Start live clicked')
+                isLiveModalOpen = true
+              }
+            "
           />
-        </div>
-      </template>
+        </DashboardSection>
 
-      <template #body>
-        <div class="space-y-4">
-          <UFormField
-            label="Title"
-            required
-          >
-            <UInput
-              v-model="liveForm.title"
-              placeholder="Enter stream title..."
-            />
-          </UFormField>
-          <UFormField label="Description">
-            <UTextarea
-              v-model="liveForm.description"
-              placeholder="Enter stream description..."
-            />
-          </UFormField>
-        </div>
-      </template>
+        <UTable
+          :data="lives"
+          :columns="columns"
+        >
+          <template #title-cell="{ row }">
+            <NuxtLink
+              :to="`/app/live/${row.original.id}`"
+              class="font-medium text-gray-900 dark:text-white hover:text-primary-500"
+            >
+              {{ row.original.title }}
+            </NuxtLink>
+          </template>
+        </UTable>
+      </div>
 
-      <template #footer>
-        <div class="flex justify-end gap-2">
-          <UButton
-            color="secondary"
-            variant="ghost"
-            @click="isLiveModalOpen = false"
-          >
-            Cancel
-          </UButton>
-          <UButton
-            color="primary"
-            :loading="isLoading"
-            @click="createLive"
-          >
-            Go Live
-          </UButton>
-        </div>
-      </template>
-    </UModal>
-  </UDashboardPanel>
+      <UModal v-model:open="isLiveModalOpen">
+        <template #header>
+          <div class="flex-1 flex items-center justify-between">
+            <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
+              Start Live Sale
+            </h3>
+            <UButton
+              color="neutral"
+              variant="ghost"
+              icon="i-heroicons-x-mark-20-solid"
+              class="-my-1"
+              @click="isLiveModalOpen = false"
+            />
+          </div>
+        </template>
+
+        <template #body>
+          <div class="space-y-4">
+            <UFormField
+              label="Title"
+              required
+            >
+              <UInput
+                v-model="liveForm.title"
+                placeholder="Enter stream title..."
+              />
+            </UFormField>
+            <UFormField label="Description">
+              <UTextarea
+                v-model="liveForm.description"
+                placeholder="Enter stream description..."
+              />
+            </UFormField>
+          </div>
+        </template>
+
+        <template #footer>
+          <div class="flex justify-end gap-2">
+            <UButton
+              color="secondary"
+              variant="ghost"
+              @click="isLiveModalOpen = false"
+            >
+              Cancel
+            </UButton>
+            <UButton
+              color="primary"
+              :loading="isLoading"
+              @click="createLive"
+            >
+              Go Live
+            </UButton>
+          </div>
+        </template>
+      </UModal>
+    </UDashboardPanel>
+  </div>
 </template>
