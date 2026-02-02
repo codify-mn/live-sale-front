@@ -1,65 +1,65 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: [
-    '@nuxt/eslint',
-    '@nuxt/image',
-    '@nuxt/ui',
-    '@nuxt/content',
-    '@vueuse/nuxt',
-    'nuxt-og-image'
-  ],
+    modules: [
+        '@nuxt/eslint',
+        '@nuxt/image',
+        '@nuxt/ui',
+        '@nuxt/content',
+        '@vueuse/nuxt',
+        'nuxt-og-image'
+    ],
 
-  ssr: false,
+    ssr: false,
 
-  devtools: {
-    enabled: true
-  },
-
-  components: [
-    {
-      path: '~/components',
-      pathPrefix: false
-    }
-  ],
-
-  css: ['~/assets/css/main.css'],
-
-  // Page transitions
-  app: {
-    pageTransition: {
-      name: 'page',
-      mode: 'out-in'
+    devtools: {
+        enabled: true
     },
-    layoutTransition: {
-      name: 'layout',
-      mode: 'out-in'
-    }
-  },
 
-  runtimeConfig: {
-    public: {
-      apiUrl: process.env.NUXT_PUBLIC_API_URL || 'http://localhost:4000'
-    }
-  },
+    components: [
+        {
+            path: '~/components',
+            pathPrefix: false
+        }
+    ],
 
-  routeRules: {
-    '/api/**': {
-      cors: true,
-      proxy: 'http://localhost:4000'
+    css: ['~/assets/css/main.css'],
+
+    // Page transitions
+    app: {
+        pageTransition: {
+            name: 'page',
+            mode: 'out-in'
+        },
+        layoutTransition: {
+            name: 'layout',
+            mode: 'out-in'
+        }
     },
-    '/docs': {
-      redirect: '/docs/getting-started'
-    }
-  },
 
-  compatibilityDate: '2024-07-11',
+    runtimeConfig: {
+        public: {
+            apiUrl: process.env.NUXT_PUBLIC_API_URL || 'http://localhost:4000'
+        }
+    },
 
-  eslint: {
-    config: {
-      stylistic: {
-        commaDangle: 'never',
-        braceStyle: '1tbs'
-      }
+    routeRules: {
+        '/api/**': {
+            cors: true,
+            proxy: 'http://localhost:4000'
+        },
+        '/docs': {
+            redirect: '/docs/getting-started'
+        }
+    },
+
+    compatibilityDate: '2024-07-11',
+
+    eslint: {
+        config: {
+            stylistic: {
+                commaDangle: 'never',
+                braceStyle: '1tbs'
+            }
+        }
     }
-  }
 })

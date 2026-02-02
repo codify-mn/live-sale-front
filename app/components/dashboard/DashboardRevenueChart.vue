@@ -1,95 +1,103 @@
 <script setup lang="ts">
 interface Props {
-  totalRevenue?: number
-  data?: { label: string; value: number }[]
+    totalRevenue?: number
+    data?: { label: string; value: number }[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  totalRevenue: 0,
-  data: () => []
+    totalRevenue: 0,
+    data: () => []
 })
 
 // Generate last 7 days labels in Mongolian
 const last7Days = computed(() => {
-  const days = []
-  const dayNames = ['Ня', 'Да', 'Мя', 'Лх', 'Пү', 'Ба', 'Бя']
-  for (let i = 6; i >= 0; i--) {
-    const date = new Date()
-    date.setDate(date.getDate() - i)
-    days.push({
-      label: dayNames[date.getDay()],
-      date: date.toISOString().split('T')[0]
-    })
-  }
-  return days
+    const days = []
+    const dayNames = ['Ня', 'Да', 'Мя', 'Лх', 'Пү', 'Ба', 'Бя']
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date()
+        date.setDate(date.getDate() - i)
+        days.push({
+            label: dayNames[date.getDay()],
+            date: date.toISOString().split('T')[0]
+        })
+    }
+    return days
 })
 
 // Use provided data or generate placeholder
 const chartData = computed(() => {
-  if (props.data && props.data.length > 0) {
-    return props.data
-  }
-  // Placeholder data when no real data
-  return last7Days.value.map(day => ({
-    label: day.label,
-    value: Math.floor(Math.random() * 50000) + 10000
-  }))
+    if (props.data && props.data.length > 0) {
+        return props.data
+    }
+    // Placeholder data when no real data
+    return last7Days.value.map((day) => ({
+        label: day.label,
+        value: Math.floor(Math.random() * 50000) + 10000
+    }))
 })
 
-const maxValue = computed(() => Math.max(...chartData.value.map(d => d.value), 1))
+const maxValue = computed(() => Math.max(...chartData.value.map((d) => d.value), 1))
 
 const formatCompact = (value: number): string => {
-  if (value >= 1000000) return `${(value / 1000000).toFixed(1)}сая`
-  if (value >= 1000) return `${(value / 1000).toFixed(0)}мян`
-  return value.toString()
+    if (value >= 1000000) return `${(value / 1000000).toFixed(1)}сая`
+    if (value >= 1000) return `${(value / 1000).toFixed(0)}мян`
+    return value.toString()
 }
 </script>
 
 <template>
-  <DashboardCard padding="lg">
-    <div class="space-y-4">
-      <!-- Header -->
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-            Энэ долоо хоногийн орлого
-          </p>
-          <p class="text-2xl font-bold text-gray-900 dark:text-white mt-1">
-            {{ new Intl.NumberFormat('mn-MN').format(totalRevenue) }}₮
-          </p>
-        </div>
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-900/30 dark:to-green-800/20 flex items-center justify-center">
-          <UIcon name="i-lucide-trending-up" class="w-5 h-5 text-green-500" />
-        </div>
-      </div>
-
-      <!-- Simple Bar Chart -->
-      <div class="flex items-end gap-2 h-24">
-        <div
-          v-for="(item, index) in chartData"
-          :key="index"
-          class="flex-1 flex flex-col items-center gap-1"
-        >
-          <!-- Bar -->
-          <div class="w-full relative group">
-            <!-- Tooltip -->
-            <div class="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-              <div class="bg-gray-900 dark:bg-gray-700 text-white text-xs px-2 py-1 rounded-lg whitespace-nowrap shadow-lg">
-                {{ formatCompact(item.value) }}₮
-              </div>
+    <DashboardCard padding="lg">
+        <div class="space-y-4">
+            <!-- Header -->
+            <div class="flex items-center justify-between">
+                <div>
+                    <p
+                        class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                    >
+                        Энэ долоо хоногийн орлого
+                    </p>
+                    <p class="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+                        {{ new Intl.NumberFormat('mn-MN').format(totalRevenue) }}₮
+                    </p>
+                </div>
+                <div
+                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-900/30 dark:to-green-800/20 flex items-center justify-center"
+                >
+                    <UIcon name="i-lucide-trending-up" class="w-5 h-5 text-green-500" />
+                </div>
             </div>
-            <!-- Bar itself -->
-            <div
-              class="w-full rounded-t-lg bg-gradient-to-t from-primary-500 to-primary-400 dark:from-primary-600 dark:to-primary-500 transition-all duration-300 hover:from-primary-600 hover:to-primary-500"
-              :style="{ height: `${Math.max((item.value / maxValue) * 64, 4)}px` }"
-            />
-          </div>
-          <!-- Label -->
-          <span class="text-[10px] text-gray-400 dark:text-gray-500 font-medium">
-            {{ item.label }}
-          </span>
+
+            <!-- Simple Bar Chart -->
+            <div class="flex items-end gap-2 h-24">
+                <div
+                    v-for="(item, index) in chartData"
+                    :key="index"
+                    class="flex-1 flex flex-col items-center gap-1"
+                >
+                    <!-- Bar -->
+                    <div class="w-full relative group">
+                        <!-- Tooltip -->
+                        <div
+                            class="absolute -top-8 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                        >
+                            <div
+                                class="bg-gray-900 dark:bg-gray-700 text-white text-xs px-2 py-1 rounded-lg whitespace-nowrap shadow-lg"
+                            >
+                                {{ formatCompact(item.value) }}₮
+                            </div>
+                        </div>
+                        <!-- Bar itself -->
+                        <div
+                            class="w-full rounded-t-lg bg-gradient-to-t from-primary-500 to-primary-400 dark:from-primary-600 dark:to-primary-500 transition-all duration-300 hover:from-primary-600 hover:to-primary-500"
+                            :style="{ height: `${Math.max((item.value / maxValue) * 64, 4)}px` }"
+                        />
+                    </div>
+                    <!-- Label -->
+                    <span class="text-[10px] text-gray-400 dark:text-gray-500 font-medium">
+                        {{ item.label }}
+                    </span>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </DashboardCard>
+    </DashboardCard>
 </template>
