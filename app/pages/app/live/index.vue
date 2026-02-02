@@ -79,7 +79,7 @@ const columns = [
 </script>
 
 <template>
-  <div class="w-full h-full">
+  <div class="w-full h-full overflow-y-auto">
     <UDashboardPanel id="live-sales">
       <UDashboardNavbar title="Facebook Live" />
       <div class="p-6 space-y-6 overflow-y-auto mt-6">

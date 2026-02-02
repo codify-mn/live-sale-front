@@ -56,7 +56,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="w-full">
+  <div class="w-full h-full overflow-y-auto">
     <UDashboardPanel
       id="home"
       class="px-4 pb-6 overflow-y-auto"

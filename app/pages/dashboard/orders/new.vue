@@ -177,256 +177,256 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 </script>
 
 <template>
-  <div>
+  <div class="w-full h-full overflow-y-auto">
     <UDashboardPanel id="new-order">
-    <template #header>
-      <UDashboardNavbar>
-        <template #leading>
-          <UButton
-            to="/dashboard/orders"
-            icon="i-lucide-arrow-left"
-            color="neutral"
-            variant="ghost"
-          />
-        </template>
+      <template #header>
+        <UDashboardNavbar>
+          <template #leading>
+            <UButton
+              to="/dashboard/orders"
+              icon="i-lucide-arrow-left"
+              color="neutral"
+              variant="ghost"
+            />
+          </template>
 
-        <template #title>
-          <div>
-            <h1 class="text-lg font-semibold text-gray-900 dark:text-white">
-              Захиалга нэмэх
-            </h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400">
-              Шинэ захиалга үүсгэх
-            </p>
-          </div>
-        </template>
+          <template #title>
+            <div>
+              <h1 class="text-lg font-semibold text-gray-900 dark:text-white">
+                Захиалга нэмэх
+              </h1>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                Шинэ захиалга үүсгэх
+              </p>
+            </div>
+          </template>
 
-        <template #right>
-          <UButton
-            type="submit"
-            form="order-form"
-            color="primary"
-            icon="i-lucide-check"
-            :loading="loading"
-            :disabled="!canSubmit"
+          <template #right>
+            <UButton
+              type="submit"
+              form="order-form"
+              color="primary"
+              icon="i-lucide-check"
+              :loading="loading"
+              :disabled="!canSubmit"
+            >
+              Захиалга үүсгэх
+            </UButton>
+          </template>
+        </UDashboardNavbar>
+      </template>
+
+      <template #body>
+        <div class="p-6 overflow-y-auto">
+          <UForm
+            id="order-form"
+            :schema="schema"
+            :state="state"
+            @submit="onSubmit"
           >
-            Захиалга үүсгэх
-          </UButton>
-        </template>
-      </UDashboardNavbar>
-    </template>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <!-- Left Column - Product Selection -->
+              <div class="lg:col-span-2 space-y-6">
+                <!-- Product Search Grid -->
+                <OrderProductGrid @select="handleProductSelect" />
 
-    <template #body>
-      <div class="p-6 overflow-y-auto">
-        <UForm
-          id="order-form"
-          :schema="schema"
-          :state="state"
-          @submit="onSubmit"
-        >
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Left Column - Product Selection -->
-            <div class="lg:col-span-2 space-y-6">
-              <!-- Product Search Grid -->
-              <OrderProductGrid @select="handleProductSelect" />
+                <!-- Customer Info -->
+                <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+                  <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-4">
+                    Худалдан авагчийн мэдээлэл
+                  </h3>
 
-              <!-- Customer Info -->
-              <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
-                <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-4">
-                  Худалдан авагчийн мэдээлэл
-                </h3>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <UFormField
-                    label="Нэр"
-                    name="customer_name"
-                    required
-                  >
-                    <UInput
-                      v-model="state.customer_name"
-                      placeholder="Худалдан авагчийн нэр"
-                      size="lg"
-                    />
-                  </UFormField>
-
-                  <UFormField
-                    label="Утас"
-                    name="customer_phone"
-                    required
-                  >
-                    <UInput
-                      v-model="state.customer_phone"
-                      placeholder="99001122"
-                      size="lg"
-                    />
-                  </UFormField>
-
-                  <UFormField
-                    label="Нөөц утас"
-                    name="customer_phone_secondary"
-                  >
-                    <UInput
-                      v-model="state.customer_phone_secondary"
-                      placeholder="88001122"
-                      size="lg"
-                    />
-                  </UFormField>
-
-                  <UFormField
-                    label="Имэйл"
-                    name="customer_email"
-                  >
-                    <UInput
-                      v-model="state.customer_email"
-                      type="email"
-                      placeholder="email@example.com"
-                      size="lg"
-                    />
-                  </UFormField>
-
-                  <UFormField
-                    label="Хот/Аймаг"
-                    name="customer_city"
-                  >
-                    <UInput
-                      v-model="state.customer_city"
-                      placeholder="Улаанбаатар"
-                      size="lg"
-                    />
-                  </UFormField>
-
-                  <UFormField
-                    label="Дүүрэг/Сум"
-                    name="customer_district"
-                  >
-                    <UInput
-                      v-model="state.customer_district"
-                      placeholder="Баянзүрх"
-                      size="lg"
-                    />
-                  </UFormField>
-
-                  <div class="sm:col-span-2">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <UFormField
-                      label="Хаяг"
-                      name="customer_address"
+                      label="Нэр"
+                      name="customer_name"
+                      required
                     >
-                      <UTextarea
-                        v-model="state.customer_address"
-                        placeholder="Дэлгэрэнгүй хаяг"
-                        :rows="2"
+                      <UInput
+                        v-model="state.customer_name"
+                        placeholder="Худалдан авагчийн нэр"
+                        size="lg"
                       />
                     </UFormField>
-                  </div>
-                </div>
-              </div>
-            </div>
 
-            <!-- Right Column - Cart & Payment -->
-            <div class="space-y-6">
-              <!-- Cart -->
-              <OrderCartCard
-                :items="cartItems"
-                :shipping-fee="shippingFee"
-                :discount="discount"
-                @remove="removeCartItem"
-                @update-quantity="updateCartItemQuantity"
-              />
-
-              <!-- Shipping & Discount -->
-              <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
-                <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-4">
-                  Нэмэлт
-                </h3>
-
-                <div class="space-y-4">
-                  <div>
-                    <label class="text-sm text-gray-600 dark:text-gray-400 mb-1 block">
-                      Хүргэлтийн төлбөр
-                    </label>
-                    <UInput
-                      v-model.number="shippingFee"
-                      type="number"
-                      min="0"
-                      placeholder="0"
+                    <UFormField
+                      label="Утас"
+                      name="customer_phone"
+                      required
                     >
-                      <template #trailing>
-                        <span class="text-gray-500 text-sm">₮</span>
-                      </template>
-                    </UInput>
-                  </div>
-
-                  <div>
-                    <label class="text-sm text-gray-600 dark:text-gray-400 mb-1 block">
-                      Хөнгөлөлт
-                    </label>
-                    <UInput
-                      v-model.number="discount"
-                      type="number"
-                      min="0"
-                      placeholder="0"
-                    >
-                      <template #trailing>
-                        <span class="text-gray-500 text-sm">₮</span>
-                      </template>
-                    </UInput>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Payment Method -->
-              <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
-                <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-4">
-                  Төлбөрийн арга
-                </h3>
-
-                <URadioGroup
-                  v-model="state.payment_method"
-                  :items="paymentMethodOptions"
-                  orientation="vertical"
-                  :ui="{
-                    fieldset: 'space-y-2'
-                  }"
-                >
-                  <template #label="{ item }">
-                    <div class="flex items-center gap-2">
-                      <UIcon
-                        :name="item.icon"
-                        class="w-4 h-4 text-gray-500"
+                      <UInput
+                        v-model="state.customer_phone"
+                        placeholder="99001122"
+                        size="lg"
                       />
-                      <span>{{ item.label }}</span>
+                    </UFormField>
+
+                    <UFormField
+                      label="Нөөц утас"
+                      name="customer_phone_secondary"
+                    >
+                      <UInput
+                        v-model="state.customer_phone_secondary"
+                        placeholder="88001122"
+                        size="lg"
+                      />
+                    </UFormField>
+
+                    <UFormField
+                      label="Имэйл"
+                      name="customer_email"
+                    >
+                      <UInput
+                        v-model="state.customer_email"
+                        type="email"
+                        placeholder="email@example.com"
+                        size="lg"
+                      />
+                    </UFormField>
+
+                    <UFormField
+                      label="Хот/Аймаг"
+                      name="customer_city"
+                    >
+                      <UInput
+                        v-model="state.customer_city"
+                        placeholder="Улаанбаатар"
+                        size="lg"
+                      />
+                    </UFormField>
+
+                    <UFormField
+                      label="Дүүрэг/Сум"
+                      name="customer_district"
+                    >
+                      <UInput
+                        v-model="state.customer_district"
+                        placeholder="Баянзүрх"
+                        size="lg"
+                      />
+                    </UFormField>
+
+                    <div class="sm:col-span-2">
+                      <UFormField
+                        label="Хаяг"
+                        name="customer_address"
+                      >
+                        <UTextarea
+                          v-model="state.customer_address"
+                          placeholder="Дэлгэрэнгүй хаяг"
+                          :rows="2"
+                        />
+                      </UFormField>
                     </div>
-                  </template>
-                </URadioGroup>
+                  </div>
+                </div>
               </div>
 
-              <!-- Submit Button (Mobile) -->
-              <div class="lg:hidden">
-                <UButton
-                  type="submit"
-                  form="order-form"
-                  color="primary"
-                  icon="i-lucide-check"
-                  :loading="loading"
-                  :disabled="!canSubmit"
-                  block
-                  size="lg"
-                >
-                  Захиалга үүсгэх - {{ formatPrice(total) }}
-                </UButton>
+              <!-- Right Column - Cart & Payment -->
+              <div class="space-y-6">
+                <!-- Cart -->
+                <OrderCartCard
+                  :items="cartItems"
+                  :shipping-fee="shippingFee"
+                  :discount="discount"
+                  @remove="removeCartItem"
+                  @update-quantity="updateCartItemQuantity"
+                />
+
+                <!-- Shipping & Discount -->
+                <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+                  <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-4">
+                    Нэмэлт
+                  </h3>
+
+                  <div class="space-y-4">
+                    <div>
+                      <label class="text-sm text-gray-600 dark:text-gray-400 mb-1 block">
+                        Хүргэлтийн төлбөр
+                      </label>
+                      <UInput
+                        v-model.number="shippingFee"
+                        type="number"
+                        min="0"
+                        placeholder="0"
+                      >
+                        <template #trailing>
+                          <span class="text-gray-500 text-sm">₮</span>
+                        </template>
+                      </UInput>
+                    </div>
+
+                    <div>
+                      <label class="text-sm text-gray-600 dark:text-gray-400 mb-1 block">
+                        Хөнгөлөлт
+                      </label>
+                      <UInput
+                        v-model.number="discount"
+                        type="number"
+                        min="0"
+                        placeholder="0"
+                      >
+                        <template #trailing>
+                          <span class="text-gray-500 text-sm">₮</span>
+                        </template>
+                      </UInput>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Payment Method -->
+                <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5">
+                  <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-4">
+                    Төлбөрийн арга
+                  </h3>
+
+                  <URadioGroup
+                    v-model="state.payment_method"
+                    :items="paymentMethodOptions"
+                    orientation="vertical"
+                    :ui="{
+                      fieldset: 'space-y-2'
+                    }"
+                  >
+                    <template #label="{ item }">
+                      <div class="flex items-center gap-2">
+                        <UIcon
+                          :name="item.icon"
+                          class="w-4 h-4 text-gray-500"
+                        />
+                        <span>{{ item.label }}</span>
+                      </div>
+                    </template>
+                  </URadioGroup>
+                </div>
+
+                <!-- Submit Button (Mobile) -->
+                <div class="lg:hidden">
+                  <UButton
+                    type="submit"
+                    form="order-form"
+                    color="primary"
+                    icon="i-lucide-check"
+                    :loading="loading"
+                    :disabled="!canSubmit"
+                    block
+                    size="lg"
+                  >
+                    Захиалга үүсгэх - {{ formatPrice(total) }}
+                  </UButton>
+                </div>
               </div>
             </div>
-          </div>
-        </UForm>
-      </div>
+          </UForm>
+        </div>
 
-      <!-- Variant Selection Modal -->
-      <OrderVariantModal
-        v-model:open="variantModalOpen"
-        :product="selectedProduct"
-        @select="handleVariantSelect"
-      />
-    </template>
+        <!-- Variant Selection Modal -->
+        <OrderVariantModal
+          v-model:open="variantModalOpen"
+          :product="selectedProduct"
+          @select="handleVariantSelect"
+        />
+      </template>
     </UDashboardPanel>
   </div>
 </template>

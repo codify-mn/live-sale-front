@@ -10,7 +10,7 @@ defineProps<Props>()
 
 <template>
   <div
-    class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary-500 via-primary-600 to-accent-600 p-6"
+    class="relative overflow-hidden h-full rounded-2xl bg-gradient-to-br from-primary-500 via-primary-600 to-accent-600 p-6"
   >
     <!-- Background decoration -->
     <div class="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-sm" />
@@ -22,8 +22,17 @@ defineProps<Props>()
       <div
         class="w-14 h-14 rounded-2xl bg-white/90 backdrop-blur-sm flex items-center justify-center flex-shrink-0 shadow-lg shadow-black/10"
       >
-        <img v-if="logoUrl" :src="logoUrl" :alt="shopName" class="w-10 h-10 object-contain rounded-lg" />
-        <UIcon v-else name="i-lucide-store" class="w-7 h-7 text-primary-600" />
+        <img
+          v-if="logoUrl"
+          :src="logoUrl"
+          :alt="shopName"
+          class="w-10 h-10 object-contain rounded-lg"
+        >
+        <UIcon
+          v-else
+          name="i-lucide-store"
+          class="w-7 h-7 text-primary-600"
+        />
       </div>
 
       <!-- Info -->
@@ -39,7 +48,10 @@ defineProps<Props>()
           class="inline-flex items-center gap-1.5 text-sm text-white/70 hover:text-white mt-1 transition-colors"
         >
           <span class="truncate">{{ shopUrl.replace(/^https?:\/\//, '') }}</span>
-          <UIcon name="i-lucide-external-link" class="w-3.5 h-3.5 flex-shrink-0" />
+          <UIcon
+            name="i-lucide-external-link"
+            class="w-3.5 h-3.5 flex-shrink-0"
+          />
         </a>
       </div>
 

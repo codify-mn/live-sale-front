@@ -91,7 +91,7 @@ const statusOptions = [
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   // Validate variants if has_variants is true
   if (state.has_variants && variants.value.length > 0) {
-    const invalidVariants = variants.value.filter((v) => !v.name || !v.keyword)
+    const invalidVariants = variants.value.filter(v => !v.name || !v.keyword)
     if (invalidVariants.length > 0) {
       toast.add({
         title: 'Алдаа',
@@ -142,126 +142,147 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
+  <div class="w-full h-full overflow-y-auto">
     <UDashboardPanel id="new-product">
-    <template #header>
-      <UDashboardNavbar>
-        <template #leading>
-          <UButton
-            to="/dashboard/products"
-            icon="i-lucide-arrow-left"
-            color="neutral"
-            variant="ghost"
-          />
-        </template>
+      <template #header>
+        <UDashboardNavbar>
+          <template #leading>
+            <UButton
+              to="/dashboard/products"
+              icon="i-lucide-arrow-left"
+              color="neutral"
+              variant="ghost"
+            />
+          </template>
 
-        <template #title>
-          <div>
-            <h1 class="text-lg font-semibold text-gray-900 dark:text-white">Бараа нэмэх</h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400">
-              Бараа бүтээгдэхүүний мэдээллийг оруулан шинээр нэмэх
-            </p>
-          </div>
-        </template>
+          <template #title>
+            <div>
+              <h1 class="text-lg font-semibold text-gray-900 dark:text-white">
+                Бараа нэмэх
+              </h1>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                Бараа бүтээгдэхүүний мэдээллийг оруулан шинээр нэмэх
+              </p>
+            </div>
+          </template>
 
-        <template #right>
-          <UButton
-            type="submit"
-            form="product-form"
-            color="primary"
-            icon="i-lucide-check"
-            :loading="loading"
+          <template #right>
+            <UButton
+              type="submit"
+              form="product-form"
+              color="primary"
+              icon="i-lucide-check"
+              :loading="loading"
+            >
+              Бараа нэмэх
+            </UButton>
+          </template>
+        </UDashboardNavbar>
+      </template>
+
+      <template #body>
+        <div class="p-6 overflow-y-auto">
+          <UForm
+            id="product-form"
+            :schema="schema"
+            :state="state"
+            @submit="onSubmit"
           >
-            Бараа нэмэх
-          </UButton>
-        </template>
-      </UDashboardNavbar>
-    </template>
-
-    <template #body>
-      <div class="p-6 overflow-y-auto">
-        <UForm id="product-form" :schema="schema" :state="state" @submit="onSubmit">
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Left Column - Main Form -->
-            <div class="lg:col-span-2 space-y-6">
-              <!-- Product Title -->
-              <ProductFormCard title="Барааны гарчиг" required>
-                <UInput v-model="state.name" placeholder="Барааны гарчгийг оруулна уу" size="lg" />
-              </ProductFormCard>
-
-              <!-- Variants Section -->
-              <ProductFormCard title="Барааны төрлүүд">
-                <div class="space-y-4">
-                  <ProductVariantForm
-                    v-for="(variant, index) in variants"
-                    :key="index"
-                    :model-value="variant"
-                    :index="index"
-                    :product-name="state.name"
-                    :can-remove="variants.length > 0"
-                    @update:model-value="handleVariantUpdate(index, $event)"
-                    @remove="removeVariant(index)"
-                    @duplicate="duplicateVariant(index)"
-                  />
-                  <div
-                    class="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700"
-                  >
-                    <UButton
-                      type="button"
-                      color="primary"
-                      icon="i-lucide-plus-circle"
-                      @click="addVariant"
-                    >
-                      Төрөл нэмэх
-                    </UButton>
-                  </div>
-                </div>
-              </ProductFormCard>
-              <div class="flex items-center justify-end">
-                <UButton
-                  type="submit"
-                  form="product-form"
-                  color="primary"
-                  icon="i-lucide-check"
-                  :loading="loading"
-                  class="mt-4 flex items-end justify-end"
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <!-- Left Column - Main Form -->
+              <div class="lg:col-span-2 space-y-6">
+                <!-- Product Title -->
+                <ProductFormCard
+                  title="Барааны гарчиг"
+                  required
                 >
-                  Бараа нэмэх
-                </UButton>
+                  <UInput
+                    v-model="state.name"
+                    placeholder="Барааны гарчгийг оруулна уу"
+                    size="lg"
+                  />
+                </ProductFormCard>
+
+                <!-- Variants Section -->
+                <ProductFormCard title="Барааны төрлүүд">
+                  <div class="space-y-4">
+                    <ProductVariantForm
+                      v-for="(variant, index) in variants"
+                      :key="index"
+                      :model-value="variant"
+                      :index="index"
+                      :product-name="state.name"
+                      :can-remove="variants.length > 0"
+                      @update:model-value="handleVariantUpdate(index, $event)"
+                      @remove="removeVariant(index)"
+                      @duplicate="duplicateVariant(index)"
+                    />
+                    <div
+                      class="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700"
+                    >
+                      <UButton
+                        type="button"
+                        color="primary"
+                        icon="i-lucide-plus-circle"
+                        @click="addVariant"
+                      >
+                        Төрөл нэмэх
+                      </UButton>
+                    </div>
+                  </div>
+                </ProductFormCard>
+                <div class="flex items-center justify-end">
+                  <UButton
+                    type="submit"
+                    form="product-form"
+                    color="primary"
+                    icon="i-lucide-check"
+                    :loading="loading"
+                    class="mt-4 flex items-end justify-end"
+                  >
+                    Бараа нэмэх
+                  </UButton>
+                </div>
+              </div>
+
+              <!-- Right Column - Sidebar -->
+              <div class="space-y-6">
+                <!-- Status -->
+                <ProductFormCard
+                  title="Барааны төлөв"
+                  required
+                >
+                  <USelect
+                    v-model="state.status"
+                    :items="statusOptions"
+                    size="lg"
+                  />
+                </ProductFormCard>
+
+                <!-- Category -->
+                <ProductFormCard title="Ангилал">
+                  <UInput
+                    v-model="state.category"
+                    placeholder="Эмэгтэй хувцас, Гэр ахуй..."
+                    size="lg"
+                  />
+                </ProductFormCard>
+
+                <!-- Product Settings -->
+                <ProductFormCard title="Барааны тохиргоо">
+                  <div class="divide-y divide-gray-100 dark:divide-gray-800">
+                    <ProductSettingToggle
+                      v-model="state.track_inventory"
+                      label="Үлдэгдэл автоматаар тооцох"
+                      description="Захиалга хийгдсэн үед тухайн барааны үлдэгдэлээс хасна."
+                    />
+                  </div>
+                </ProductFormCard>
               </div>
             </div>
-
-            <!-- Right Column - Sidebar -->
-            <div class="space-y-6">
-              <!-- Status -->
-              <ProductFormCard title="Барааны төлөв" required>
-                <USelect v-model="state.status" :items="statusOptions" size="lg" />
-              </ProductFormCard>
-
-              <!-- Category -->
-              <ProductFormCard title="Ангилал">
-                <UInput
-                  v-model="state.category"
-                  placeholder="Эмэгтэй хувцас, Гэр ахуй..."
-                  size="lg"
-                />
-              </ProductFormCard>
-
-              <!-- Product Settings -->
-              <ProductFormCard title="Барааны тохиргоо">
-                <div class="divide-y divide-gray-100 dark:divide-gray-800">
-                  <ProductSettingToggle
-                    v-model="state.track_inventory"
-                    label="Үлдэгдэл автоматаар тооцох"
-                    description="Захиалга хийгдсэн үед тухайн барааны үлдэгдэлээс хасна."
-                  />
-                </div>
-              </ProductFormCard>
-            </div>
-          </div>
-        </UForm>
-      </div>
-    </template>
+          </UForm>
+        </div>
+      </template>
     </UDashboardPanel>
   </div>
 </template>

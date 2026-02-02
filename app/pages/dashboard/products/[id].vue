@@ -119,7 +119,7 @@ const loadProduct = async () => {
 
     // Load variants
     if (product.value.variants && product.value.variants.length > 0) {
-      variants.value = product.value.variants.map((v) => ({
+      variants.value = product.value.variants.map(v => ({
         id: v.id,
         name: v.name,
         keyword: v.keyword || '',
@@ -154,7 +154,7 @@ const loadProduct = async () => {
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   // Validate variants if has_variants is true
   if (state.has_variants && variants.value.length > 0) {
-    const invalidVariants = variants.value.filter((v) => !v.name || !v.keyword)
+    const invalidVariants = variants.value.filter(v => !v.name || !v.keyword)
     if (invalidVariants.length > 0) {
       toast.add({
         title: 'Алдаа',
@@ -237,168 +237,211 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div>
+  <div class="w-full h-full overflow-y-auto">
     <UDashboardPanel id="product-detail">
-    <template #header>
-      <UDashboardNavbar>
-        <template #leading>
-          <UButton
-            to="/dashboard/products"
-            icon="i-lucide-arrow-left"
-            color="neutral"
-            variant="ghost"
-          />
-        </template>
-
-        <template #title>
-          <div>
-            <h1 class="text-lg font-semibold text-gray-900 dark:text-white">
-              {{ product?.name || 'Бараа засах' }}
-            </h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400">
-              Бараа бүтээгдэхүүний мэдээллийг засварлах
-            </p>
-          </div>
-        </template>
-
-        <template #right>
-          <div class="flex items-center gap-2">
+      <template #header>
+        <UDashboardNavbar>
+          <template #leading>
             <UButton
-              icon="i-lucide-trash-2"
-              color="error"
+              to="/dashboard/products"
+              icon="i-lucide-arrow-left"
+              color="neutral"
               variant="ghost"
-              @click="deleteModalOpen = true"
             />
-            <UButton
-              type="submit"
-              form="product-form"
-              color="primary"
-              icon="i-lucide-check"
-              :loading="saving"
-            >
-              Хадгалах
-            </UButton>
-          </div>
-        </template>
-      </UDashboardNavbar>
-    </template>
+          </template>
 
-    <template #body>
-      <div v-if="loading" class="flex items-center justify-center p-20">
-        <UIcon name="i-lucide-loader-2" class="w-8 h-8 animate-spin text-primary" />
-      </div>
+          <template #title>
+            <div>
+              <h1 class="text-lg font-semibold text-gray-900 dark:text-white">
+                {{ product?.name || 'Бараа засах' }}
+              </h1>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                Бараа бүтээгдэхүүний мэдээллийг засварлах
+              </p>
+            </div>
+          </template>
 
-      <div v-else-if="product" class="p-6 overflow-y-auto">
-        <UForm id="product-form" :schema="schema" :state="state" @submit="onSubmit">
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Left Column - Main Form -->
-            <div class="lg:col-span-2 space-y-6">
-              <!-- Product Title -->
-              <ProductFormCard title="Барааны гарчиг" required>
-                <UInput v-model="state.name" placeholder="Барааны гарчгийг оруулна уу" size="lg" />
-              </ProductFormCard>
+          <template #right>
+            <div class="flex items-center gap-2">
+              <UButton
+                icon="i-lucide-trash-2"
+                color="error"
+                variant="ghost"
+                @click="deleteModalOpen = true"
+              />
+              <UButton
+                type="submit"
+                form="product-form"
+                color="primary"
+                icon="i-lucide-check"
+                :loading="saving"
+              >
+                Хадгалах
+              </UButton>
+            </div>
+          </template>
+        </UDashboardNavbar>
+      </template>
 
-              <!-- Variants Section -->
-              <ProductFormCard title="Барааны төрлүүд">
-                <div class="space-y-4">
-                  <ProductVariantForm
-                    v-for="(variant, index) in variants"
-                    :key="variant.id || `new-${index}`"
-                    :model-value="variant"
-                    :index="index"
-                    :product-name="state.name"
-                    :can-remove="variants.length > 0"
-                    @update:model-value="handleVariantUpdate(index, $event)"
-                    @remove="removeVariant(index)"
-                    @duplicate="duplicateVariant(index)"
-                  />
-                  <div
-                    class="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700"
-                  >
-                    <UButton
-                      type="button"
-                      color="primary"
-                      icon="i-lucide-plus-circle"
-                      @click="addVariant"
-                    >
-                      Төрөл нэмэх
-                    </UButton>
-                  </div>
-                </div>
-              </ProductFormCard>
-              <div class="flex items-center justify-end">
-                <UButton
-                  type="submit"
-                  form="product-form"
-                  color="primary"
-                  icon="i-lucide-check"
-                  :loading="saving"
-                  class="mt-4 flex items-end justify-end"
+      <template #body>
+        <div
+          v-if="loading"
+          class="flex items-center justify-center p-20"
+        >
+          <UIcon
+            name="i-lucide-loader-2"
+            class="w-8 h-8 animate-spin text-primary"
+          />
+        </div>
+
+        <div
+          v-else-if="product"
+          class="p-6 overflow-y-auto"
+        >
+          <UForm
+            id="product-form"
+            :schema="schema"
+            :state="state"
+            @submit="onSubmit"
+          >
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <!-- Left Column - Main Form -->
+              <div class="lg:col-span-2 space-y-6">
+                <!-- Product Title -->
+                <ProductFormCard
+                  title="Барааны гарчиг"
+                  required
                 >
-                  Хадгалах
-                </UButton>
-              </div>
-            </div>
-
-            <!-- Right Column - Sidebar -->
-            <div class="space-y-6">
-              <!-- Status -->
-              <ProductFormCard title="Барааны төлөв" required>
-                <USelect v-model="state.status" :items="statusOptions" size="lg" />
-              </ProductFormCard>
-
-              <!-- Category -->
-              <ProductFormCard title="Ангилал">
-                <UInput
-                  v-model="state.category"
-                  placeholder="Эмэгтэй хувцас, Гэр ахуй..."
-                  size="lg"
-                />
-              </ProductFormCard>
-
-              <!-- Product Settings -->
-              <ProductFormCard title="Барааны тохиргоо">
-                <div class="divide-y divide-gray-100 dark:divide-gray-800">
-                  <ProductSettingToggle
-                    v-model="state.track_inventory"
-                    label="Үлдэгдэл автоматаар тооцох"
-                    description="Захиалга хийгдсэн үед тухайн барааны үлдэгдэлээс хасна."
+                  <UInput
+                    v-model="state.name"
+                    placeholder="Барааны гарчгийг оруулна уу"
+                    size="lg"
                   />
+                </ProductFormCard>
+
+                <!-- Variants Section -->
+                <ProductFormCard title="Барааны төрлүүд">
+                  <div class="space-y-4">
+                    <ProductVariantForm
+                      v-for="(variant, index) in variants"
+                      :key="variant.id || `new-${index}`"
+                      :model-value="variant"
+                      :index="index"
+                      :product-name="state.name"
+                      :can-remove="variants.length > 0"
+                      @update:model-value="handleVariantUpdate(index, $event)"
+                      @remove="removeVariant(index)"
+                      @duplicate="duplicateVariant(index)"
+                    />
+                    <div
+                      class="flex items-center justify-end gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-gray-700"
+                    >
+                      <UButton
+                        type="button"
+                        color="primary"
+                        icon="i-lucide-plus-circle"
+                        @click="addVariant"
+                      >
+                        Төрөл нэмэх
+                      </UButton>
+                    </div>
+                  </div>
+                </ProductFormCard>
+                <div class="flex items-center justify-end">
+                  <UButton
+                    type="submit"
+                    form="product-form"
+                    color="primary"
+                    icon="i-lucide-check"
+                    :loading="saving"
+                    class="mt-4 flex items-end justify-end"
+                  >
+                    Хадгалах
+                  </UButton>
                 </div>
-              </ProductFormCard>
+              </div>
+
+              <!-- Right Column - Sidebar -->
+              <div class="space-y-6">
+                <!-- Status -->
+                <ProductFormCard
+                  title="Барааны төлөв"
+                  required
+                >
+                  <USelect
+                    v-model="state.status"
+                    :items="statusOptions"
+                    size="lg"
+                  />
+                </ProductFormCard>
+
+                <!-- Category -->
+                <ProductFormCard title="Ангилал">
+                  <UInput
+                    v-model="state.category"
+                    placeholder="Эмэгтэй хувцас, Гэр ахуй..."
+                    size="lg"
+                  />
+                </ProductFormCard>
+
+                <!-- Product Settings -->
+                <ProductFormCard title="Барааны тохиргоо">
+                  <div class="divide-y divide-gray-100 dark:divide-gray-800">
+                    <ProductSettingToggle
+                      v-model="state.track_inventory"
+                      label="Үлдэгдэл автоматаар тооцох"
+                      description="Захиалга хийгдсэн үед тухайн барааны үлдэгдэлээс хасна."
+                    />
+                  </div>
+                </ProductFormCard>
+              </div>
             </div>
-          </div>
-        </UForm>
-      </div>
+          </UForm>
+        </div>
 
-      <!-- Delete Modal -->
-      <UModal v-model:open="deleteModalOpen">
-        <template #content>
-          <UCard>
-            <template #header>
-              <div class="flex items-center gap-2">
-                <UIcon name="i-lucide-alert-triangle" class="text-red-500" />
-                <span class="font-semibold">Устгах</span>
-              </div>
-            </template>
+        <!-- Delete Modal -->
+        <UModal v-model:open="deleteModalOpen">
+          <template #content>
+            <UCard>
+              <template #header>
+                <div class="flex items-center gap-2">
+                  <UIcon
+                    name="i-lucide-alert-triangle"
+                    class="text-red-500"
+                  />
+                  <span class="font-semibold">Устгах</span>
+                </div>
+              </template>
 
-            <p>
-              <strong>{{ product?.name }}</strong> бүтээгдэхүүнийг устгахдаа итгэлтэй байна уу?
-            </p>
-            <p class="text-sm text-gray-500 mt-2">Энэ үйлдлийг буцаах боломжгүй.</p>
+              <p>
+                <strong>{{ product?.name }}</strong> бүтээгдэхүүнийг устгахдаа итгэлтэй байна уу?
+              </p>
+              <p class="text-sm text-gray-500 mt-2">
+                Энэ үйлдлийг буцаах боломжгүй.
+              </p>
 
-            <template #footer>
-              <div class="flex justify-end gap-2">
-                <UButton color="neutral" variant="outline" @click="deleteModalOpen = false">
-                  Болих
-                </UButton>
-                <UButton color="error" :loading="deleting" @click="confirmDelete"> Устгах </UButton>
-              </div>
-            </template>
-          </UCard>
-        </template>
-      </UModal>
-    </template>
+              <template #footer>
+                <div class="flex justify-end gap-2">
+                  <UButton
+                    color="neutral"
+                    variant="outline"
+                    @click="deleteModalOpen = false"
+                  >
+                    Болих
+                  </UButton>
+                  <UButton
+                    color="error"
+                    :loading="deleting"
+                    @click="confirmDelete"
+                  >
+                    Устгах
+                  </UButton>
+                </div>
+              </template>
+            </UCard>
+          </template>
+        </UModal>
+      </template>
     </UDashboardPanel>
   </div>
 </template>
