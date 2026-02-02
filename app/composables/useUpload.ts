@@ -69,18 +69,24 @@ export function useUpload() {
             // Upload one by one to track progress
             for (let i = 0; i < files.length; i++) {
                 const file = files[i]
-                progress.value[i].status = 'uploading'
-                progress.value[i].progress = 50
+                if (!file || !progress.value[i]) continue
+                
+                progress.value[i]!.status = 'uploading'
+                progress.value[i]!.progress = 50
 
                 try {
                     const result = await uploadSingle(file)
-                    progress.value[i].status = 'done'
-                    progress.value[i].progress = 100
-                    progress.value[i].result = result
+                    if (progress.value[i]) {
+                        progress.value[i]!.status = 'done'
+                        progress.value[i]!.progress = 100
+                        progress.value[i]!.result = result
+                    }
                     urls.push(result.url)
                 } catch (err: any) {
-                    progress.value[i].status = 'error'
-                    progress.value[i].error = err.data?.message || 'Upload failed'
+                    if (progress.value[i]) {
+                        progress.value[i]!.status = 'error'
+                        progress.value[i]!.error = err.data?.message || 'Upload failed'
+                    }
                 }
             }
 

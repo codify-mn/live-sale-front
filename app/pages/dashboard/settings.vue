@@ -4,15 +4,10 @@ import type { NavigationMenuItem } from '@nuxt/ui'
 const links = [
     [
         {
-            label: 'Ерөнхий',
-            icon: 'i-lucide-user',
-            to: '/dashboard/settings',
-            exact: true
-        },
-        {
             label: 'Дэлгүүр',
             icon: 'i-lucide-store',
-            to: '/dashboard/settings/shop'
+            to: '/dashboard/settings',
+            exact: true
         },
         {
             label: 'Мэдэгдэл',

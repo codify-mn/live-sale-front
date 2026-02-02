@@ -5,7 +5,6 @@ export interface ShopSettings {
     reply_message: string
     payment_method: string
     comment_prefix: string
-    allow_overselling: boolean
     delivery_fee: number
     delivery_note: string
     free_delivery_over: number

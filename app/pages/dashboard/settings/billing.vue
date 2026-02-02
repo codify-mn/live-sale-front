@@ -136,7 +136,7 @@ async function handleCancel() {
 </script>
 
 <template>
-    <div>
+    <div class="flex flex-col gap-4">
         <div v-if="loading" class="flex justify-center items-center py-12">
             <UIcon name="i-lucide-loader-2" class="w-8 h-8 animate-spin text-gray-400" />
         </div>

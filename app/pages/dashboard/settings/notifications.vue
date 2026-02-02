@@ -56,7 +56,7 @@ async function onChange() {
 </script>
 
 <template>
-    <div>
+    <div class="flex flex-col gap-4">
         <div v-for="(section, index) in sections" :key="index">
             <UPageCard
                 :title="section.title"

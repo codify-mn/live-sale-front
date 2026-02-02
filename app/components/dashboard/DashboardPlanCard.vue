@@ -72,7 +72,7 @@ const daysColor = computed(() => {
                 <div class="flex items-center justify-between">
                     <span class="text-sm text-gray-500 dark:text-gray-400">Одоогийн багц</span>
                     <NuxtLink
-                        to="/settings/billing"
+                        to="/dashboard/settings/billing"
                         class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 flex items-center gap-1"
                     >
                         <UIcon name="i-lucide-settings" class="w-4 h-4" />
@@ -135,7 +135,7 @@ const daysColor = computed(() => {
                     </UButton>
                     <UButton
                         v-else
-                        to="/settings/billing"
+                        to="/dashboard/settings/billing"
                         color="neutral"
                         variant="outline"
                         block

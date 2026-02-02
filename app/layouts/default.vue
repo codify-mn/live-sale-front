@@ -45,7 +45,7 @@ const links = [
             type: 'trigger',
             children: [
                 {
-                    label: 'Профайл',
+                    label: 'Дэлгүүр',
                     to: '/dashboard/settings',
                     exact: true,
                     onSelect: () => {
@@ -55,6 +55,12 @@ const links = [
                 {
                     label: 'Мэдэгдэл',
                     to: '/dashboard/settings/notifications',
+                    onSelect: () => {
+                        open.value = false
+                    }
+                },  {
+                    label: 'Төлбөр',
+                    to: '/dashboard/settings/billing',
                     onSelect: () => {
                         open.value = false
                     }

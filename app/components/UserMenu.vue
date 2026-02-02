@@ -28,8 +28,8 @@ const items = computed<DropdownMenuItem[][]>(() => [
     ],
     [
         {
-            label: 'Профайл',
-            icon: 'i-lucide-user',
+            label: 'Дэлгүүр',
+            icon: 'i-lucide-store',
             to: '/dashboard/settings'
         },
         {
