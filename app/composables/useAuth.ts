@@ -24,10 +24,6 @@ interface LoginResponse {
   user: User
 }
 
-interface ErrorResponse {
-  error: string
-}
-
 export interface LoginCredentials {
   email: string
   password: string

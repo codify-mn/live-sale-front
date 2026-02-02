@@ -107,8 +107,12 @@ const steps = [
     <section class="py-20 bg-muted/30">
       <UContainer>
         <div class="text-center mb-12">
-          <h2 class="text-3xl font-bold mb-4">Бүх боломжууд нэг дор</h2>
-          <p class="text-muted text-lg">Амжилттай борлуулалт хийхэд хэрэгтэй бүх зүйл</p>
+          <h2 class="text-3xl font-bold mb-4">
+            Бүх боломжууд нэг дор
+          </h2>
+          <p class="text-muted text-lg">
+            Амжилттай борлуулалт хийхэд хэрэгтэй бүх зүйл
+          </p>
         </div>
         <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           <UCard
@@ -117,9 +121,7 @@ const steps = [
             class="text-center"
             :ui="{ body: 'p-6' }"
           >
-            <div
-              class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4"
-            >
+            <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
               <UIcon :name="feature.icon" class="w-6 h-6 text-primary" />
             </div>
             <h3 class="font-semibold mb-2">
@@ -137,8 +139,12 @@ const steps = [
     <section class="py-20">
       <UContainer>
         <div class="text-center mb-12">
-          <h2 class="text-3xl font-bold mb-4">Яагаад Comment Boost?</h2>
-          <p class="text-muted text-lg">Бизнесээ өсгөхөд туслах давуу талууд</p>
+          <h2 class="text-3xl font-bold mb-4">
+            Яагаад Comment Boost?
+          </h2>
+          <p class="text-muted text-lg">
+            Бизнесээ өсгөхөд туслах давуу талууд
+          </p>
         </div>
         <div class="grid md:grid-cols-3 gap-8">
           <div v-for="benefit in benefits" :key="benefit.title" class="text-center p-6">
@@ -162,8 +168,12 @@ const steps = [
     <section class="py-20 bg-muted/30">
       <UContainer>
         <div class="text-center mb-12">
-          <h2 class="text-3xl font-bold mb-4">Хэрхэн ажилладаг вэ?</h2>
-          <p class="text-muted text-lg">3 энгийн алхамаар эхлээрэй</p>
+          <h2 class="text-3xl font-bold mb-4">
+            Хэрхэн ажилладаг вэ?
+          </h2>
+          <p class="text-muted text-lg">
+            3 энгийн алхамаар эхлээрэй
+          </p>
         </div>
         <div class="grid md:grid-cols-3 gap-8">
           <div v-for="step in steps" :key="step.step" class="relative text-center">
@@ -186,13 +196,21 @@ const steps = [
       <UContainer>
         <div class="relative rounded-3xl bg-primary/5 p-8 lg:p-16 text-center overflow-hidden">
           <LazyStarsBg />
-          <h2 class="text-3xl lg:text-4xl font-bold mb-4 relative">Өнөөдөр эхлээрэй</h2>
+          <h2 class="text-3xl lg:text-4xl font-bold mb-4 relative">
+            Өнөөдөр эхлээрэй
+          </h2>
           <p class="text-lg text-muted mb-8 relative max-w-2xl mx-auto">
             Үнэгүй бүртгүүлж, Live борлуулалтаа дараагийн түвшинд гаргаарай.
           </p>
           <div class="flex flex-col sm:flex-row gap-4 justify-center relative">
             <UButton to="/signup" label="Үнэгүй эхлэх" size="xl" />
-            <UButton to="/docs" label="Дэлгэрэнгүй" size="xl" color="neutral" variant="outline" />
+            <UButton
+              to="/docs"
+              label="Дэлгэрэнгүй"
+              size="xl"
+              color="neutral"
+              variant="outline"
+            />
           </div>
         </div>
       </UContainer>

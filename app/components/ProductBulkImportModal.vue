@@ -136,9 +136,13 @@ const handleImport = async () => {
   }
 }
 
-const resetModal = () => {
+const clearFile = () => {
   file.value = null
   importResult.value = null
+}
+
+const resetModal = () => {
+  clearFile()
   selectedStatus.value = 'draft'
 }
 
@@ -262,10 +266,7 @@ watch(isOpen, (newVal) => {
                   size="xs"
                   color="neutral"
                   variant="ghost"
-                  @click.stop="
-                    file = null
-                    importResult = null
-                  "
+                  @click.stop="clearFile"
                 >
                   Өөр файл сонгох
                 </UButton>

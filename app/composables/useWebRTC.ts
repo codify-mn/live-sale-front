@@ -121,7 +121,7 @@ export const useWebRTC = () => {
       pc = null
     }
     if (localStream) {
-      localStream.getTracks().forEach((track) => track.stop())
+      localStream.getTracks().forEach(track => track.stop())
       localStream = null
     }
     if (videoRef.value) {

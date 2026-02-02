@@ -30,6 +30,14 @@ const links = [
       }
     },
     {
+      label: 'Захиалга',
+      icon: 'i-lucide-shopping-cart',
+      to: '/dashboard/orders',
+      onSelect: () => {
+        open.value = false
+      }
+    },
+    {
       label: 'Тохиргоо',
       to: '/dashboard/settings',
       icon: 'i-lucide-settings',
