@@ -7,7 +7,7 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: 'Шинэ нууц үг - Comment Boost'
+  title: 'Шинэ нууц үг - CommentBoost'
 })
 
 const route = useRoute()
@@ -43,78 +43,139 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 </script>
 
 <template>
-  <UCard class="max-w-sm w-full">
-    <template #header>
-      <div class="text-center">
-        <UIcon name="i-lucide-lock-keyhole" class="w-12 h-12 text-primary mx-auto mb-4" />
-        <h1 class="text-2xl font-bold">Шинэ нууц үг</h1>
-        <p class="text-gray-500 dark:text-gray-400 mt-2">Шинэ нууц үгээ оруулна уу</p>
-      </div>
-    </template>
-
-    <div class="space-y-4">
-      <!-- Invalid Token -->
-      <div v-if="isInvalidToken" class="text-center space-y-4">
-        <UIcon name="i-lucide-alert-triangle" class="w-16 h-16 text-amber-500 mx-auto" />
-        <p class="text-gray-600 dark:text-gray-300">Буруу эсвэл хугацаа дууссан холбоос байна.</p>
-        <UButton to="/forgot-password" variant="outline" block> Дахин холбоос авах </UButton>
-      </div>
-
-      <!-- Success Message -->
-      <div v-else-if="isSubmitted" class="text-center space-y-4">
-        <UIcon name="i-lucide-check-circle" class="w-16 h-16 text-green-500 mx-auto" />
-        <p class="text-gray-600 dark:text-gray-300">Нууц үг амжилттай солигдлоо!</p>
-        <UButton to="/login" block> Нэвтрэх </UButton>
-      </div>
-
-      <!-- Form -->
-      <template v-else>
-        <!-- Error Alert -->
-        <UAlert
-          v-if="authError"
-          color="error"
-          variant="subtle"
-          :title="authError"
-          icon="i-lucide-alert-circle"
-          :close-button="{
-            icon: 'i-lucide-x',
-            color: 'error',
-            variant: 'link',
-            padded: false
-          }"
-          @close="clearError"
-        />
-
-        <UForm :schema="schema" :state="state" class="space-y-4" @submit="onSubmit">
-          <UFormField label="Шинэ нууц үг" name="password">
-            <UInput
-              v-model="state.password"
-              type="password"
-              placeholder="Хамгийн багадаа 8 тэмдэгт"
-              icon="i-lucide-lock"
-              size="lg"
-            />
-          </UFormField>
-
-          <UFormField label="Нууц үг давтах" name="confirmPassword">
-            <UInput
-              v-model="state.confirmPassword"
-              type="password"
-              placeholder="Нууц үг давтана уу"
-              icon="i-lucide-lock"
-              size="lg"
-            />
-          </UFormField>
-
-          <UButton type="submit" block size="lg" :loading="isLoading"> Нууц үг солих </UButton>
-        </UForm>
-
-        <div class="text-center">
-          <NuxtLink to="/login" class="text-sm text-primary hover:underline">
-            Нэвтрэх хуудас руу буцах
-          </NuxtLink>
-        </div>
-      </template>
+  <div class="min-h-screen flex items-center justify-center p-6 bg-gray-50 dark:bg-gray-950">
+    <!-- Background decoration -->
+    <div class="absolute inset-0 -z-10 overflow-hidden">
+      <div class="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full blur-3xl opacity-20" style="background: radial-gradient(circle, rgba(249, 115, 22, 0.3) 0%, transparent 70%);" />
+      <div class="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full blur-3xl opacity-20" style="background: radial-gradient(circle, rgba(168, 85, 247, 0.2) 0%, transparent 70%);" />
     </div>
-  </UCard>
+
+    <div class="w-full max-w-md">
+      <!-- Back button -->
+      <NuxtLink
+        to="/login"
+        class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 dark:hover:text-white mb-8 transition-colors"
+      >
+        <UIcon name="i-lucide-arrow-left" class="w-4 h-4" />
+        Нэвтрэх хуудас руу буцах
+      </NuxtLink>
+
+      <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-800 p-8">
+        <!-- Invalid Token state -->
+        <div v-if="isInvalidToken" class="text-center space-y-6">
+          <div class="w-16 h-16 rounded-2xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mx-auto">
+            <UIcon name="i-lucide-alert-triangle" class="w-8 h-8 text-amber-500" />
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Буруу холбоос</h1>
+            <p class="text-gray-500 dark:text-gray-400">
+              Буруу эсвэл хугацаа дууссан холбоос байна.
+            </p>
+          </div>
+          <UButton
+            to="/forgot-password"
+            block
+            size="lg"
+            class="bg-gradient-to-r from-primary-500 to-pink-500 border-0"
+          >
+            Дахин холбоос авах
+          </UButton>
+        </div>
+
+        <!-- Success state -->
+        <div v-else-if="isSubmitted" class="text-center space-y-6">
+          <div class="w-16 h-16 rounded-2xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto">
+            <UIcon name="i-lucide-check-circle" class="w-8 h-8 text-green-500" />
+          </div>
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">Амжилттай!</h1>
+            <p class="text-gray-500 dark:text-gray-400">
+              Нууц үг амжилттай солигдлоо.
+            </p>
+          </div>
+          <UButton
+            to="/login"
+            block
+            size="lg"
+            class="bg-gradient-to-r from-primary-500 to-pink-500 border-0"
+          >
+            Нэвтрэх
+          </UButton>
+        </div>
+
+        <!-- Form state -->
+        <template v-else>
+          <div class="text-center mb-8">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-pink-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary-500/25">
+              <UIcon name="i-lucide-lock-keyhole" class="w-8 h-8 text-white" />
+            </div>
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              Шинэ нууц үг
+            </h1>
+            <p class="text-gray-500 dark:text-gray-400">
+              Шинэ нууц үгээ оруулна уу
+            </p>
+          </div>
+
+          <!-- Error Alert -->
+          <Transition
+            enter-active-class="transition duration-200 ease-out"
+            enter-from-class="opacity-0 -translate-y-2"
+            enter-to-class="opacity-100 translate-y-0"
+            leave-active-class="transition duration-150 ease-in"
+            leave-from-class="opacity-100 translate-y-0"
+            leave-to-class="opacity-0 -translate-y-2"
+          >
+            <UAlert
+              v-if="authError"
+              color="error"
+              variant="subtle"
+              :title="authError"
+              icon="i-lucide-alert-circle"
+              class="mb-6"
+              :close-button="{
+                icon: 'i-lucide-x',
+                color: 'error',
+                variant: 'link',
+                padded: false
+              }"
+              @close="clearError"
+            />
+          </Transition>
+
+          <UForm :schema="schema" :state="state" class="space-y-5" @submit="onSubmit">
+            <UFormField label="Шинэ нууц үг" name="password">
+              <UInput
+                v-model="state.password"
+                type="password"
+                placeholder="Хамгийн багадаа 8 тэмдэгт"
+                icon="i-lucide-lock"
+                size="lg"
+              />
+            </UFormField>
+
+            <UFormField label="Нууц үг давтах" name="confirmPassword">
+              <UInput
+                v-model="state.confirmPassword"
+                type="password"
+                placeholder="Нууц үг давтана уу"
+                icon="i-lucide-lock"
+                size="lg"
+              />
+            </UFormField>
+
+            <UButton
+              type="submit"
+              block
+              size="lg"
+              :loading="isLoading"
+              class="bg-gradient-to-r from-primary-500 to-pink-500 hover:from-primary-600 hover:to-pink-600 border-0 shadow-lg shadow-primary-500/25"
+            >
+              Нууц үг солих
+            </UButton>
+          </UForm>
+        </template>
+      </div>
+    </div>
+  </div>
 </template>

@@ -1,10 +1,12 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+// Public layout for marketing pages (landing, pricing, etc.)
+</script>
 
 <template>
-  <div>
+  <div class="min-h-screen flex flex-col">
     <AppHeader />
 
-    <UMain>
+    <UMain class="flex-1">
       <slot />
     </UMain>
 

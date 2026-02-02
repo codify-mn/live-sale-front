@@ -24,6 +24,18 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
+  // Page transitions
+  app: {
+    pageTransition: {
+      name: 'page',
+      mode: 'out-in'
+    },
+    layoutTransition: {
+      name: 'layout',
+      mode: 'out-in'
+    }
+  },
+
   runtimeConfig: {
     public: {
       apiUrl: process.env.NUXT_PUBLIC_API_URL || 'http://localhost:4000'
