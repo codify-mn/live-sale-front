@@ -168,7 +168,7 @@ async function onSubmit() {
           <div
             class="absolute top-5 left-0 h-0.5 bg-primary-500 mx-16 transition-all duration-500 ease-out"
             :style="{
-              width: `calc(${((currentStep - 1) / (totalSteps - 1)) * 100}% - ${(currentStep-1)*4}rem)`
+              width: `calc(${((currentStep - 1) / (totalSteps - 1)) * 100}% - ${(currentStep - 1) * 4}rem)`
             }"
           />
 
