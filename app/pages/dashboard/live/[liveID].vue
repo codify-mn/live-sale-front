@@ -158,7 +158,7 @@ const statusLabel = computed(() => {
                         <UButton
                             color="primary"
                             icon="i-heroicons-play-solid"
-                            @click="webrtc.startLive(live)"
+                            @click="webrtc.startLive(live!)"
                         >
                             Start Stream
                         </UButton>

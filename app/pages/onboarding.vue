@@ -82,7 +82,7 @@ function nextStep() {
         if (!result.success) {
             toast.add({
                 title: 'Алдаа',
-                description: result.error.errors[0]?.message || 'Мэдээллээ шалгана уу',
+                description: result.error.issues[0]?.message || 'Мэдээллээ шалгана уу',
                 color: 'error'
             })
             return
