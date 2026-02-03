@@ -11,7 +11,18 @@ useSeoMeta({
 })
 
 const route = useRoute()
-const { loginWithEmail, register, isLoading, authError, clearError } = useAuth()
+const {
+    loginWithEmail,
+    register,
+    verifyOTP,
+    resendOTP,
+    cancelVerification,
+    isLoading,
+    authError,
+    pendingVerificationEmail,
+    resendCooldown,
+    clearError
+} = useAuth()
 
 // Check for mode in URL query
 const isRegisterMode = ref(route.query.mode === 'register')
@@ -28,8 +39,13 @@ const registerSchema = z.object({
     last_name: z.string().min(1, 'Овгоо оруулна уу')
 })
 
+const otpSchema = z.object({
+    otp: z.string().length(6, 'Код 6 оронтой байх ёстой').regex(/^\d+$/, 'Зөвхөн тоо оруулна уу')
+})
+
 type LoginSchema = z.output<typeof loginSchema>
 type RegisterSchema = z.output<typeof registerSchema>
+type OTPSchema = z.output<typeof otpSchema>
 
 const loginState = reactive({
     email: '',
@@ -41,6 +57,10 @@ const registerState = reactive({
     password: '',
     first_name: '',
     last_name: ''
+})
+
+const otpState = reactive({
+    otp: ''
 })
 
 const toggleMode = () => {
@@ -56,10 +76,26 @@ const onLoginSubmit = async (event: FormSubmitEvent<LoginSchema>) => {
 }
 
 const onRegisterSubmit = async (event: FormSubmitEvent<RegisterSchema>) => {
-    const success = await register(event.data)
+    await register(event.data)
+    // If successful, pendingVerificationEmail will be set and OTP form will show
+}
+
+const onOTPSubmit = async (event: FormSubmitEvent<OTPSchema>) => {
+    if (!pendingVerificationEmail.value) return
+    const success = await verifyOTP(pendingVerificationEmail.value, event.data.otp)
     if (success) {
         navigateTo('/auth/callback')
     }
+}
+
+const handleResendOTP = async () => {
+    if (!pendingVerificationEmail.value || resendCooldown.value > 0) return
+    await resendOTP(pendingVerificationEmail.value)
+}
+
+const handleBackToRegister = () => {
+    cancelVerification()
+    otpState.otp = ''
 }
 
 const features = [
@@ -180,14 +216,27 @@ const features = [
                 <!-- Header -->
                 <div class="text-center mb-8">
                     <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                        {{ isRegisterMode ? 'Бүртгүүлэх' : 'Тавтай морилно уу' }}
+                        <template v-if="pendingVerificationEmail">
+                            Имэйл баталгаажуулалт
+                        </template>
+                        <template v-else>
+                            {{ isRegisterMode ? 'Бүртгүүлэх' : 'Тавтай морилно уу' }}
+                        </template>
                     </h1>
                     <p class="text-gray-500 dark:text-gray-400">
-                        {{
-                            isRegisterMode
-                                ? 'Шинэ хаяг үүсгэж эхлээрэй'
-                                : 'Өөрийн хаягаар нэвтрээрэй'
-                        }}
+                        <template v-if="pendingVerificationEmail">
+                            <span class="font-medium text-gray-700 dark:text-gray-300">{{
+                                pendingVerificationEmail
+                            }}</span>
+                            хаяг руу 6 оронтой код илгээлээ
+                        </template>
+                        <template v-else>
+                            {{
+                                isRegisterMode
+                                    ? 'Шинэ хаяг үүсгэж эхлээрэй'
+                                    : 'Өөрийн хаягаар нэвтрээрэй'
+                            }}
+                        </template>
                     </p>
                 </div>
 
@@ -261,9 +310,67 @@ const features = [
                     />
                 </Transition>
 
+                <!-- OTP Verification Form -->
+                <UForm
+                    v-if="pendingVerificationEmail"
+                    :schema="otpSchema"
+                    :state="otpState"
+                    class="space-y-5"
+                    @submit="onOTPSubmit"
+                >
+                    <UFormField label="Баталгаажуулах код" name="otp">
+                        <UInput
+                            v-model="otpState.otp"
+                            type="text"
+                            inputmode="numeric"
+                            placeholder="000000"
+                            icon="i-lucide-shield-check"
+                            size="lg"
+                            maxlength="6"
+                            class="text-center tracking-[0.5em] font-mono text-lg"
+                        />
+                    </UFormField>
+
+                    <UButton
+                        type="submit"
+                        block
+                        size="lg"
+                        :loading="isLoading"
+                        class="bg-gradient-to-r from-primary-500 to-pink-500 hover:from-primary-600 hover:to-pink-600 border-0 shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 transition-all duration-300"
+                    >
+                        Баталгаажуулах
+                    </UButton>
+
+                    <div class="flex items-center justify-between pt-2">
+                        <button
+                            type="button"
+                            class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors cursor-pointer"
+                            @click="handleBackToRegister"
+                        >
+                            ← Буцах
+                        </button>
+                        <button
+                            type="button"
+                            class="text-sm transition-colors cursor-pointer"
+                            :class="
+                                resendCooldown > 0
+                                    ? 'text-gray-400 cursor-not-allowed'
+                                    : 'text-primary-500 hover:text-primary-600'
+                            "
+                            :disabled="resendCooldown > 0 || isLoading"
+                            @click="handleResendOTP"
+                        >
+                            <template v-if="resendCooldown > 0">
+                                Дахин илгээх ({{ resendCooldown }}с)
+                            </template>
+                            <template v-else> Код дахин илгээх </template>
+                        </button>
+                    </div>
+                </UForm>
+
                 <!-- Login Form -->
                 <UForm
-                    v-if="!isRegisterMode"
+                    v-else-if="!isRegisterMode"
                     :schema="loginSchema"
                     :state="loginState"
                     class="space-y-5"
@@ -368,8 +475,8 @@ const features = [
                     </UButton>
                 </UForm>
 
-                <!-- Toggle Mode -->
-                <div class="text-center mt-8">
+                <!-- Toggle Mode (hidden during OTP verification) -->
+                <div v-if="!pendingVerificationEmail" class="text-center mt-8">
                     <span class="text-gray-500 dark:text-gray-400">
                         {{ isRegisterMode ? 'Хаяг байгаа юу?' : 'Хаяг байхгүй юу?' }}
                     </span>
@@ -382,8 +489,11 @@ const features = [
                     </button>
                 </div>
 
-                <!-- Terms -->
-                <p class="text-center text-xs text-gray-400 dark:text-gray-500 mt-8">
+                <!-- Terms (hidden during OTP verification) -->
+                <p
+                    v-if="!pendingVerificationEmail"
+                    class="text-center text-xs text-gray-400 dark:text-gray-500 mt-8"
+                >
                     Үргэлжлүүлснээр та манай
                     <NuxtLink to="/terms" class="text-primary-500 hover:underline"
                         >Үйлчилгээний нөхцөл</NuxtLink
@@ -392,6 +502,11 @@ const features = [
                     <NuxtLink to="/privacy" class="text-primary-500 hover:underline"
                         >Нууцлалын бодлого</NuxtLink
                     >-г зөвшөөрч байна.
+                </p>
+
+                <!-- OTP Info -->
+                <p v-else class="text-center text-xs text-gray-400 dark:text-gray-500 mt-8">
+                    Код 10 минутын дотор хүчинтэй. Имэйлээ шалгаад spam хавтсыг мөн шалгаарай.
                 </p>
             </div>
         </div>
