@@ -10,7 +10,7 @@ defineProps<Props>()
 
 <template>
     <div
-        class="relative overflow-hidden h-full rounded-2xl bg-gradient-to-br from-primary-500 via-primary-600 to-accent-600 p-6"
+        class="relative overflow-hidden h-full rounded-2xl bg-linear-to-br from-primary-500 via-primary-600 to-accent-600 p-6"
     >
         <!-- Background decoration -->
         <div
@@ -24,7 +24,7 @@ defineProps<Props>()
         <div class="relative flex items-center gap-4">
             <!-- Logo -->
             <div
-                class="w-14 h-14 rounded-2xl bg-white/90 backdrop-blur-sm flex items-center justify-center flex-shrink-0 shadow-lg shadow-black/10"
+                class="w-14 h-14 rounded-2xl bg-white/90 backdrop-blur-sm flex items-center justify-center shrink-0 shadow-lg shadow-black/10"
             >
                 <img
                     v-if="logoUrl"
@@ -48,7 +48,7 @@ defineProps<Props>()
                     class="inline-flex items-center gap-1.5 text-sm text-white/70 hover:text-white mt-1 transition-colors"
                 >
                     <span class="truncate">{{ shopUrl.replace(/^https?:\/\//, '') }}</span>
-                    <UIcon name="i-lucide-external-link" class="w-3.5 h-3.5 flex-shrink-0" />
+                    <UIcon name="i-lucide-external-link" class="w-3.5 h-3.5 shrink-0" />
                 </a>
             </div>
 
@@ -58,7 +58,7 @@ defineProps<Props>()
                 variant="ghost"
                 icon="i-lucide-settings"
                 size="sm"
-                class="text-white/70 hover:text-white hover:bg-white/10 flex-shrink-0"
+                class="text-white/70 hover:text-white hover:bg-white/10 shrink-0"
             />
         </div>
     </div>

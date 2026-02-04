@@ -1,3 +1,5 @@
+import type { FacebookPage } from '~/types'
+
 export interface Shop {
     id: number
     name: string
@@ -6,6 +8,8 @@ export interface Shop {
     is_active: boolean
     picture: string
     description: string
+    facebook_page_id: number
+    facebook_page?: FacebookPage
     settings: {
         auto_reply: boolean
         reply_message: string

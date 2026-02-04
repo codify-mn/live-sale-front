@@ -1,13 +1,8 @@
 <script setup lang="ts">
 const config = useRuntimeConfig()
 const toast = useToast()
-
-const { data: facebookStatus, refresh } = await useFetch(
-    `${config.public.apiUrl}/api/connect/facebook/status`,
-    {
-        credentials: 'include'
-    }
-)
+const { user, fetchUser } = useAuth()
+const shop = useShop()
 
 const isDisconnecting = ref(false)
 const isConnecting = ref(false)
@@ -20,7 +15,7 @@ const disconnect = async () => {
             credentials: 'include'
         })
         toast.add({ title: 'Success', description: 'Facebook disconnected successfully' })
-        await refresh()
+        await fetchUser()
     } catch (e) {
         toast.add({ title: 'Error', description: 'Failed to disconnect', color: 'error' })
     } finally {
@@ -50,10 +45,10 @@ const connect = async () => {
             variant="subtle"
         >
             <template #description>
-                <div v-if="facebookStatus?.connected" class="mt-1 text-sm text-gray-500">
+                <div v-if="user?.is_facebook_connected" class="mt-1 text-sm text-gray-500">
                     Connected to
                     <span class="font-medium text-gray-900 dark:text-white">{{
-                        facebookStatus.page_name
+                        shop?.facebook_page?.page_name
                     }}</span>
                 </div>
                 <div v-else class="mt-1 text-sm text-gray-500">
@@ -70,7 +65,7 @@ const connect = async () => {
                     />
                 </div>
 
-                <div v-if="facebookStatus?.connected">
+                <div v-if="user?.is_facebook_connected">
                     <UButton
                         color="error"
                         variant="soft"
