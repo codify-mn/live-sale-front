@@ -7,9 +7,9 @@ const shop = useShop()
 </script>
 
 <template>
-    <div class="flex items-center gap-3 px-2 py-1.5" :class="collapsed ? 'justify-center' : ''">
+    <div class="flex items-center gap-3 py-1.5 w-full" :class="collapsed ? 'justify-center' : ''">
         <div
-            class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center flex-shrink-0 shadow-sm"
+            class="w-9 h-9 rounded-xl bg-linear-to-br from-primary-500 to-accent-500 flex items-center justify-center shrink-0 shadow-sm"
         >
             <img
                 v-if="shop?.picture"

@@ -21,13 +21,6 @@ onBeforeUnmount(() => {
     webrtc.stopStream()
 })
 
-const facebookLiveUrl = computed(() => {
-    if (live.value?.ref_id) {
-        return `https://www.facebook.com/${live.value.ref_id}`
-    }
-    return null
-})
-
 const statusLabel = computed(() => {
     const labels: Record<string, string> = {
         idle: 'Offline',
@@ -85,8 +78,8 @@ const statusLabel = computed(() => {
                         {{ statusLabel }}
                     </UBadge>
                     <UButton
-                        v-if="facebookLiveUrl"
-                        :to="facebookLiveUrl"
+                        v-if="live"
+                        :to="live?.view_url"
                         target="_blank"
                         color="primary"
                         variant="soft"

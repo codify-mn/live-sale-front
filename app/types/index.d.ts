@@ -75,6 +75,7 @@ export interface LiveSale {
     status: string
     created_at: string
     updated_at: string
+    view_url: string
     comments: LiveSaleComment[]
     products: LiveSaleProduct[]
 }
@@ -90,6 +91,8 @@ export interface LiveSaleProduct {
 export interface FacebookPage {
     id: number
     page_name: string
+    followers_count: number
+    profile_picture: string
     ref_id: string
     user_id: number
     shop_id: number

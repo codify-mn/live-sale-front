@@ -4,11 +4,9 @@ import type { LiveSale } from '~/types'
 const config = useRuntimeConfig()
 const toast = useToast()
 
-const { data: lives, refresh } = await useFetch<LiveSale[]>(
+const { data: lives, refresh } = await useLazyFetch<LiveSale[]>(
     `${config.public.apiUrl}/api/live-sales`,
-    {
-        credentials: 'include'
-    }
+    { credentials: 'include' }
 )
 
 const isLiveModalOpen = ref(false)
@@ -37,7 +35,7 @@ const createLive = async () => {
             credentials: 'include'
         })
 
-        navigateTo(`/app/live/${id}`)
+        navigateTo(`/dashboard/live/${id}`)
     } catch (error) {
         console.error('Failed to create live:', error)
         toast.add({
@@ -70,11 +68,8 @@ const statusLabel = (status: string) => {
     return map[status] || status
 }
 
-const facebookUrl = (live: LiveSale) => {
-    if (live.ref_id) {
-        return `https://www.facebook.com/${live.ref_id}`
-    }
-    return null
+const getFacebookURL = (live: LiveSale) => {
+    return `https://www.facebook.com/${live.view_url}`
 }
 
 const formatDate = (dateStr: string) => {
@@ -156,19 +151,11 @@ const formatDate = (dateStr: string) => {
                                         {{ statusLabel(live.status) }}
                                     </UBadge>
                                 </div>
-                                <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
-                                    <span v-if="live.page?.name">{{ live.page.name }}</span>
-                                    <span v-else>Page #{{ live.page_id }}</span>
-                                    <span v-if="live.created_at" class="mx-1.5">&middot;</span>
-                                    <span v-if="live.created_at">{{
-                                        formatDate(live.created_at)
-                                    }}</span>
-                                </p>
-                                <p
-                                    v-if="live.description"
-                                    class="text-xs text-gray-400 dark:text-gray-500 truncate mt-0.5"
-                                >
-                                    {{ live.description }}
+                                <p class="text-xs text-gray-400 dark:text-gray-500 truncate mt-0.5">
+                                    <span v-if="live.description">{{ live.description }}</span>
+                                    <span class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                        {{ formatDate(live.created_at) }}
+                                    </span>
                                 </p>
                             </div>
 
@@ -186,11 +173,10 @@ const formatDate = (dateStr: string) => {
                                 </div>
                             </div>
 
-                            <!-- Actions -->
                             <div class="flex items-center gap-2 shrink-0">
                                 <UButton
-                                    v-if="facebookUrl(live)"
-                                    :to="facebookUrl(live)!"
+                                    v-if="live.view_url"
+                                    :to="live.view_url"
                                     target="_blank"
                                     color="primary"
                                     variant="soft"

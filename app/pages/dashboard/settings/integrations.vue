@@ -39,52 +39,31 @@ const connect = async () => {
             class="mb-4"
         />
 
-        <UPageCard
-            title="Facebook"
-            description="Connect your Facebook Page to start live selling"
-            variant="subtle"
-        >
-            <template #description>
-                <div v-if="user?.is_facebook_connected" class="mt-1 text-sm text-gray-500">
+        <UPageCard title="Facebook" variant="subtle">
+            <div class="flex items-center justify-between gap-4">
+                <p
+                    v-if="user?.is_facebook_connected"
+                    class="text-sm text-gray-500 dark:text-gray-400"
+                >
                     Connected to
                     <span class="font-medium text-gray-900 dark:text-white">{{
                         shop?.facebook_page?.page_name
                     }}</span>
-                </div>
-                <div v-else class="mt-1 text-sm text-gray-500">
+                </p>
+                <p v-else class="text-sm text-gray-500 dark:text-gray-400">
                     Connect your Facebook Page to sync products and orders
-                </div>
-            </template>
-
-            <div class="flex items-center justify-between mt-4">
+                </p>
                 <div class="flex items-center gap-2">
-                    <UIcon
-                        size="2rem"
-                        name="i-simple-icons-facebook"
-                        class="text-xl text-blue-600 dark:text-blue-400"
-                    />
-                </div>
-
-                <div v-if="user?.is_facebook_connected">
                     <UButton
-                        color="error"
-                        variant="soft"
-                        :loading="isDisconnecting"
-                        @click="disconnect"
-                        >Disconnect</UButton
-                    >
-                </div>
-                <div v-else>
-                    <UButton
-                        icon="i-simple-icons-facebook"
-                        @click="connect"
+                        :icon="
+                            user?.is_facebook_connected
+                                ? 'i-heroicons-arrow-path'
+                                : 'i-simple-icons-facebook'
+                        "
+                        :label="user?.is_facebook_connected ? 'Reconnect' : 'Connect Page'"
                         :loading="isConnecting"
-                    >
-                        <template v-if="isConnecting">
-                            <UIcon name="i-heroicons-refresh-cw" class="animate-spin" />
-                        </template>
-                        Connect Page
-                    </UButton>
+                        @click="connect"
+                    />
                 </div>
             </div>
         </UPageCard>
