@@ -53,12 +53,20 @@ const links = [
                     }
                 },
                 {
+                    label: 'Холболт',
+                    to: '/dashboard/settings/integrations',
+                    onSelect: () => {
+                        open.value = false
+                    }
+                },
+                {
                     label: 'Мэдэгдэл',
                     to: '/dashboard/settings/notifications',
                     onSelect: () => {
                         open.value = false
                     }
-                },  {
+                },
+                {
                     label: 'Төлбөр',
                     to: '/dashboard/settings/billing',
                     onSelect: () => {

@@ -32,6 +32,7 @@ export default defineNuxtConfig({
         },
         layoutTransition: {
             name: 'layout',
+            duration: 50,
             mode: 'out-in'
         }
     },
@@ -43,9 +44,9 @@ export default defineNuxtConfig({
     },
 
     routeRules: {
-        '/api/**': {
+        '/api': {
             cors: true,
-            proxy: 'http://localhost:4000'
+            proxy: 'http://localhost:4000/api'
         },
         '/docs': {
             redirect: '/docs/getting-started'

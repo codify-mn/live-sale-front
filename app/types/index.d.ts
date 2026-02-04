@@ -86,3 +86,11 @@ export interface LiveSaleProduct {
     keyword: string
     product: Product
 }
+
+export interface FacebookPage {
+    id: number
+    page_name: string
+    ref_id: string
+    user_id: number
+    shop_id: number
+}

@@ -10,6 +10,11 @@ const links = [
             exact: true
         },
         {
+            label: 'Холболт',
+            icon: 'i-lucide-plug',
+            to: '/dashboard/settings/integrations'
+        },
+        {
             label: 'Мэдэгдэл',
             icon: 'i-lucide-bell',
             to: '/dashboard/settings/notifications'

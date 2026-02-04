@@ -7,10 +7,9 @@ export interface User {
     last_name: string
     picture: string
     role: string
-    facebook_id?: string
-    google_id?: string
+    shop_id: number
+    is_facebook_connected: boolean
     onboarding_completed: boolean
-    shop_id: number | null
 }
 
 interface AuthResponse {
@@ -139,11 +138,14 @@ const _useAuth = () => {
         isLoading.value = true
         authError.value = null
         try {
-            const data = await $fetch<VerifyOTPResponse>(`${config.public.apiUrl}/auth/verify-otp`, {
-                method: 'POST',
-                credentials: 'include',
-                body: { email, otp }
-            })
+            const data = await $fetch<VerifyOTPResponse>(
+                `${config.public.apiUrl}/auth/verify-otp`,
+                {
+                    method: 'POST',
+                    credentials: 'include',
+                    body: { email, otp }
+                }
+            )
 
             if (data.success && data.user) {
                 user.value = data.user
@@ -167,11 +169,14 @@ const _useAuth = () => {
         isLoading.value = true
         authError.value = null
         try {
-            const data = await $fetch<ResendOTPResponse>(`${config.public.apiUrl}/auth/resend-otp`, {
-                method: 'POST',
-                credentials: 'include',
-                body: { email }
-            })
+            const data = await $fetch<ResendOTPResponse>(
+                `${config.public.apiUrl}/auth/resend-otp`,
+                {
+                    method: 'POST',
+                    credentials: 'include',
+                    body: { email }
+                }
+            )
 
             if (data.success) {
                 // Start 60 second cooldown

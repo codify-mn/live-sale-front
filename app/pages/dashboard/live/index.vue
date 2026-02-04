@@ -106,7 +106,7 @@ const formatDate = (dateStr: string) => {
                     <NuxtLink
                         v-for="live in lives"
                         :key="live.id"
-                        :to="`/app/live/${live.id}`"
+                        :to="`/dashboard/live/${live.id}`"
                         class="block group"
                     >
                         <div
