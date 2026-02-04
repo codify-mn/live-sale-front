@@ -1,16 +1,27 @@
 import { createSharedComposable } from '@vueuse/core'
+import type { QPayBankAccount } from './useQPay'
 
 export interface ShopSettings {
     auto_reply: boolean
     reply_message: string
-    payment_method: string
     comment_prefix: string
+    delivery_type: string
     delivery_fee: number
     delivery_note: string
     free_delivery_over: number
-    bank_name: string
-    bank_account_number: string
-    bank_account_name: string
+    max_quantity_per_item: number
+    unpaid_order_cancel_hours: number
+}
+
+export interface ShopQPayData {
+    merchant_id: string
+    vendor_id?: string
+    p2p_terminal_id?: string
+    card_terminal_id?: string
+    merchant_type: string
+    is_registered: boolean
+    registered_at?: string
+    bank_account?: QPayBankAccount
 }
 
 export interface ShopData {
@@ -20,8 +31,8 @@ export interface ShopData {
     owner_id: number
     is_active: boolean
     picture: string
-    description: string
     settings: ShopSettings
+    qpay?: ShopQPayData
 }
 
 const _useShopSettings = () => {

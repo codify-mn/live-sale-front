@@ -2,31 +2,18 @@
 import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
 import { useShopSettings } from '~/composables/useShopSettings'
+import { useQPay } from '~/composables/useQPay'
 
 const { shop, isLoading, isSaving, fetchShop, updateShop } = useShopSettings()
+const { status: qpayStatus, isLoading: qpayLoading, fetchStatus: fetchQPayStatus } = useQPay()
 
 const fileRef = ref<HTMLInputElement>()
 const config = useRuntimeConfig()
-
-const paymentMethods = [
-    { label: 'Бэлэн мөнгө', value: 'cash', icon: 'i-lucide-banknote' },
-    { label: 'Банкны шилжүүлэг', value: 'bank_transfer', icon: 'i-lucide-landmark' },
-    { label: 'QPay', value: 'qpay', icon: 'i-lucide-smartphone' }
-]
-
-const banks = [
-    { label: 'Хаан банк', value: 'Хаан банк' },
-    { label: 'Худалдаа хөгжлийн банк', value: 'Худалдаа хөгжлийн банк' },
-    { label: 'Голомт банк', value: 'Голомт банк' },
-    { label: 'Төрийн банк', value: 'Төрийн банк' },
-    { label: 'Хас банк', value: 'Хас банк' },
-    { label: 'Богд банк', value: 'Богд банк' }
-]
+const showQPayRegisterModal = ref(false)
 
 const shopSchema = z.object({
     name: z.string().min(1, 'Дэлгүүрийн нэр оруулна уу'),
     phone_number: z.string().optional(),
-    description: z.string().optional(),
     picture: z.string().optional()
 })
 
@@ -35,41 +22,63 @@ type ShopSchema = z.output<typeof shopSchema>
 const state = reactive({
     name: '',
     phone_number: '',
-    description: '',
     picture: '',
-    payment_method: 'cash',
-    bank_name: '',
-    bank_account_number: '',
-    bank_account_name: '',
+    delivery_type: 'none',
     delivery_fee: 0,
     free_delivery_over: 0,
     delivery_note: '',
     auto_reply: false,
     reply_message: '',
     comment_prefix: '',
+    max_quantity_per_item: 10,
+    unpaid_order_cancel_hours: 24
 })
 
-const showBankFields = computed(() => state.payment_method === 'bank_transfer')
+const deliveryTypes = [
+    { label: 'Хүргэлтгүй', value: 'none' },
+    { label: 'Хүргэлттэй (Үнэ тогтмол)', value: 'fixed' },
+    { label: 'Тодорхой үнийн дүнгээс дээш үнэгүй', value: 'free_over' },
+    { label: 'Хүргэлттэй (Үнэ тусдаа өөрсдөө тооцож авна)', value: 'custom' },
+    { label: 'Бүх хүргэлт үнэгүй', value: 'all_free' }
+]
+
+const cancelTimeOptions = [
+    { label: '1 цаг', value: 1 },
+    { label: '2 цаг', value: 2 },
+    { label: '6 цаг', value: 6 },
+    { label: '12 цаг', value: 12 },
+    { label: '24 цаг (Санал болгох)', value: 24 },
+    { label: '48 цаг', value: 48 },
+    { label: '72 цаг', value: 72 }
+]
+
+const showDeliveryFee = computed(
+    () => state.delivery_type === 'fixed' || state.delivery_type === 'free_over'
+)
+const showFreeDeliveryOver = computed(() => state.delivery_type === 'free_over')
 
 onMounted(async () => {
-    await fetchShop()
+    await Promise.all([fetchShop(), fetchQPayStatus()])
     if (shop.value) {
         state.name = shop.value.name || ''
         state.phone_number = shop.value.phone_number || ''
-        state.description = shop.value.description || ''
         state.picture = shop.value.picture || ''
-        state.payment_method = shop.value.settings?.payment_method || 'cash'
-        state.bank_name = shop.value.settings?.bank_name || ''
-        state.bank_account_number = shop.value.settings?.bank_account_number || ''
-        state.bank_account_name = shop.value.settings?.bank_account_name || ''
+        state.delivery_type = shop.value.settings?.delivery_type || 'none'
         state.delivery_fee = shop.value.settings?.delivery_fee || 0
         state.free_delivery_over = shop.value.settings?.free_delivery_over || 0
         state.delivery_note = shop.value.settings?.delivery_note || ''
         state.auto_reply = shop.value.settings?.auto_reply || false
         state.reply_message = shop.value.settings?.reply_message || ''
         state.comment_prefix = shop.value.settings?.comment_prefix || ''
+        state.max_quantity_per_item = shop.value.settings?.max_quantity_per_item || 10
+        state.unpaid_order_cancel_hours = shop.value.settings?.unpaid_order_cancel_hours || 24
     }
 })
+
+function onQPayRegisterSuccess() {
+    showQPayRegisterModal.value = false
+    fetchQPayStatus()
+}
 
 async function onSubmit(_event: FormSubmitEvent<ShopSchema>) {
     await saveSettings()
@@ -79,19 +88,17 @@ async function saveSettings() {
     const updates = {
         name: state.name,
         phone_number: state.phone_number,
-        description: state.description,
         picture: state.picture,
         settings: {
-            payment_method: state.payment_method,
-            bank_name: state.bank_name,
-            bank_account_number: state.bank_account_number,
-            bank_account_name: state.bank_account_name,
+            delivery_type: state.delivery_type,
             delivery_fee: state.delivery_fee,
             free_delivery_over: state.free_delivery_over,
             delivery_note: state.delivery_note,
             auto_reply: state.auto_reply,
             reply_message: state.reply_message,
             comment_prefix: state.comment_prefix,
+            max_quantity_per_item: state.max_quantity_per_item,
+            unpaid_order_cancel_hours: state.unpaid_order_cancel_hours
         }
     }
     await updateShop(updates)
@@ -169,16 +176,6 @@ function onFileClick() {
                 </UFormField>
                 <USeparator />
                 <UFormField
-                    name="description"
-                    label="Тайлбар"
-                    description="Дэлгүүрийн товч танилцуулга."
-                    class="flex max-sm:flex-col justify-between items-start gap-4"
-                    :ui="{ container: 'w-full' }"
-                >
-                    <UTextarea v-model="state.description" :rows="3" autoresize class="w-full" />
-                </UFormField>
-                <USeparator />
-                <UFormField
                     name="picture"
                     label="Лого"
                     description="JPG, GIF эсвэл PNG. Хамгийн ихдээ 1MB."
@@ -197,65 +194,80 @@ function onFileClick() {
                     </div>
                 </UFormField>
             </UPageCard>
-
-            <!-- Section 2: Payment Settings -->
             <UPageCard
-                title="Төлбөрийн тохиргоо"
-                description="Төлбөр хүлээн авах арга зам."
+                title="QPay тохиргоо"
+                description="QPay-ээр төлбөр хүлээн авах тохиргоо."
                 variant="naked"
                 class="mb-4"
             />
 
             <UPageCard variant="subtle" class="mb-8">
-                <UFormField
-                    name="payment_method"
-                    label="Төлбөрийн арга"
-                    description="Хэрэглэгчдээс төлбөр хүлээн авах арга."
-                    class="flex max-sm:flex-col justify-between items-start gap-4"
-                >
-                    <URadioGroup
-                        v-model="state.payment_method"
-                        :items="paymentMethods"
-                        class="gap-4"
-                    />
-                </UFormField>
-
-                <template v-if="showBankFields">
-                    <USeparator />
-                    <UFormField
-                        name="bank_name"
-                        label="Банк"
-                        description="Шилжүүлэг хүлээн авах банк."
-                        class="flex max-sm:flex-col justify-between items-start gap-4"
-                    >
-                        <USelect
-                            v-model="state.bank_name"
-                            :items="banks"
-                            placeholder="Банк сонгох"
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <div
+                            class="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center"
+                        >
+                            <UIcon
+                                name="i-lucide-smartphone"
+                                class="w-6 h-6 text-purple-600 dark:text-purple-400"
+                            />
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-900 dark:text-white">QPay мерчант</h4>
+                            <p class="text-sm text-gray-500">
+                                <template v-if="qpayLoading"> Ачаалж байна... </template>
+                                <template v-else-if="qpayStatus?.is_registered">
+                                    Merchant ID: {{ qpayStatus.merchant_id }}
+                                </template>
+                                <template v-else>
+                                    QPay-д бүртгүүлж, шууд төлбөр хүлээн авах боломжтой болно.
+                                </template>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <QPayStatusBadge
+                            v-if="qpayStatus"
+                            :is-registered="qpayStatus.is_registered"
+                            :merchant-type="qpayStatus.merchant_type"
                         />
-                    </UFormField>
-                    <USeparator />
-                    <UFormField
-                        name="bank_account_number"
-                        label="Дансны дугаар"
-                        description="Банкны дансны дугаар."
-                        class="flex max-sm:flex-col justify-between items-start gap-4"
-                    >
-                        <UInput v-model="state.bank_account_number" autocomplete="off" />
-                    </UFormField>
-                    <USeparator />
-                    <UFormField
-                        name="bank_account_name"
-                        label="Дансны нэр"
-                        description="Дансны эзэмшигчийн нэр."
-                        class="flex max-sm:flex-col justify-between items-start gap-4"
-                    >
-                        <UInput v-model="state.bank_account_name" autocomplete="off" />
-                    </UFormField>
+                        <UButton
+                            v-if="!qpayStatus?.is_registered"
+                            size="sm"
+                            @click="showQPayRegisterModal = true"
+                        >
+                            Бүртгүүлэх
+                        </UButton>
+                    </div>
+                </div>
+
+                <template v-if="qpayStatus?.is_registered && qpayStatus.bank_account">
+                    <USeparator class="my-4" />
+                    <div class="space-y-2">
+                        <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Бүртгэлтэй данс
+                        </p>
+                        <div
+                            class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-900 rounded-lg"
+                        >
+                            <UIcon name="i-lucide-credit-card" class="w-4 h-4 text-gray-400" />
+                            <span class="text-sm"
+                                >{{ qpayStatus.bank_account.account_number }} -
+                                {{ qpayStatus.bank_account.account_name }}</span
+                            >
+                            <UBadge
+                                v-if="qpayStatus.bank_account.is_default"
+                                size="xs"
+                                color="primary"
+                                variant="soft"
+                                >Үндсэн</UBadge
+                            >
+                        </div>
+                    </div>
                 </template>
             </UPageCard>
 
-            <!-- Section 3: Delivery Settings -->
+            <!-- Section 2: Delivery Settings -->
             <UPageCard
                 title="Хүргэлтийн тохиргоо"
                 description="Хүргэлтийн төлбөр болон нөхцөл."
@@ -265,34 +277,57 @@ function onFileClick() {
 
             <UPageCard variant="subtle" class="mb-8">
                 <UFormField
-                    name="delivery_fee"
-                    label="Хүргэлтийн төлбөр"
-                    description="Захиалга бүрийн хүргэлтийн төлбөр."
+                    name="delivery_type"
+                    label="Хүргэлтийн төрөл"
                     class="flex max-sm:flex-col justify-between items-start gap-4"
                 >
-                    <UInput v-model.number="state.delivery_fee" type="number" autocomplete="off">
-                        <template #trailing>
-                            <span class="text-muted text-xs">₮</span>
-                        </template>
-                    </UInput>
+                    <URadioGroup
+                        v-model="state.delivery_type"
+                        :items="deliveryTypes"
+                        class="gap-3"
+                    />
                 </UFormField>
-                <USeparator />
-                <UFormField
-                    name="free_delivery_over"
-                    label="Үнэгүй хүргэлтийн босго"
-                    description="Энэ дүнгээс дээш захиалга хүргэлт үнэгүй."
-                    class="flex max-sm:flex-col justify-between items-start gap-4"
-                >
-                    <UInput
-                        v-model.number="state.free_delivery_over"
-                        type="number"
-                        autocomplete="off"
+
+                <template v-if="showDeliveryFee">
+                    <USeparator />
+                    <UFormField
+                        name="delivery_fee"
+                        label="Хүргэлтийн үнэ"
+                        class="flex max-sm:flex-col justify-between items-start gap-4"
                     >
-                        <template #trailing>
-                            <span class="text-muted text-xs">₮</span>
-                        </template>
-                    </UInput>
-                </UFormField>
+                        <UInput
+                            v-model.number="state.delivery_fee"
+                            type="number"
+                            autocomplete="off"
+                        >
+                            <template #trailing>
+                                <span class="text-muted text-xs">₮</span>
+                            </template>
+                        </UInput>
+                    </UFormField>
+                </template>
+
+                <template v-if="showFreeDeliveryOver">
+                    <USeparator />
+                    <UFormField
+                        name="free_delivery_over"
+                        label="Үнэгүй захиалгын доод үнийн дүн"
+                        description="Энэ дүнгээс дээш захиалга хүргэлт үнэгүй."
+                        class="flex max-sm:flex-col justify-between items-start gap-4"
+                    >
+                        <UInput
+                            v-model.number="state.free_delivery_over"
+                            type="number"
+                            autocomplete="off"
+                            placeholder="100000 гэх мэт"
+                        >
+                            <template #trailing>
+                                <span class="text-muted text-xs">₮</span>
+                            </template>
+                        </UInput>
+                    </UFormField>
+                </template>
+
                 <USeparator />
                 <UFormField
                     name="delivery_note"
@@ -305,7 +340,47 @@ function onFileClick() {
                 </UFormField>
             </UPageCard>
 
-            <!-- Section 4: Auto Reply Settings -->
+            <!-- Section 4: Order Settings -->
+            <UPageCard
+                title="Захиалгын тохиргоо"
+                description="Захиалга болон сагсны тохиргоо."
+                variant="naked"
+                class="mb-4"
+            />
+
+            <UPageCard variant="subtle" class="mb-8">
+                <UFormField
+                    name="max_quantity_per_item"
+                    label="Нэг барааны сагслах дээд хэмжээ"
+                    description="Хэрэглэгч нэг бараанаас хэдэн ширхэг захиалж болох."
+                    class="flex max-sm:flex-col justify-between items-start gap-4"
+                >
+                    <UInput
+                        v-model.number="state.max_quantity_per_item"
+                        type="number"
+                        min="1"
+                        max="100"
+                        autocomplete="off"
+                    />
+                </UFormField>
+                <USeparator />
+                <UFormField
+                    name="unpaid_order_cancel_hours"
+                    label="Төлөгдөөгүй захиалга цуцлагдах хугацаа"
+                    description="QPay төлбөр хийгдээгүй захиалга автоматаар цуцлагдах хугацаа."
+                    class="flex max-sm:flex-col justify-between items-start gap-4"
+                >
+                    <USelect
+                        v-model="state.unpaid_order_cancel_hours"
+                        :items="cancelTimeOptions"
+                        placeholder="Хугацаа сонгох"
+                    />
+                </UFormField>
+            </UPageCard>
+
+            <!-- Section 5: QPay Settings -->
+
+            <!-- Section 5: Auto Reply Settings -->
             <UPageCard
                 title="Автомат хариулт"
                 description="Facebook мессенжерийн автомат хариултын тохиргоо."
@@ -349,5 +424,38 @@ function onFileClick() {
                 </UFormField>
             </UPageCard>
         </UForm>
+
+        <!-- QPay Registration Modal -->
+        <UModal v-model:open="showQPayRegisterModal">
+            <template #content>
+                <UCard>
+                    <template #header>
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center"
+                            >
+                                <UIcon
+                                    name="i-lucide-smartphone"
+                                    class="w-5 h-5 text-purple-600 dark:text-purple-400"
+                                />
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-900 dark:text-white">
+                                    QPay бүртгүүлэх
+                                </h3>
+                                <p class="text-sm text-gray-500">Мерчант мэдээллээ оруулна уу</p>
+                            </div>
+                        </div>
+                    </template>
+
+                    <div class="max-h-[70vh] overflow-y-auto px-1">
+                        <QPayMerchantForm
+                            @success="onQPayRegisterSuccess"
+                            @cancel="showQPayRegisterModal = false"
+                        />
+                    </div>
+                </UCard>
+            </template>
+        </UModal>
     </div>
 </template>

@@ -14,24 +14,30 @@ const config = useRuntimeConfig()
 const toast = useToast()
 const route = useRoute()
 const { user, fetchUser } = useAuth()
+const { shop, fetchShop } = useShopSettings()
 
 const isSubmitting = ref(false)
+const isSavingStep = ref(false)
 const currentStep = ref(1)
-const totalSteps = 4 // Updated to 4 steps
+const totalSteps = 4
 
 const steps = [
     { number: 1, label: 'Facebook холболт', icon: 'i-simple-icons-facebook' },
-    { number: 2, label: 'Дэлгүүрийн мэдээлэл', icon: 'i-lucide-store' },
-    { number: 3, label: 'Төлбөрийн мэдээлэл', icon: 'i-lucide-credit-card' },
-    { number: 4, label: 'Хүргэлтийн тохиргоо', icon: 'i-lucide-truck' }
+    { number: 2, label: 'Дэлгүүр', icon: 'i-lucide-store' },
+    { number: 3, label: 'QPay', icon: 'i-lucide-smartphone' },
+    { number: 4, label: 'Хүргэлт', icon: 'i-lucide-truck' }
 ]
 
 // Facebook connection state
 const isConnecting = ref(false)
 const selectedPage = ref<FacebookPage | null>(null)
 
-// Step 2 schema (previously step 1)
-const step2Schema = z.object({
+// Shop state
+const qpayRegistered = ref(false)
+const shopCreated = ref(false)
+
+// Step 2 schema - shop info
+const shopSchema = z.object({
     shop_name: z.string().min(2, 'Дэлгүүрийн нэр хамгийн багадаа 2 тэмдэгт байх ёстой')
 })
 
@@ -40,47 +46,10 @@ const state = reactive({
     facebook_page_id: 0,
     shop_name: '',
     phone_number: '',
-    description: '',
-    payment_method: 'cash',
-    bank_name: '',
-    bank_account_number: '',
-    bank_account_name: '',
     delivery_fee: 0,
     delivery_note: '',
     free_delivery_over: 0
 })
-
-const paymentMethods = [
-    {
-        label: 'Бэлэн мөнгө',
-        value: 'cash',
-        icon: 'i-lucide-banknote',
-        description: 'Бэлнээр төлбөр хүлээн авна'
-    },
-    {
-        label: 'Банкны шилжүүлэг',
-        value: 'bank_transfer',
-        icon: 'i-lucide-landmark',
-        description: 'Дансаар шилжүүлэх'
-    },
-    {
-        label: 'QPay',
-        value: 'qpay',
-        icon: 'i-lucide-smartphone',
-        description: 'QPay-ээр төлбөр хүлээн авна'
-    }
-]
-
-const banks = [
-    { label: 'Хаан банк', value: 'Хаан банк' },
-    { label: 'Худалдаа хөгжлийн банк', value: 'Худалдаа хөгжлийн банк' },
-    { label: 'Голомт банк', value: 'Голомт банк' },
-    { label: 'Төрийн банк', value: 'Төрийн банк' },
-    { label: 'Хас банк', value: 'Хас банк' },
-    { label: 'Богд банк', value: 'Богд банк' }
-]
-
-const showBankFields = computed(() => state.payment_method === 'bank_transfer')
 
 const slideDirection = ref<'left' | 'right'>('left')
 
@@ -106,14 +75,84 @@ const {
 })
 
 // On mount, check if user is returning from Facebook callback
-onMounted(() => {
+onMounted(async () => {
     if (route.query.callback_status === 'connected' || user.value?.is_facebook_connected) {
         fetchFacebookPages()
     }
+
+    // Load existing shop data if resuming onboarding
+    await fetchShop()
+    if (shop.value) {
+        shopCreated.value = true
+        state.shop_name = shop.value.name || state.shop_name
+        state.phone_number = shop.value.phone_number || ''
+        state.delivery_fee = shop.value.settings?.delivery_fee || 0
+        state.delivery_note = shop.value.settings?.delivery_note || ''
+        state.free_delivery_over = shop.value.settings?.free_delivery_over || 0
+
+        // Check if QPay is already registered
+        if (shop.value.qpay?.is_registered) {
+            qpayRegistered.value = true
+        }
+    }
 })
 
-function nextStep() {
-    // Step 1: Facebook connection
+// Create shop (called after step 2)
+async function createShop() {
+    try {
+        await $fetch(`${config.public.apiUrl}/api/onboarding`, {
+            method: 'POST',
+            credentials: 'include',
+            body: {
+                facebook_page_id: state.facebook_page_id,
+                shop_name: state.shop_name,
+                phone_number: state.phone_number,
+                delivery_fee: state.delivery_fee,
+                delivery_note: state.delivery_note,
+                free_delivery_over: state.free_delivery_over
+            }
+        })
+        shopCreated.value = true
+        await fetchUser()
+        await fetchShop()
+        return true
+    } catch (err: any) {
+        toast.add({
+            title: 'Алдаа',
+            description: err.data?.message || 'Дэлгүүр үүсгэхэд алдаа гарлаа',
+            color: 'error'
+        })
+        return false
+    }
+}
+
+// Update shop settings (called on subsequent steps)
+async function updateShopSettings() {
+    if (!shop.value) return true // Skip if no shop yet
+
+    try {
+        await $fetch(`${config.public.apiUrl}/api/shops/my`, {
+            method: 'PUT',
+            credentials: 'include',
+            body: {
+                name: state.shop_name,
+                phone_number: state.phone_number,
+                settings: {
+                    delivery_fee: state.delivery_fee,
+                    delivery_note: state.delivery_note,
+                    free_delivery_over: state.free_delivery_over
+                }
+            }
+        })
+        return true
+    } catch (err: any) {
+        console.error('Failed to update shop:', err)
+        return true // Don't block navigation on update failure
+    }
+}
+
+async function nextStep() {
+    // Step 1: Facebook connection validation
     if (currentStep.value === 1) {
         if (!selectedPage.value) {
             toast.add({
@@ -123,23 +162,44 @@ function nextStep() {
             })
             return
         }
-        state.facebook_page_id = selectedPage.value?.id
-        if (state.shop_name == '') {
-            state.shop_name = selectedPage.value?.page_name
+        state.facebook_page_id = selectedPage.value.id
+        if (state.shop_name === '') {
+            state.shop_name = selectedPage.value.page_name
         }
     }
 
-    // Step 2: Shop name validation
+    // Step 2: Shop info validation and creation
     if (currentStep.value === 2) {
-        const result = step2Schema.safeParse({ shop_name: state.shop_name })
+        const result = shopSchema.safeParse({ shop_name: state.shop_name })
         if (!result.success) {
             toast.add({
                 title: 'Алдаа',
-                description: result.error.message ?? 'Мэдээллээ шалгана уу',
+                description: result.error.issues[0]?.message || 'Мэдээллээ шалгана уу',
                 color: 'error'
             })
             return
         }
+
+        // Create shop after step 2
+        if (!shopCreated.value) {
+            isSavingStep.value = true
+            const success = await createShop()
+            isSavingStep.value = false
+            if (!success) return
+        } else {
+            // Update existing shop
+            isSavingStep.value = true
+            await updateShopSettings()
+            isSavingStep.value = false
+        }
+    }
+
+    // Step 3: QPay - validation is optional, user can skip
+    if (currentStep.value === 3) {
+        // Just update settings and continue
+        isSavingStep.value = true
+        await updateShopSettings()
+        isSavingStep.value = false
     }
 
     if (currentStep.value < totalSteps) {
@@ -155,40 +215,41 @@ function prevStep() {
     }
 }
 
+function skipQPayStep() {
+    // Skip QPay registration and go to delivery
+    slideDirection.value = 'left'
+    currentStep.value++
+}
+
+function onQPaySuccess() {
+    qpayRegistered.value = true
+    toast.add({
+        title: 'Амжилттай!',
+        description: 'QPay бүртгэл амжилттай',
+        color: 'success'
+    })
+    // Auto advance to next step
+    nextStep()
+}
+
 async function onSubmit() {
     isSubmitting.value = true
 
     try {
-        await $fetch(`${config.public.apiUrl}/api/onboarding`, {
-            method: 'POST',
-            credentials: 'include',
-            body: {
-                facebook_page_id: state.facebook_page_id,
-                shop_name: state.shop_name,
-                phone_number: state.phone_number,
-                description: state.description,
-                payment_method: state.payment_method,
-                bank_name: state.bank_name,
-                bank_account_number: state.bank_account_number,
-                bank_account_name: state.bank_account_name,
-                delivery_fee: state.delivery_fee,
-                delivery_note: state.delivery_note,
-                free_delivery_over: state.free_delivery_over
-            }
-        })
+        // Save final settings
+        await updateShopSettings()
 
         toast.add({
             title: 'Амжилттай!',
-            description: 'Таны дэлгүүр үүслээ',
+            description: 'Таны дэлгүүр бэлэн боллоо',
             color: 'success'
         })
 
-        await fetchUser()
-        await navigateTo('/dashboard')
+        navigateTo('/dashboard')
     } catch (err: any) {
         toast.add({
             title: 'Алдаа гарлаа',
-            description: err.data?.message || 'Дэлгүүр үүсгэхэд алдаа гарлаа',
+            description: err.data?.message || 'Тохиргоо хадгалахад алдаа гарлаа',
             color: 'error'
         })
     } finally {
@@ -277,14 +338,14 @@ async function onSubmit() {
                             >
                                 <UIcon
                                     name="i-simple-icons-facebook"
-                                    class="w-7 h-7 text-blue-600"
+                                    class="w-7 h-7 text-blue-500"
                                 />
                             </div>
                             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-                                Facebook холбох
+                                Facebook холболт
                             </h1>
                             <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm">
-                                Facebook хуудсаа холбож, сонгоно уу
+                                Facebook хуудсаа холбож онлайн борлуулалт эхлүүлээрэй
                             </p>
                         </div>
 
@@ -304,18 +365,15 @@ async function onSubmit() {
 
                         <div v-else-if="currentStep === 3" key="header-3" class="text-center">
                             <div
-                                class="w-14 h-14 rounded-2xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center mx-auto mb-4"
+                                class="w-14 h-14 rounded-2xl bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center mx-auto mb-4"
                             >
-                                <UIcon
-                                    name="i-lucide-credit-card"
-                                    class="w-7 h-7 text-primary-500"
-                                />
+                                <UIcon name="i-lucide-smartphone" class="w-7 h-7 text-purple-500" />
                             </div>
                             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-                                Төлбөрийн мэдээлэл
+                                QPay бүртгэл
                             </h1>
                             <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm">
-                                Хэрхэн төлбөр хүлээн авахаа сонгоно уу
+                                QPay мерчант болж бүртгүүлнэ үү
                             </p>
                         </div>
 
@@ -344,9 +402,6 @@ async function onSubmit() {
                         <!-- Step 1: Facebook Connection -->
                         <div v-if="currentStep === 1" key="step-1" class="space-y-4">
                             <div v-if="!user?.is_facebook_connected" class="text-center space-y-4">
-                                <p class="text-gray-600 dark:text-gray-400 text-sm">
-                                    Facebook хуудсаа холбож, онлайн борлуулалт эхлүүлээрэй
-                                </p>
                                 <UButton
                                     size="lg"
                                     icon="i-simple-icons-facebook"
@@ -359,14 +414,17 @@ async function onSubmit() {
                                 </UButton>
                             </div>
 
-                            <div v-else-if="isLoadingPages">
+                            <div v-else-if="isLoadingPages" class="text-center py-8">
                                 <UIcon
                                     name="i-lucide-loader-2"
                                     class="w-6 h-6 animate-spin text-gray-400"
                                 />
                             </div>
 
-                            <div v-else-if="facebookPages" class="space-y-4">
+                            <div
+                                v-else-if="facebookPages && facebookPages.length > 0"
+                                class="space-y-4"
+                            >
                                 <p class="text-sm text-gray-600 dark:text-gray-400">
                                     Дараах Facebook хуудаснуудаас нэгийг сонгоно уу:
                                 </p>
@@ -424,7 +482,10 @@ async function onSubmit() {
                                     </label>
                                 </div>
                             </div>
-                            <div v-else>no facebook pages</div>
+
+                            <div v-else class="text-center py-4 text-gray-500">
+                                Facebook хуудас олдсонгүй
+                            </div>
                         </div>
 
                         <!-- Step 2: Shop Info -->
@@ -446,109 +507,29 @@ async function onSubmit() {
                                     icon="i-lucide-phone"
                                 />
                             </UFormField>
-
-                            <UFormField label="Тайлбар">
-                                <UTextarea
-                                    v-model="state.description"
-                                    placeholder="Дэлгүүрийнхээ тухай товч тайлбар..."
-                                    :rows="3"
-                                    class="w-full"
-                                />
-                            </UFormField>
                         </div>
 
-                        <!-- Step 3: Payment Info -->
-                        <div v-else-if="currentStep === 3" key="step-3" class="space-y-4">
-                            <UFormField label="Төлбөрийн хэлбэр">
-                                <div class="space-y-2">
-                                    <label
-                                        v-for="method in paymentMethods"
-                                        :key="method.value"
-                                        class="flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all duration-200"
-                                        :class="[
-                                            state.payment_method === method.value
-                                                ? 'border-primary-500 bg-primary-50/50 dark:bg-primary-900/10 ring-1 ring-primary-500/20'
-                                                : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                                        ]"
-                                    >
-                                        <input
-                                            v-model="state.payment_method"
-                                            type="radio"
-                                            :value="method.value"
-                                            class="sr-only"
-                                        />
-                                        <div
-                                            class="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
-                                            :class="
-                                                state.payment_method === method.value
-                                                    ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400'
-                                                    : 'bg-gray-100 dark:bg-gray-800 text-gray-500'
-                                            "
-                                        >
-                                            <UIcon :name="method.icon" class="w-5 h-5" />
-                                        </div>
-                                        <div class="flex-1 min-w-0">
-                                            <p
-                                                class="text-sm font-semibold text-gray-900 dark:text-white"
-                                            >
-                                                {{ method.label }}
-                                            </p>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400">
-                                                {{ method.description }}
-                                            </p>
-                                        </div>
-                                        <div
-                                            class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors"
-                                            :class="
-                                                state.payment_method === method.value
-                                                    ? 'border-primary-500 bg-primary-500'
-                                                    : 'border-gray-300 dark:border-gray-600'
-                                            "
-                                        >
-                                            <div
-                                                v-if="state.payment_method === method.value"
-                                                class="w-2 h-2 rounded-full bg-white"
-                                            />
-                                        </div>
-                                    </label>
+                        <!-- Step 3: QPay Registration -->
+                        <div
+                            v-else-if="currentStep === 3"
+                            key="step-3"
+                            class="max-h-[60vh] overflow-y-auto -mx-2 px-2"
+                        >
+                            <div v-if="qpayRegistered" class="text-center py-8 space-y-4">
+                                <div
+                                    class="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto"
+                                >
+                                    <UIcon name="i-lucide-check" class="w-8 h-8 text-green-500" />
                                 </div>
-                            </UFormField>
-
-                            <Transition name="expand">
-                                <div v-if="showBankFields" class="space-y-4 pt-2">
-                                    <UFormField label="Банкны нэр">
-                                        <USelect
-                                            v-model="state.bank_name"
-                                            :items="banks"
-                                            value-key="value"
-                                            placeholder="Банк сонгох"
-                                            size="lg"
-                                        />
-                                    </UFormField>
-
-                                    <UFormField label="Дансны дугаар">
-                                        <UInput
-                                            v-model="state.bank_account_number"
-                                            placeholder="1234567890"
-                                            size="lg"
-                                            icon="i-lucide-hash"
-                                        />
-                                    </UFormField>
-
-                                    <UFormField label="Данс эзэмшигчийн нэр">
-                                        <UInput
-                                            v-model="state.bank_account_name"
-                                            placeholder="Баатар Дорж"
-                                            size="lg"
-                                            icon="i-lucide-user"
-                                        />
-                                    </UFormField>
-                                </div>
-                            </Transition>
+                                <p class="text-gray-600 dark:text-gray-400">
+                                    QPay бүртгэл амжилттай хийгдсэн байна
+                                </p>
+                            </div>
+                            <QPayMerchantForm v-else inline @success="onQPaySuccess" />
                         </div>
 
                         <!-- Step 4: Delivery Settings -->
-                        <div v-else key="step-4" class="space-y-4">
+                        <div v-else-if="currentStep === 4" key="step-4" class="space-y-4">
                             <UFormField label="Хүргэлтийн төлбөр (₮)">
                                 <UInput
                                     v-model.number="state.delivery_fee"
@@ -604,12 +585,24 @@ async function onSubmit() {
                         <div v-else />
 
                         <div class="flex items-center gap-3">
+                            <!-- Skip QPay button -->
                             <UButton
-                                v-if="currentStep > 1 && currentStep < totalSteps"
+                                v-if="currentStep === 3 && !qpayRegistered"
                                 variant="ghost"
                                 color="neutral"
                                 size="sm"
-                                @click="currentStep++"
+                                @click="skipQPayStep"
+                            >
+                                Дараа бүртгүүлэх
+                            </UButton>
+
+                            <!-- Skip delivery settings button -->
+                            <UButton
+                                v-if="currentStep === 4"
+                                variant="ghost"
+                                color="neutral"
+                                size="sm"
+                                @click="onSubmit"
                             >
                                 Дараа тохируулах
                             </UButton>
@@ -618,19 +611,22 @@ async function onSubmit() {
                                 v-if="currentStep < totalSteps"
                                 trailing-icon="i-lucide-arrow-right"
                                 size="lg"
+                                :loading="isSavingStep"
                                 @click="nextStep"
                             >
-                                Дараах
+                                {{
+                                    currentStep === 2 && !shopCreated ? 'Дэлгүүр үүсгэх' : 'Дараах'
+                                }}
                             </UButton>
 
                             <UButton
-                                v-else
+                                v-if="currentStep === totalSteps"
                                 size="lg"
                                 icon="i-lucide-rocket"
                                 :loading="isSubmitting"
                                 @click="onSubmit"
                             >
-                                Дэлгүүр үүсгэх
+                                Дуусгах
                             </UButton>
                         </div>
                     </div>
