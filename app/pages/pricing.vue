@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Plan } from '~/types/subscription'
+import type { Plan, BillingCycle } from '~/types/subscription'
 
 definePageMeta({
     layout: 'public'
@@ -10,14 +10,25 @@ useSeoMeta({
     description: 'Энгийн, ил тод үнийн бодлого. Бүх хэмжээний бизнест тохирсон багцууд.'
 })
 
-const { plans, subscription, loading, fetchPlans, fetchSubscription, startTrial } =
-    useSubscription()
+const {
+    plans,
+    subscription,
+    loading,
+    fetchPlans,
+    fetchSubscription,
+    purchasePlan,
+    currentInvoice,
+    purchaseLoading,
+    checkingPayment,
+    checkInvoicePayment
+} = useSubscription()
 const { isAuthenticated: authCheck } = useAuth()
 const toast = useToast()
 const router = useRouter()
 
 const isYearly = ref(false)
 const startingTrial = ref<string | null>(null)
+const showPaymentModal = ref(false)
 
 onMounted(async () => {
     await fetchPlans()
@@ -100,7 +111,7 @@ function isCurrentPlan(plan: Plan): boolean {
     return subscription.value?.plan?.slug === plan.slug
 }
 
-async function handlePlanSelect(plan: Plan) {
+async function handlePlanSelect(plan: Plan, billingCycle?: BillingCycle) {
     if (!authCheck.value) {
         router.push('/login?redirect=/pricing')
         return
@@ -115,25 +126,48 @@ async function handlePlanSelect(plan: Plan) {
         return
     }
 
+    const cycle = billingCycle || (isYearly.value ? 'yearly' : 'monthly')
     startingTrial.value = plan.slug
+
     try {
-        await startTrial(plan.slug)
-        toast.add({
-            title: 'Амжилттай!',
-            description: `${plan.name} багцын ${plan.trial_days} хоногийн туршилт эхэллээ.`,
-            icon: 'i-lucide-check',
-            color: 'success'
-        })
-        router.push('/dashboard')
+        await purchasePlan(plan.slug, cycle)
+        showPaymentModal.value = true
     } catch (e: any) {
         toast.add({
             title: 'Алдаа',
-            description: e.data?.error || 'Туршилт эхлүүлэхэд алдаа гарлаа.',
+            description: e.data?.error || 'Төлбөр үүсгэхэд алдаа гарлаа.',
             icon: 'i-lucide-x',
             color: 'error'
         })
     } finally {
         startingTrial.value = null
+    }
+}
+
+async function handleCheckPayment() {
+    if (!currentInvoice.value) return
+
+    try {
+        const result = await checkInvoicePayment(currentInvoice.value.id)
+        if (result.is_paid) {
+            showPaymentModal.value = false
+            toast.add({
+                title: 'Амжилттай!',
+                description: 'Төлбөр баталгаажлаа. Таны багц идэвхжлээ.',
+                icon: 'i-lucide-check',
+                color: 'success'
+            })
+            router.push('/dashboard')
+        } else {
+            toast.add({
+                title: 'Төлбөр хүлээгдэж байна',
+                description: 'Төлбөр хараахан ирээгүй байна. Дахин шалгана уу.',
+                icon: 'i-lucide-clock',
+                color: 'warning'
+            })
+        }
+    } catch {
+        // Error handled in composable
     }
 }
 
@@ -149,7 +183,7 @@ const faq = [
     },
     {
         label: 'Үнэгүй туршилт байгаа юу?',
-        content: 'Тийм, бүх төлбөртэй багц 14 хоногийн үнэгүй туршилттай. Карт шаардлагагүй.'
+        content: 'Тийм, бүх төлбөртэй багц 30 хоногийн үнэгүй туршилттай. Карт шаардлагагүй.'
     },
     {
         label: 'Хязгаараа хэтрүүлбэл яах вэ?',
@@ -548,5 +582,14 @@ const trustPoints = [
                 </div>
             </UContainer>
         </section>
+
+        <!-- Payment Modal -->
+        <BillingPaymentModal
+            :open="showPaymentModal"
+            :invoice="currentInvoice"
+            :checking="checkingPayment"
+            @update:open="showPaymentModal = $event"
+            @check-payment="handleCheckPayment"
+        />
     </div>
 </template>

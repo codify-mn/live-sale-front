@@ -59,31 +59,40 @@ const usageItems = computed(() => {
 
     const plan = subscription.value.plan
 
+    const calcPercent = (current: number, max: number) => {
+        if (max === -1) return 0
+        return Math.min(100, (current / max) * 100)
+    }
+
     return [
         {
             label: 'Бүтээгдэхүүн',
             current: usage.value.product_count,
             max: plan.limits.max_products,
-            icon: 'i-lucide-package'
+            icon: 'i-lucide-package',
+            percent: calcPercent(usage.value.product_count, plan.limits.max_products)
         },
         {
             label: 'Захиалга /сараар/',
             current: usage.value.order_count_month,
             max: plan.limits.max_orders_per_month,
-            icon: 'i-lucide-shopping-cart'
+            icon: 'i-lucide-shopping-cart',
+            percent: calcPercent(usage.value.order_count_month, plan.limits.max_orders_per_month)
         },
         {
             label: 'Хадгалах зай',
             current: usage.value.storage_used_mb,
             max: plan.limits.max_storage_mb,
             icon: 'i-lucide-hard-drive',
-            isStorage: true
+            isStorage: true,
+            percent: calcPercent(usage.value.storage_used_mb, plan.limits.max_storage_mb)
         },
         {
             label: 'Дэлгүүр',
             current: usage.value.shop_count,
             max: plan.limits.max_shops,
-            icon: 'i-lucide-store'
+            icon: 'i-lucide-store',
+            percent: calcPercent(usage.value.shop_count, plan.limits.max_shops)
         }
     ]
 })
@@ -100,15 +109,6 @@ const featureItems = computed(() => {
         { label: 'Тусгай дэмжлэг', enabled: features.priority_support },
         { label: 'API хандалт', enabled: features.api_access }
     ]
-})
-
-const usagePercent = computed(() => {
-    if (!usage.value || !subscription.value?.plan) return 0
-    if (subscription.value.plan.limits.max_products === -1) return 0
-    return Math.min(
-        100,
-        (usage.value.product_count / subscription.value.plan.limits.max_products) * 100
-    )
 })
 
 async function handleCancel() {
@@ -201,8 +201,15 @@ async function handleCancel() {
                 </div>
 
                 <template #footer>
-                    <div class="flex gap-2">
+                    <div class="flex gap-2 flex-wrap">
                         <UButton label="Багц өөрчлөх" color="primary" to="/pricing" />
+                        <UButton
+                            label="Төлбөрийн түүх"
+                            color="neutral"
+                            variant="outline"
+                            icon="i-lucide-history"
+                            to="/dashboard/settings/billing/history"
+                        />
                         <UButton
                             v-if="isActive && subscription.plan?.slug !== 'free'"
                             label="Цуцлах"
@@ -221,11 +228,28 @@ async function handleCancel() {
                 variant="subtle"
             >
                 <div class="space-y-4">
-                    <div v-for="item in usageItems" :key="item.label" class="flex flex-col gap-2">
+                    <div
+                        v-for="item in usageItems"
+                        :key="item.label"
+                        class="flex flex-col gap-2 p-3 rounded-lg transition-colors"
+                        :class="item.percent >= 80 ? 'bg-amber-50 dark:bg-amber-900/20' : ''"
+                    >
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
-                                <UIcon :name="item.icon" class="w-4 h-4 text-gray-500" />
+                                <UIcon
+                                    :name="item.icon"
+                                    class="w-4 h-4"
+                                    :class="item.percent >= 80 ? 'text-amber-600' : 'text-gray-500'"
+                                />
                                 <span class="text-sm font-medium">{{ item.label }}</span>
+                                <UBadge
+                                    v-if="item.percent >= 80"
+                                    color="warning"
+                                    variant="subtle"
+                                    size="xs"
+                                >
+                                    {{ Math.round(item.percent) }}%
+                                </UBadge>
                             </div>
                             <span class="text-sm text-gray-600 dark:text-gray-400">
                                 <template v-if="item.isStorage">
@@ -239,11 +263,11 @@ async function handleCancel() {
                             </span>
                         </div>
                         <UProgress
-                            v-model="usagePercent"
+                            :model-value="item.percent"
                             :color="
-                                usagePercent >= 90
+                                item.percent >= 90
                                     ? 'error'
-                                    : usagePercent >= 70
+                                    : item.percent >= 70
                                       ? 'warning'
                                       : 'primary'
                             "

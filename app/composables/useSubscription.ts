@@ -3,8 +3,15 @@ import type {
     Plan,
     Subscription,
     SubscriptionUsage,
-    SubscriptionLimits
+    SubscriptionLimits,
+    BillingCycle
 } from '~/types/subscription'
+import type {
+    SubscriptionInvoice,
+    InvoiceListResponse,
+    PurchaseResponse,
+    PaymentCheckResponse
+} from '~/types/billing'
 
 interface PlansResponse {
     plans: Plan[]
@@ -38,6 +45,13 @@ const _useSubscription = () => {
     const plans = ref<Plan[]>([])
     const loading = ref(false)
     const error = ref<string | null>(null)
+
+    // Invoice / billing state
+    const invoices = ref<SubscriptionInvoice[]>([])
+    const currentInvoice = ref<SubscriptionInvoice | null>(null)
+    const invoicesTotal = ref(0)
+    const purchaseLoading = ref(false)
+    const checkingPayment = ref(false)
 
     const fetchPlans = async () => {
         loading.value = true
@@ -228,6 +242,90 @@ const _useSubscription = () => {
         return `${mb} MB`
     }
 
+    // ========== INVOICE / BILLING METHODS ==========
+
+    const purchasePlan = async (planSlug: string, billingCycle: BillingCycle) => {
+        purchaseLoading.value = true
+        error.value = null
+        try {
+            const data = await $fetch<PurchaseResponse>(`${apiUrl}/api/subscription/purchase`, {
+                method: 'POST',
+                credentials: 'include',
+                body: {
+                    plan_slug: planSlug,
+                    billing_cycle: billingCycle
+                }
+            })
+            currentInvoice.value = data.invoice
+            return data
+        } catch (e: any) {
+            error.value = e.data?.error || 'Failed to create invoice'
+            throw e
+        } finally {
+            purchaseLoading.value = false
+        }
+    }
+
+    const fetchInvoices = async (page = 1, limit = 20) => {
+        loading.value = true
+        error.value = null
+        try {
+            const data = await $fetch<InvoiceListResponse>(`${apiUrl}/api/subscription/invoices`, {
+                credentials: 'include',
+                params: { page, limit }
+            })
+            invoices.value = data.invoices
+            invoicesTotal.value = data.total
+            return data
+        } catch (e: any) {
+            error.value = e.data?.error || 'Failed to fetch invoices'
+            throw e
+        } finally {
+            loading.value = false
+        }
+    }
+
+    const checkInvoicePayment = async (invoiceId: number) => {
+        checkingPayment.value = true
+        error.value = null
+        try {
+            const data = await $fetch<PaymentCheckResponse>(
+                `${apiUrl}/api/subscription/invoices/${invoiceId}/check`,
+                {
+                    method: 'POST',
+                    credentials: 'include'
+                }
+            )
+            currentInvoice.value = data.invoice
+
+            if (data.is_paid) {
+                // Refresh subscription data
+                await fetchSubscription()
+            }
+
+            return data
+        } catch (e: any) {
+            error.value = e.data?.error || 'Failed to check payment'
+            throw e
+        } finally {
+            checkingPayment.value = false
+        }
+    }
+
+    const getInvoice = async (invoiceId: number) => {
+        try {
+            const data = await $fetch<{ invoice: SubscriptionInvoice }>(
+                `${apiUrl}/api/subscription/invoices/${invoiceId}`,
+                { credentials: 'include' }
+            )
+            currentInvoice.value = data.invoice
+            return data.invoice
+        } catch (e: any) {
+            error.value = e.data?.error || 'Failed to fetch invoice'
+            throw e
+        }
+    }
+
     // Initialize data
     const init = async () => {
         await Promise.all([fetchSubscription(), fetchUsage()])
@@ -241,6 +339,13 @@ const _useSubscription = () => {
         plans,
         loading,
         error,
+
+        // Invoice state
+        invoices,
+        currentInvoice,
+        invoicesTotal,
+        purchaseLoading,
+        checkingPayment,
 
         // Computed
         daysRemaining,
@@ -266,7 +371,13 @@ const _useSubscription = () => {
         checkFeature,
         formatLimit,
         formatStorage,
-        init
+        init,
+
+        // Invoice methods
+        purchasePlan,
+        fetchInvoices,
+        checkInvoicePayment,
+        getInvoice
     }
 }
 

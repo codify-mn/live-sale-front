@@ -19,11 +19,13 @@ const shopSchema = z.object({
 
 type ShopSchema = z.output<typeof shopSchema>
 
+type DeliveryType = 'none' | 'fixed' | 'free_over' | 'custom' | 'all_free'
+
 const state = reactive({
     name: '',
     phone_number: '',
     picture: '',
-    delivery_type: 'none',
+    delivery_type: 'none' as DeliveryType,
     delivery_fee: 0,
     free_delivery_over: 0,
     delivery_note: '',
@@ -63,7 +65,7 @@ onMounted(async () => {
         state.name = shop.value.name || ''
         state.phone_number = shop.value.phone_number || ''
         state.picture = shop.value.picture || ''
-        state.delivery_type = shop.value.settings?.delivery_type || 'none'
+        state.delivery_type = (shop.value.settings?.delivery_type || 'none') as DeliveryType
         state.delivery_fee = shop.value.settings?.delivery_fee || 0
         state.free_delivery_over = shop.value.settings?.free_delivery_over || 0
         state.delivery_note = shop.value.settings?.delivery_note || ''
@@ -268,79 +270,14 @@ function onFileClick() {
             </UPageCard>
 
             <!-- Section 2: Delivery Settings -->
-            <UPageCard
-                title="Хүргэлтийн тохиргоо"
-                description="Хүргэлтийн төлбөр болон нөхцөл."
-                variant="naked"
-                class="mb-4"
+            <Delivery
+                v-model:delivery_type="state.delivery_type"
+                v-model:delivery_fee="state.delivery_fee"
+                v-model:free_delivery_over="state.free_delivery_over"
+                v-model:delivery_note="state.delivery_note"
             />
 
-            <UPageCard variant="subtle" class="mb-8">
-                <UFormField
-                    name="delivery_type"
-                    label="Хүргэлтийн төрөл"
-                    class="flex max-sm:flex-col justify-between items-start gap-4"
-                >
-                    <URadioGroup
-                        v-model="state.delivery_type"
-                        :items="deliveryTypes"
-                        class="gap-3"
-                    />
-                </UFormField>
-
-                <template v-if="showDeliveryFee">
-                    <USeparator />
-                    <UFormField
-                        name="delivery_fee"
-                        label="Хүргэлтийн үнэ"
-                        class="flex max-sm:flex-col justify-between items-start gap-4"
-                    >
-                        <UInput
-                            v-model.number="state.delivery_fee"
-                            type="number"
-                            autocomplete="off"
-                        >
-                            <template #trailing>
-                                <span class="text-muted text-xs">₮</span>
-                            </template>
-                        </UInput>
-                    </UFormField>
-                </template>
-
-                <template v-if="showFreeDeliveryOver">
-                    <USeparator />
-                    <UFormField
-                        name="free_delivery_over"
-                        label="Үнэгүй захиалгын доод үнийн дүн"
-                        description="Энэ дүнгээс дээш захиалга хүргэлт үнэгүй."
-                        class="flex max-sm:flex-col justify-between items-start gap-4"
-                    >
-                        <UInput
-                            v-model.number="state.free_delivery_over"
-                            type="number"
-                            autocomplete="off"
-                            placeholder="100000 гэх мэт"
-                        >
-                            <template #trailing>
-                                <span class="text-muted text-xs">₮</span>
-                            </template>
-                        </UInput>
-                    </UFormField>
-                </template>
-
-                <USeparator />
-                <UFormField
-                    name="delivery_note"
-                    label="Хүргэлтийн тэмдэглэл"
-                    description="Хэрэглэгчдэд харуулах хүргэлтийн нэмэлт мэдээлэл."
-                    class="flex max-sm:flex-col justify-between items-start gap-4"
-                    :ui="{ container: 'w-full' }"
-                >
-                    <UTextarea v-model="state.delivery_note" :rows="2" autoresize class="w-full" />
-                </UFormField>
-            </UPageCard>
-
-            <!-- Section 4: Order Settings -->
+            <!-- Section 3: Order Settings -->
             <UPageCard
                 title="Захиалгын тохиргоо"
                 description="Захиалга болон сагсны тохиргоо."

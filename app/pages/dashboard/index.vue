@@ -38,15 +38,6 @@ const requiredActions = computed(() => {
         })
     }
 
-    if (!shop.value?.description) {
-        actions.push({
-            title: 'Дэлгүүрийн тайлбар',
-            description: 'Дэлгүүрийнхээ тухай товч мэдээлэл оруулна уу',
-            icon: 'i-lucide-info',
-            to: '/dashboard/settings'
-        })
-    }
-
     return actions
 })
 

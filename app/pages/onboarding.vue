@@ -41,11 +41,13 @@ const shopSchema = z.object({
     shop_name: z.string().min(2, 'Дэлгүүрийн нэр хамгийн багадаа 2 тэмдэгт байх ёстой')
 })
 
+type DeliveryType = 'none' | 'fixed' | 'free_over' | 'custom' | 'all_free'
 // Full state
 const state = reactive({
     facebook_page_id: 0,
     shop_name: '',
     phone_number: '',
+    delivery_type: 'none' as DeliveryType,
     delivery_fee: 0,
     delivery_note: '',
     free_delivery_over: 0
@@ -530,44 +532,12 @@ async function onSubmit() {
 
                         <!-- Step 4: Delivery Settings -->
                         <div v-else-if="currentStep === 4" key="step-4" class="space-y-4">
-                            <UFormField label="Хүргэлтийн төлбөр (₮)">
-                                <UInput
-                                    v-model.number="state.delivery_fee"
-                                    type="number"
-                                    placeholder="5000"
-                                    size="lg"
-                                    icon="i-lucide-banknote"
-                                >
-                                    <template #trailing>
-                                        <span class="text-gray-400 text-sm">₮</span>
-                                    </template>
-                                </UInput>
-                            </UFormField>
-
-                            <UFormField label="Үнэгүй хүргэлтийн босго (₮)">
-                                <UInput
-                                    v-model.number="state.free_delivery_over"
-                                    type="number"
-                                    placeholder="50000"
-                                    size="lg"
-                                    icon="i-lucide-gift"
-                                >
-                                    <template #trailing>
-                                        <span class="text-gray-400 text-sm">₮</span>
-                                    </template>
-                                </UInput>
-                                <template #hint>
-                                    <span class="text-xs text-gray-400">0 бол идэвхгүй</span>
-                                </template>
-                            </UFormField>
-
-                            <UFormField label="Хүргэлтийн мэдээлэл">
-                                <UTextarea
-                                    v-model="state.delivery_note"
-                                    placeholder="Жишээ: Улаанбаатар хот дотор 24 цагийн дотор хүргэнэ..."
-                                    :rows="3"
-                                />
-                            </UFormField>
+                            <Delivery
+                                v-model:delivery_type="state.delivery_type"
+                                v-model:delivery_fee="state.delivery_fee"
+                                v-model:free_delivery_over="state.free_delivery_over"
+                                v-model:delivery_note="state.delivery_note"
+                            />
                         </div>
                     </Transition>
 
@@ -608,7 +578,10 @@ async function onSubmit() {
                             </UButton>
 
                             <UButton
-                                v-if="currentStep < totalSteps"
+                                v-if="
+                                    currentStep < totalSteps &&
+                                    (currentStep !== 3 || qpayRegistered)
+                                "
                                 trailing-icon="i-lucide-arrow-right"
                                 size="lg"
                                 :loading="isSavingStep"
