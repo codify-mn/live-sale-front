@@ -75,6 +75,7 @@ export interface LiveSale {
     status: string
     created_at: string
     updated_at: string
+    picture: string
     view_url: string
     comments: LiveSaleComment[]
     products: LiveSaleProduct[]

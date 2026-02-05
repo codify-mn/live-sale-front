@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { LiveSale } from '~/types'
+import type { Product } from '~/composables/useProducts'
 
 const toast = useToast()
 const config = useRuntimeConfig()
@@ -9,13 +10,24 @@ const webrtc = useWebRTC()
 
 const { data: live } = useLazyFetch<LiveSale>(
     `${config.public.apiUrl}/api/live-sales/${route.params.liveID}`,
-    {
-        credentials: 'include'
-    }
+    { credentials: 'include' }
 )
 
 provide('live', live)
-provide('addedProducts', ref(live.value?.products || []))
+
+const { data: liveProducts, refresh: refreshLiveProducts } = await useLazyFetch<Product[]>(
+    `${config.public.apiUrl}/api/live-sales/${route.params.liveID}/products`,
+    { credentials: 'include' }
+)
+
+const addedProducts = useState('addedProducts', () => liveProducts)
+
+const handleProductSelect = (product: Product) => {
+    const imageUrl = product.variants?.[0]?.images?.[0] || null
+    webrtc.canvasStream.updateProduct(product.name, imageUrl)
+}
+
+provide('onProductSelect', handleProductSelect)
 
 onBeforeUnmount(() => {
     webrtc.stopStream()
@@ -36,6 +48,9 @@ const statusLabel = computed(() => {
 </script>
 <template>
     <div class="h-[calc(100vh)] w-full flex gap-4 p-4">
+        <!-- Hidden canvas for stream compositing -->
+        <canvas :ref="webrtc.canvasStream.canvasRef" class="hidden" />
+
         <!-- Product List -->
         <div class="flex-1 md:max-w-1/3">
             <ProductList />
@@ -60,9 +75,27 @@ const statusLabel = computed(() => {
                         <h2 class="font-semibold text-base truncate">
                             {{ live?.title || 'Untitled Live' }}
                         </h2>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
-                            {{ live?.page?.name || `Page #${live?.page_id}` }}
-                        </p>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <template v-if="!webrtc.isStreaming.value">
+                            <UButton
+                                color="primary"
+                                icon="i-heroicons-play-solid"
+                                @click="webrtc.startLive(live!)"
+                            >
+                                Start Stream
+                            </UButton>
+                        </template>
+                        <template v-else>
+                            <UButton
+                                color="error"
+                                icon="i-heroicons-stop-solid"
+                                @click="webrtc.stopStream"
+                            >
+                                Stop Stream
+                            </UButton>
+                        </template>
                     </div>
                 </div>
                 <div class="flex items-center gap-2 shrink-0">
@@ -127,45 +160,7 @@ const statusLabel = computed(() => {
             <div
                 class="flex justify-between items-center bg-white dark:bg-gray-900 px-4 py-3 rounded-lg shadow-sm"
             >
-                <div class="flex items-center gap-3">
-                    <span
-                        class="inline-block w-2.5 h-2.5 rounded-full"
-                        :class="
-                            webrtc.isStreaming.value ? 'bg-green-500 animate-pulse' : 'bg-gray-400'
-                        "
-                    />
-                    <div>
-                        <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                            {{ statusLabel }}
-                        </p>
-                        <p
-                            v-if="live?.description"
-                            class="text-xs text-gray-500 dark:text-gray-400 truncate max-w-xs"
-                        >
-                            {{ live?.description }}
-                        </p>
-                    </div>
-                </div>
-                <div class="flex gap-2">
-                    <template v-if="!webrtc.isStreaming.value">
-                        <UButton
-                            color="primary"
-                            icon="i-heroicons-play-solid"
-                            @click="webrtc.startLive(live!)"
-                        >
-                            Start Stream
-                        </UButton>
-                    </template>
-                    <template v-else>
-                        <UButton
-                            color="error"
-                            icon="i-heroicons-stop-solid"
-                            @click="webrtc.stopStream"
-                        >
-                            Stop Stream
-                        </UButton>
-                    </template>
-                </div>
+                <LiveStats :is-streaming="webrtc.isStreaming.value" />
             </div>
         </div>
 

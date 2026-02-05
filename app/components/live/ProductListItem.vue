@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Product } from '~/composables/useProducts'
-import type { LiveSaleProduct } from '~/types'
+import type { LiveSale, LiveSaleProduct } from '~/types'
 
 const props = defineProps<{
     product: Product
@@ -11,7 +11,7 @@ const emit = defineEmits<{
     (e: 'select', product: Product): void
 }>()
 
-const addedProducts = inject<LiveSaleProduct[]>('addedProducts')
+const addedProducts = useState<LiveSaleProduct[]>('addedProducts')
 
 const items = computed(() => [
     [
@@ -32,10 +32,10 @@ const items = computed(() => [
 ])
 
 const price = computed(() => {
-    if (props.product.sale_price) {
-        return props.product.sale_price
+    if (props.product.variants[0]?.sale_price) {
+        return props.product.variants[0].sale_price
     }
-    return props.product.base_price
+    return props.product.variants[0]?.price ?? 0
 })
 
 const formattedPrice = computed(() => {
@@ -43,6 +43,10 @@ const formattedPrice = computed(() => {
         style: 'currency',
         currency: 'MNT'
     }).format(price.value)
+})
+
+const isAdded = computed(() => {
+    return addedProducts.value.some((p) => p.product_id === props.product.id)
 })
 </script>
 
@@ -73,9 +77,9 @@ const formattedPrice = computed(() => {
 
         <div class="opacity-0 group-hover:opacity-100 transition-opacity flex justify-center gap-2">
             <UButton
-                v-if="addedProducts?.some((p) => p.product_id === props.product.id)"
+                v-if="isAdded"
                 color="success"
-                icon="i-heroicons-eye"
+                icon="i-lucide-check"
                 size="lg"
                 class="rounded-lg cursor-pointer"
                 @click="emit('select', props.product)"
@@ -83,7 +87,7 @@ const formattedPrice = computed(() => {
             <UButton
                 v-else
                 color="primary"
-                icon="i-heroicons-plus"
+                icon="i-lucide-plus"
                 size="lg"
                 class="rounded-lg cursor-pointer"
                 @click="emit('add', props.product)"
@@ -93,7 +97,7 @@ const formattedPrice = computed(() => {
                 <UButton
                     color="error"
                     variant="ghost"
-                    icon="i-heroicons-ellipsis-vertical"
+                    icon="i-lucide-ellipsis-vertical"
                     size="md"
                 />
             </UDropdownMenu>

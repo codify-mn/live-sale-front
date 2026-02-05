@@ -391,7 +391,11 @@ async function onSubmit() {
                                                     : 'bg-gray-100 dark:bg-gray-800 text-gray-500'
                                             "
                                         >
-                                            <UIcon name="i-simple-icons-facebook" class="w-5 h-5" />
+                                            <img
+                                                :src="page.profile_picture"
+                                                alt=""
+                                                class="w-full h-full object-cover"
+                                            />
                                         </div>
                                         <div class="flex-1 min-w-0">
                                             <p

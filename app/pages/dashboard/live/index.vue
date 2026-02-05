@@ -4,10 +4,13 @@ import type { LiveSale } from '~/types'
 const config = useRuntimeConfig()
 const toast = useToast()
 
-const { data: lives, refresh } = await useLazyFetch<LiveSale[]>(
-    `${config.public.apiUrl}/api/live-sales`,
-    { credentials: 'include' }
-)
+const {
+    data: lives,
+    refresh,
+    status
+} = await useLazyFetch<LiveSale[]>(`${config.public.apiUrl}/api/live-sales`, {
+    credentials: 'include'
+})
 
 const isLiveModalOpen = ref(false)
 const isLoading = ref(false)
@@ -29,7 +32,7 @@ const createLive = async () => {
 
         isLoading.value = true
 
-        const { id } = await $fetch<LiveSale>(`${config.public.apiUrl}/api/live-sales/start-new`, {
+        const { id } = await $fetch<LiveSale>(`${config.public.apiUrl}/api/live-sales`, {
             method: 'POST',
             body: liveForm,
             credentials: 'include'
@@ -46,30 +49,6 @@ const createLive = async () => {
     } finally {
         isLoading.value = false
     }
-}
-
-const statusColor = (status: string) => {
-    const map: Record<string, string> = {
-        live: 'error',
-        ended: 'neutral',
-        scheduled: 'info',
-        created: 'warning'
-    }
-    return map[status] || 'neutral'
-}
-
-const statusLabel = (status: string) => {
-    const map: Record<string, string> = {
-        live: 'LIVE',
-        ended: 'Ended',
-        scheduled: 'Scheduled',
-        created: 'Created'
-    }
-    return map[status] || status
-}
-
-const getFacebookURL = (live: LiveSale) => {
-    return `https://www.facebook.com/${live.view_url}`
 }
 
 const formatDate = (dateStr: string) => {
@@ -90,14 +69,24 @@ const formatDate = (dateStr: string) => {
             <UDashboardNavbar title="Facebook Live">
                 <template #right>
                     <UButton color="primary" icon="i-lucide-video" @click="isLiveModalOpen = true">
-                        New Live
+                        Шинэ Live
                     </UButton>
                 </template>
             </UDashboardNavbar>
 
             <div class="p-6 space-y-6 overflow-y-auto">
                 <!-- Live Sales List -->
-                <div v-if="lives && lives.length > 0" class="space-y-3">
+                <div v-if="status === 'pending'" class="space-y-3">
+                    <div class="flex items-center gap-4 p-4" v-for="i in 2">
+                        <USkeleton class="h-12 w-12 rounded-full" />
+
+                        <div class="grid gap-2">
+                            <USkeleton class="h-4 w-[250px]" />
+                            <USkeleton class="h-4 w-[200px]" />
+                        </div>
+                    </div>
+                </div>
+                <div v-else-if="lives && lives.length > 0" class="space-y-3">
                     <NuxtLink
                         v-for="live in lives"
                         :key="live.id"
@@ -107,24 +96,30 @@ const formatDate = (dateStr: string) => {
                         <div
                             class="flex items-center gap-4 p-4 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 transition-all duration-200 hover:shadow-md hover:border-gray-300 dark:hover:border-gray-700"
                         >
-                            <!-- Facebook Icon -->
                             <div
                                 class="shrink-0 w-12 h-12 rounded-full flex items-center justify-center"
                                 :class="
-                                    live.status === 'live'
+                                    live.status === 'live_now'
                                         ? 'bg-red-100 dark:bg-red-900/30'
                                         : 'bg-blue-100 dark:bg-blue-900/30'
                                 "
                             >
+                                <div v-if="live.status === 'vod'">
+                                    <NuxtImg
+                                        class="w-12 h-12 rounded-full object-cover"
+                                        :src="live.picture"
+                                    />
+                                </div>
                                 <UIcon
+                                    v-else
                                     :name="
-                                        live.status === 'live'
+                                        live.status === 'live_now'
                                             ? 'i-lucide-radio'
                                             : 'i-simple-icons-facebook'
                                     "
                                     class="text-xl"
                                     :class="
-                                        live.status === 'live'
+                                        live.status === 'live_now'
                                             ? 'text-red-600 dark:text-red-400'
                                             : 'text-blue-600 dark:text-blue-400'
                                     "
@@ -135,24 +130,23 @@ const formatDate = (dateStr: string) => {
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center gap-2 mb-0.5">
                                     <h3
-                                        class="font-semibold text-sm text-gray-900 dark:text-white truncate group-hover:text-primary-500 transition-colors"
+                                        class="font-semibold text-md text-gray-900 dark:text-white truncate group-hover:text-primary-500 transition-colors"
                                     >
                                         {{ live.title || 'Untitled Live' }}
                                     </h3>
-                                    <UBadge
-                                        :color="statusColor(live.status) as any"
-                                        :variant="live.status === 'live' ? 'solid' : 'subtle'"
-                                        size="xs"
-                                    >
-                                        <span
-                                            v-if="live.status === 'live'"
-                                            class="inline-block w-1.5 h-1.5 rounded-full bg-white mr-1 animate-pulse"
-                                        />
-                                        {{ statusLabel(live.status) }}
-                                    </UBadge>
+
+                                    <StatusBadge :status="live.status" />
                                 </div>
-                                <p class="text-xs text-gray-400 dark:text-gray-500 truncate mt-0.5">
-                                    <span v-if="live.description">{{ live.description }}</span>
+                                <p
+                                    class="text-xs text-gray-400 dark:text-gray-500 truncate mt-0.5 flex items-center gap-1"
+                                >
+                                    <template v-if="live.description">
+                                        <span class="truncate max-w-[30ch]">{{
+                                            live.description
+                                        }}</span>
+                                        <USeparator orientation="vertical" class="h-4" />
+                                    </template>
+
                                     <span class="text-xs text-gray-500 dark:text-gray-400 truncate">
                                         {{ formatDate(live.created_at) }}
                                     </span>
@@ -175,7 +169,7 @@ const formatDate = (dateStr: string) => {
 
                             <div class="flex items-center gap-2 shrink-0">
                                 <UButton
-                                    v-if="live.view_url"
+                                    v-if="live.status == 'vod' && live.view_url"
                                     :to="live.view_url"
                                     target="_blank"
                                     color="primary"
@@ -206,13 +200,13 @@ const formatDate = (dateStr: string) => {
                         />
                     </div>
                     <h3 class="font-semibold text-gray-900 dark:text-white mb-1">
-                        No live sales yet
+                        Үүсгэсэн Live байхгүй байна.
                     </h3>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                        Start your first Facebook live sale to begin selling
+                        Анхны Facebook Live худалдаагаа эхлүүлж, борлуулалтаа ихэсгээрэй.
                     </p>
                     <UButton color="primary" icon="i-lucide-video" @click="isLiveModalOpen = true">
-                        Start Live
+                        Шинэ Live
                     </UButton>
                 </div>
             </div>
@@ -221,7 +215,7 @@ const formatDate = (dateStr: string) => {
                 <template #header>
                     <div class="flex-1 flex items-center justify-between">
                         <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
-                            Start Live Sale
+                            Create Live Sale
                         </h3>
                         <UButton
                             color="neutral"
@@ -255,7 +249,7 @@ const formatDate = (dateStr: string) => {
                             Cancel
                         </UButton>
                         <UButton color="primary" :loading="isLoading" @click="createLive">
-                            Go Live
+                            Create
                         </UButton>
                     </div>
                 </template>

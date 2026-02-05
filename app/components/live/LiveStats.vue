@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import type { LiveSale } from '~/types'
-
 const props = defineProps<{
-    live: LiveSale
     isStreaming: boolean
 }>()
 
@@ -52,18 +49,26 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="grid grid-cols-2 gap-4 mt-4 mx-2">
-        <DashboardStatCard
+    <div class="grid grid-cols-4 gap-4 flex-1">
+        <LiveStatCard
             label="Захиалга"
             :value="orders"
-            icon="i-heroicons-shopping-bag"
-            icon-color="primary"
+            icon="i-lucide-shopping-cart"
+            icon-color="warning"
         />
-        <DashboardStatCard
-            label="Үзэгч"
+        <LiveStatCard
+            label="Нийт"
+            prefix="₮"
+            :value="revenue"
+            icon="i-lucide-piggy-bank"
+            icon-color="success"
+        />
+        <LiveStatCard label="Үзэгч" :value="viewers" icon="i-lucide-users" icon-color="info" />
+        <LiveStatCard
+            label="Comments"
             :value="viewers"
-            icon="i-heroicons-users"
-            icon-color="info"
+            icon="i-lucide-message-circle"
+            icon-color="primary"
         />
     </div>
 </template>

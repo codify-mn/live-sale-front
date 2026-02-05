@@ -11,7 +11,8 @@ const props = defineProps<{
     shopId?: number
 }>()
 
-const addedProducts = inject<Ref<LiveSaleProduct[]>>('addedProducts')
+const addedProducts = useState<LiveSaleProduct[]>('addedProducts')
+const onProductSelect = inject<(product: Product) => void>('onProductSelect')
 
 const search = ref('')
 const loading = ref(false)
@@ -115,20 +116,15 @@ const handleAdd = async (product: Product) => {
 }
 
 const handleSelect = (product: Product) => {
-    console.log('Selected product on live:', product)
     toast.add({
         title: 'Product Selected',
         description: `Selected ${product.name} for live stream`,
         icon: 'i-heroicons-check-circle',
         color: 'success'
     })
-    $fetch(`${config.public.apiUrl}/api/live-sales/${route.params.liveID}/broadcast/product`, {
-        method: 'POST',
-        body: {
-            product_id: product.id
-        },
-        credentials: 'include'
-    })
+
+    // Update canvas overlay with product info
+    onProductSelect?.(product)
 }
 </script>
 <template>
@@ -141,14 +137,17 @@ const handleSelect = (product: Product) => {
                 v-model="search"
                 icon="i-heroicons-magnifying-glass"
                 placeholder="Search products..."
+                :ui="{ trailing: 'pe-1' }"
+                :loading="loading"
+                loading-icon="i-lucide-loader"
             >
-                <template #trailing>
+                <template v-if="search?.length" #trailing>
                     <UButton
-                        v-show="search !== ''"
                         color="neutral"
                         variant="link"
-                        icon="i-heroicons-x-mark"
-                        :padded="false"
+                        size="sm"
+                        icon="i-lucide-x"
+                        aria-label="Clear input"
                         @click="search = ''"
                     />
                 </template>
@@ -158,8 +157,8 @@ const handleSelect = (product: Product) => {
         <div
             class="flex-1 overflow-y-auto p-2 space-y-1 scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-700"
         >
-            <div v-if="loading && products.length === 0" class="flex justify-center p-4">
-                <UIcon name="i-heroicons-arrow-path" class="animate-spin text-2xl text-gray-400" />
+            <div v-if="loading" class="flex justify-center p-8">
+                <UIcon name="i-lucide-loader" class="animate-spin text-xl text-gray-400" />
             </div>
 
             <template v-else>
@@ -171,25 +170,14 @@ const handleSelect = (product: Product) => {
                     @select="handleSelect"
                 />
 
-                <div v-if="loading" class="flex justify-center p-2">
-                    <UIcon
-                        name="i-heroicons-arrow-path"
-                        class="animate-spin text-xl text-gray-400"
-                    />
-                </div>
-
-                <div
-                    v-if="products.length === 0 && !loading"
-                    class="text-center text-gray-400 py-8"
-                >
+                <div v-if="products.length === 0" class="text-center text-gray-400 py-8">
                     <p>No products found</p>
                 </div>
 
-                <!-- Intersection observer target for infinite scroll could go here -->
-                <div v-if="hasMore && !loading" class="p-2 text-center">
-                    <UButton size="xs" variant="ghost" @click="() => loadProducts(false)"
-                        >Load more</UButton
-                    >
+                <div v-if="hasMore" class="p-2 text-center">
+                    <UButton size="xs" variant="ghost" @click="() => loadProducts(false)">
+                        Load more
+                    </UButton>
                 </div>
             </template>
         </div>

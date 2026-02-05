@@ -17,15 +17,49 @@ const closeDialogHandler = (event: Event) => {
     event.returnValue = true
 }
 
+// Prefer H.264 codec by reordering SDP m=video payload types
+function preferH264(sdp: string): string {
+    const lines = sdp.split('\r\n')
+
+    const videoMLineIndex = lines.findIndex((line) => line.startsWith('m=video'))
+    if (videoMLineIndex === -1) return sdp
+
+    const h264PayloadTypes = lines
+        .map((line) => line.match(/^a=rtpmap:(\d+)\s+H264\//)?.[1])
+        .filter((type): type is string => type !== undefined)
+
+    if (h264PayloadTypes.length === 0) return sdp
+
+    const mLine = lines[videoMLineIndex]
+    const parts = mLine!.split(' ')
+    const [mediaType, port, protocol, ...payloads] = parts
+
+    const otherPayloadTypes = payloads.filter((pt) => !h264PayloadTypes.includes(pt))
+
+    const reorderedMLine = [
+        mediaType,
+        port,
+        protocol,
+        ...h264PayloadTypes,
+        ...otherPayloadTypes
+    ].join(' ')
+
+    const result = [...lines]
+    result[videoMLineIndex] = reorderedMLine
+    return result.join('\r\n')
+}
+
 export const useWebRTC = () => {
     const config = useRuntimeConfig()
     const toast = useToast()
+    const canvasStream = useCanvasStream()
 
     const isStreaming = ref(false)
     const streamStatus = ref<StreamStatus>(StreamStatus.IDLE)
     const videoRef = ref<HTMLVideoElement | null>(null)
     let pc: RTCPeerConnection | null = null
     let localStream: MediaStream | null = null
+    let currentLiveId: number | null = null
 
     const startLive = async (live: LiveSale) => {
         streamStatus.value = StreamStatus.STARTING
@@ -35,7 +69,7 @@ export const useWebRTC = () => {
 
             if (!live.stream_url) throw new Error('No RTMP URL returned')
 
-            // 2. Initialize WebRTC
+            // Get webcam stream
             streamStatus.value = StreamStatus.ACCESSING_CAMERA
             localStream = await navigator.mediaDevices.getUserMedia({
                 video: {
@@ -43,28 +77,31 @@ export const useWebRTC = () => {
                 },
                 audio: true
             })
+            // Pass webcam through canvas compositor
+            const composited = canvasStream.start(localStream)
 
             if (videoRef.value) {
-                videoRef.value.srcObject = localStream
+                videoRef.value.srcObject = composited
             }
 
             streamStatus.value = StreamStatus.CONNECTING
+            currentLiveId = live.id
+
             pc = new RTCPeerConnection({
                 iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
             })
 
-            // Add tracks
-            localStream.getTracks().forEach((track) => {
-                if (localStream && pc) {
-                    pc.addTrack(track, localStream)
-                }
+            // Add composited tracks (canvas video + webcam audio)
+            composited.getTracks().forEach((track) => {
+                pc!.addTrack(track, composited)
             })
 
-            // 3. Negotiate
+            // Create offer and prefer H.264
             const offer = await pc.createOffer()
+            offer.sdp = preferH264(offer.sdp || '')
             await pc.setLocalDescription(offer)
 
-            // Wait for ICE gathering to complete (simple approach) or just send the offer
+            // Wait for ICE gathering
             await new Promise<void>((resolve) => {
                 if (pc?.iceGatheringState === 'complete') {
                     resolve()
@@ -75,34 +112,46 @@ export const useWebRTC = () => {
                         }
                     }
                 }
-                // Fallback timeout
-                setTimeout(resolve, 1000)
+                setTimeout(resolve, 2000)
             })
 
-            const response = await fetch(
-                `${config.public.apiUrl}/api/live-sales/${live.id}/broadcast/negotiate`,
+            // Send SDP to SRS via WHIP
+            const srsUrl = (config.public as any).srsUrl || 'http://localhost:1985'
+            const whipUrl = `${srsUrl}/rtc/v1/whip/?app=live&stream=${live.id}`
+
+            const whipResponse = await fetch(whipUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/sdp' },
+                body: pc.localDescription?.sdp
+            })
+
+            if (!whipResponse.ok) {
+                throw new Error('SRS WHIP rejected offer: ' + (await whipResponse.text()))
+            }
+
+            const answerSdp = await whipResponse.text()
+            await pc.setRemoteDescription(
+                new RTCSessionDescription({
+                    type: 'answer',
+                    sdp: answerSdp
+                })
+            )
+
+            // Tell backend to start RTMP forwarding from SRS to Facebook
+            const forwardResponse = await fetch(
+                `${config.public.apiUrl}/api/live-sales/${live.id}/broadcast/start-forward`,
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        sdp: pc.localDescription?.sdp,
-                        rtmp_url: live.stream_url
-                    }),
                     credentials: 'include'
                 }
             )
 
-            if (!response.ok) {
-                throw new Error('Server rejected offer: ' + (await response.text()))
+            if (!forwardResponse.ok) {
+                throw new Error(
+                    'Failed to start RTMP forwarding: ' + (await forwardResponse.text())
+                )
             }
-
-            const data = await response.json()
-            await pc.setRemoteDescription(
-                new RTCSessionDescription({
-                    type: 'answer',
-                    sdp: data.sdp
-                })
-            )
 
             isStreaming.value = true
             streamStatus.value = StreamStatus.LIVE
@@ -123,14 +172,34 @@ export const useWebRTC = () => {
         }
     }
 
-    const stopStream = () => {
+    const stopStream = async () => {
         window.removeEventListener('beforeunload', closeDialogHandler)
 
         streamStatus.value = StreamStatus.STOPPING
+
+        // Stop RTMP forwarding on backend
+        if (currentLiveId) {
+            try {
+                await fetch(
+                    `${config.public.apiUrl}/api/live-sales/${currentLiveId}/broadcast/stop-forward`,
+                    {
+                        method: 'POST',
+                        credentials: 'include'
+                    }
+                )
+            } catch (e) {
+                console.error('Failed to stop forward:', e)
+            }
+        }
+
         if (pc) {
             pc.close()
             pc = null
         }
+
+        // Stop canvas compositor
+        canvasStream.stop()
+
         if (localStream) {
             localStream.getTracks().forEach((track) => track.stop())
             localStream = null
@@ -139,6 +208,7 @@ export const useWebRTC = () => {
             videoRef.value.srcObject = null
         }
         isStreaming.value = false
+        currentLiveId = null
         streamStatus.value = StreamStatus.IDLE
     }
 
@@ -146,6 +216,7 @@ export const useWebRTC = () => {
         isStreaming,
         streamStatus,
         videoRef,
+        canvasStream,
         startLive,
         stopStream
     }
