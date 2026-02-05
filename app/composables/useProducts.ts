@@ -37,9 +37,11 @@ export interface ProductVariant {
     barcode: string | null
     name: string
     options: Record<string, string>
+    stock_quantity: number
     low_stock_alert: number
     is_active: boolean
     is_main: boolean // Marks the main variant for listing
+    images: string[]
 }
 
 export interface ProductsResponse {

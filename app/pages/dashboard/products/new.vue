@@ -454,50 +454,49 @@ onMounted(() => {
 
                                 <!-- Variants Section -->
                                 <ProductFormCard title="Барааны төрлүүд">
-                                    <div class="space-y-4">
-                                        <div v-if="variants.length > 0" class="space-y-3">
-                                            <!-- Tab Headers -->
-                                            <div class="flex items-center gap-1 border-gray-200 dark:border-gray-700 pb-0 overflow-x-auto">
+                                    <div v-if="variants.length > 0">
+                                        <!-- Chrome-style Tabs -->
+                                        <div class="chrome-tabs">
+                                            <div class="flex items-end gap-0.5 px-2 pt-2 bg-gray-100 dark:bg-gray-800 rounded-t-lg overflow-x-auto">
                                                 <div
                                                     v-for="(variant, index) in variants"
                                                     :key="`tab-${index}`"
-                                                    class="group relative flex items-center gap-1.5 px-3 py-1.5 cursor-pointer transition-all duration-150 border-b-2 min-w-[120px] max-w-[180px] rounded-t-md border border-gray-200 dark:border-gray-700 last:border-r-0"
-                                                    :class="[
-                                                        activeTabIndex === index
-                                                            ? 'border-primary-500 bg-white dark:bg-gray-900 text-primary-700 dark:text-primary-400'
-                                                            : 'border-transparent hover:bg-gray-50 dark:hover:bg-gray-800/50 text-gray-600 dark:text-gray-400'
-                                                    ]"
+                                                    class="chrome-tab group"
+                                                    :class="activeTabIndex === index ? 'active' : ''"
                                                     @click="activeTabIndex = index"
                                                 >
-                                                    <UIcon
-                                                        name="i-lucide-layers"
-                                                        class="w-3.5 h-3.5 flex-shrink-0"
-                                                        :class="activeTabIndex === index ? 'text-primary-600 dark:text-primary-400' : 'text-gray-400'"
-                                                    />
-                                                    <span class="text-xs font-medium truncate flex-1">
-                                                        {{ variant.name || `Төрөл ${index + 1}` }}
-                                                    </span>
-                                                    <button
-                                                        v-if="variants.length > 1"
-                                                        type="button"
-                                                        class="flex-shrink-0 p-0.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                        :class="activeTabIndex === index ? 'opacity-70 hover:opacity-100' : ''"
-                                                        @click.stop="removeVariant(index)"
-                                                    >
-                                                        <UIcon name="i-lucide-x" class="w-3 h-3" />
-                                                    </button>
+                                                    <div class="tab-content">
+                                                        <UIcon
+                                                            name="i-lucide-layers"
+                                                            class="w-3.5 h-3.5 flex-shrink-0"
+                                                            :class="activeTabIndex === index ? 'text-primary-600 dark:text-primary-400' : 'text-gray-400'"
+                                                        />
+                                                        <span class="tab-title">
+                                                            {{ variant.name || `Төрөл ${index + 1}` }}
+                                                        </span>
+                                                        <button
+                                                            v-if="variants.length > 1"
+                                                            type="button"
+                                                            class="tab-close"
+                                                            @click.stop="removeVariant(index)"
+                                                        >
+                                                            <UIcon name="i-lucide-x" class="w-3 h-3" />
+                                                        </button>
+                                                    </div>
                                                 </div>
 
+                                                <!-- Add Tab Button -->
                                                 <button
                                                     type="button"
-                                                    class="flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-t-md transition-colors"
+                                                    class="flex items-center justify-center w-7 h-7 mb-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md transition-colors"
                                                     @click="addVariant"
                                                 >
-                                                    <UIcon name="i-lucide-plus" class="w-3.5 h-3.5" />
+                                                    <UIcon name="i-lucide-plus" class="w-4 h-4" />
                                                 </button>
                                             </div>
 
-                                            <div class="mt-4">
+                                            <!-- Tab Content -->
+                                            <div class="tab-panel">
                                                 <ProductVariantForm
                                                     v-if="currentVariant"
                                                     :model-value="currentVariant"
@@ -551,23 +550,125 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.group.relative {
+/* Chrome-style Tabs */
+.chrome-tabs {
+    --tab-height: 36px;
+    --tab-radius: 8px;
+}
+
+.chrome-tab {
     position: relative;
-    border-top-left-radius: 0.375rem;
-    border-top-right-radius: 0.375rem;
-    margin-bottom: -2px;
+    height: var(--tab-height);
+    min-width: 100px;
+    max-width: 180px;
+    padding: 0 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-end;
 }
 
-.group.relative:has(.border-primary-500) {
-    z-index: 10;
+.chrome-tab .tab-content {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    height: calc(var(--tab-height) - 4px);
+    padding: 0 12px;
+    background: linear-gradient(to bottom, #e5e7eb 0%, #d1d5db 100%);
+    border-radius: var(--tab-radius) var(--tab-radius) 0 0;
+    transition: all 0.15s ease;
 }
 
-.overflow-x-auto {
+:root.dark .chrome-tab .tab-content {
+    background: linear-gradient(to bottom, #374151 0%, #1f2937 100%);
+}
+
+.chrome-tab:hover .tab-content {
+    background: linear-gradient(to bottom, #f3f4f6 0%, #e5e7eb 100%);
+}
+
+:root.dark .chrome-tab:hover .tab-content {
+    background: linear-gradient(to bottom, #4b5563 0%, #374151 100%);
+}
+
+.chrome-tab.active .tab-content {
+    background: white;
+    box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.08);
+}
+
+:root.dark .chrome-tab.active .tab-content {
+    background: #111827;
+}
+
+.chrome-tab .tab-title {
+    flex: 1;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #4b5563;
+}
+
+:root.dark .chrome-tab .tab-title {
+    color: #9ca3af;
+}
+
+.chrome-tab.active .tab-title {
+    color: #111827;
+}
+
+:root.dark .chrome-tab.active .tab-title {
+    color: #f3f4f6;
+}
+
+.chrome-tab .tab-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    opacity: 0;
+    transition: all 0.15s ease;
+    color: #6b7280;
+    flex-shrink: 0;
+}
+
+.chrome-tab:hover .tab-close,
+.chrome-tab.active .tab-close {
+    opacity: 0.7;
+}
+
+.chrome-tab .tab-close:hover {
+    opacity: 1;
+    background: #e5e7eb;
+}
+
+:root.dark .chrome-tab .tab-close:hover {
+    background: #374151;
+}
+
+.tab-panel {
+    background: white;
+    border-radius: 0 var(--tab-radius) var(--tab-radius) var(--tab-radius);
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+    border-top: none;
+}
+
+:root.dark .tab-panel {
+    background: #111827;
+    border-color: #374151;
+}
+
+/* Hide scrollbar */
+.chrome-tabs .flex {
     scrollbar-width: none;
     -ms-overflow-style: none;
 }
 
-.overflow-x-auto::-webkit-scrollbar {
+.chrome-tabs .flex::-webkit-scrollbar {
     display: none;
 }
 </style>

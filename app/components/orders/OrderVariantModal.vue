@@ -97,8 +97,11 @@ const getVariantImage = (variant: ProductVariant): string | null => {
     return variant.images?.[0] || null
 }
 
-const getEffectivePrice = (variant: ProductVariant): number => {
-    return variant.sale_price || variant.price
+const getEffectivePrice = (): number => {
+    if (!props.product) return 0
+    return (props.product.timed_sale_enabled && props.product.timed_sale_price)
+        ? props.product.timed_sale_price
+        : props.product.price || 0
 }
 
 const isOutOfStock = (variant: ProductVariant): boolean => {
@@ -161,15 +164,15 @@ const isOutOfStock = (variant: ProductVariant): boolean => {
                             </p>
                             <div class="flex items-center gap-2 mt-1">
                                 <span
-                                    v-if="variant.sale_price"
+                                    v-if="product?.timed_sale_enabled && product?.timed_sale_price"
                                     class="text-sm text-gray-400 line-through"
                                 >
-                                    {{ formatPrice(variant.price) }}
+                                    {{ formatPrice(product.price) }}
                                 </span>
                                 <span
                                     class="text-sm font-medium text-primary-600 dark:text-primary-400"
                                 >
-                                    {{ formatPrice(getEffectivePrice(variant)) }}
+                                    {{ formatPrice(getEffectivePrice()) }}
                                 </span>
                             </div>
                             <p

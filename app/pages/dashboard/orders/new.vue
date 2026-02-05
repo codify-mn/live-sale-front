@@ -105,7 +105,9 @@ const updateCartItemQuantity = (index: number, quantity: number) => {
 // Calculate totals
 const subtotal = computed(() => {
     return cartItems.value.reduce((sum, item) => {
-        const price = item.variant.sale_price || item.variant.price
+        const price = (item.product.timed_sale_enabled && item.product.timed_sale_price)
+            ? item.product.timed_sale_price
+            : item.product.price || 0
         return sum + price * item.quantity
     }, 0)
 })
@@ -144,7 +146,9 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
                 sku: item.variant.sku || item.variant.keyword || '',
                 name: item.product.name,
                 options: item.variant.name,
-                price: item.variant.sale_price || item.variant.price,
+                price: (item.product.timed_sale_enabled && item.product.timed_sale_price)
+                    ? item.product.timed_sale_price
+                    : item.product.price || 0,
                 quantity: item.quantity
             })),
             shipping_fee: shippingFee.value,

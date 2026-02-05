@@ -515,9 +515,9 @@ onMounted(() => {
                     <span class="text-gray-900 dark:text-white">
                         {{
                             formatPrice(
-                                row.original.variants?.[0]?.sale_price ||
-                                    row.original.variants?.[0]?.price ||
-                                    0
+                                (row.original.timed_sale_enabled && row.original.timed_sale_price) ?
+                                    row.original.timed_sale_price :
+                                    row.original.price || 0
                             )
                         }}
                     </span>
