@@ -8,7 +8,7 @@ defineProps<{
 <template>
     <NuxtLink to="/" class="flex items-center gap-2.5 group" :class="$props.class">
         <div
-            class="rounded-xl bg-gradient-to-br from-primary-500 to-pink-500 flex items-center justify-center shadow-lg shadow-primary-500/25 group-hover:shadow-primary-500/40 transition-shadow duration-300"
+            class="rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-lg shadow-primary-500/25 group-hover:shadow-primary-500/40 transition-shadow duration-300"
             :class="{
                 'w-7 h-7': size === 'sm',
                 'w-9 h-9': size === 'md' || !size,

@@ -42,7 +42,7 @@ const columns = [
                 <div class="col-span-2 md:col-span-1">
                     <NuxtLink to="/" class="flex items-center gap-2.5 mb-4">
                         <div
-                            class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-pink-500 flex items-center justify-center"
+                            class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center"
                         >
                             <UIcon name="i-lucide-zap" class="w-5 h-5 text-white" />
                         </div>
@@ -67,7 +67,7 @@ const columns = [
                             href="https://instagram.com"
                             target="_blank"
                             rel="noopener noreferrer"
-                            class="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-pink-500 hover:bg-pink-50 dark:hover:bg-pink-950/50 transition-all duration-200"
+                            class="w-10 h-10 rounded-xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 transition-all duration-200"
                         >
                             <UIcon name="i-simple-icons-instagram" class="w-5 h-5" />
                         </a>

@@ -21,6 +21,17 @@ function formatAmount(amount?: number) {
   return amount?.toLocaleString() + '₮' || ''
 }
 
+const qrImageSrc = computed(() => {
+  const qrImage = props.invoice?.qpay_data?.qr_image
+  if (!qrImage) return ''
+  // If already a data URL or URL, return as-is
+  if (qrImage.startsWith('data:') || qrImage.startsWith('http')) {
+    return qrImage
+  }
+  // Otherwise, assume it's base64 and add the prefix
+  return `data:image/png;base64,${qrImage}`
+})
+
 function handleCheckPayment() {
   emit('check-payment')
 }
@@ -63,8 +74,8 @@ function handleCheckPayment() {
           <div class="flex flex-col items-center gap-4">
             <div class="p-4 bg-white rounded-xl shadow-sm border">
               <img
-                v-if="invoice.qpay_data.qr_image"
-                :src="invoice.qpay_data.qr_image"
+                v-if="qrImageSrc"
+                :src="qrImageSrc"
                 alt="QPay QR Code"
                 class="w-48 h-48"
               />

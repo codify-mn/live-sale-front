@@ -20,11 +20,6 @@ const links = [
             to: '/dashboard/settings/notifications'
         },
         {
-            label: 'Төлбөр',
-            icon: 'i-lucide-credit-card',
-            to: '/dashboard/settings/billing'
-        },
-        {
             label: 'Нууцлал',
             icon: 'i-lucide-shield',
             to: '/dashboard/settings/security'

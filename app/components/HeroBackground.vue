@@ -19,12 +19,12 @@
         <div
             class="absolute top-20 right-1/4 translate-x-1/2 w-[500px] h-[500px] rounded-full blur-3xl float-delay-1 pulse-glow"
             style="
-                background: radial-gradient(circle, rgba(236, 72, 153, 0.12) 0%, transparent 70%);
+                background: radial-gradient(circle, rgba(14, 165, 233, 0.12) 0%, transparent 70%);
             "
         />
         <div
             class="absolute top-40 left-1/2 -translate-x-1/2 w-[700px] h-[700px] rounded-full blur-3xl float-delay-2 pulse-glow"
-            style="background: radial-gradient(circle, rgba(168, 85, 247, 0.1) 0%, transparent 70%)"
+            style="background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%)"
         />
 
         <!-- Floating decorative shapes -->
@@ -35,7 +35,7 @@
         </div>
         <div class="absolute top-48 right-[15%] float-delay-1 opacity-50">
             <div
-                class="w-12 h-12 rounded-xl -rotate-6 bg-gradient-to-br from-pink-400/20 to-pink-500/10 backdrop-blur-sm border border-pink-300/20"
+                class="w-12 h-12 rounded-xl -rotate-6 bg-gradient-to-br from-blue-400/20 to-blue-500/10 backdrop-blur-sm border border-blue-300/20"
             />
         </div>
         <div class="absolute top-64 left-[20%] float-delay-2 opacity-40">
@@ -45,7 +45,7 @@
         </div>
         <div class="absolute top-80 right-[25%] float opacity-50">
             <div
-                class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400/15 to-pink-500/10 backdrop-blur-sm border border-primary-300/20"
+                class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-400/15 to-indigo-500/10 backdrop-blur-sm border border-primary-300/20"
             />
         </div>
 

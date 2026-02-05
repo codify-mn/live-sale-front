@@ -204,7 +204,7 @@ const features = [
                 <!-- Mobile logo -->
                 <NuxtLink to="/" class="flex lg:hidden items-center gap-2.5 mb-8 justify-center">
                     <div
-                        class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-pink-500 flex items-center justify-center"
+                        class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center"
                     >
                         <UIcon name="i-lucide-zap" class="w-5 h-5 text-white" />
                     </div>
@@ -336,7 +336,7 @@ const features = [
                         block
                         size="lg"
                         :loading="isLoading"
-                        class="bg-gradient-to-r from-primary-500 to-pink-500 hover:from-primary-600 hover:to-pink-600 border-0 shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 transition-all duration-300"
+                        class="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 border-0 shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 transition-all duration-300"
                     >
                         Баталгаажуулах
                     </UButton>
@@ -410,7 +410,7 @@ const features = [
                         block
                         size="lg"
                         :loading="isLoading"
-                        class="bg-gradient-to-r from-primary-500 to-pink-500 hover:from-primary-600 hover:to-pink-600 border-0 shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 transition-all duration-300"
+                        class="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 border-0 shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 transition-all duration-300"
                     >
                         Нэвтрэх
                     </UButton>
@@ -469,7 +469,7 @@ const features = [
                         block
                         size="lg"
                         :loading="isLoading"
-                        class="bg-gradient-to-r from-primary-500 to-pink-500 hover:from-primary-600 hover:to-pink-600 border-0 shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 transition-all duration-300"
+                        class="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 border-0 shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 transition-all duration-300"
                     >
                         Бүртгүүлэх
                     </UButton>

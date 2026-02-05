@@ -29,7 +29,7 @@ const navigation = [
             <NuxtLink to="/" class="flex items-center gap-2.5 group">
                 <div class="relative">
                     <div
-                        class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-pink-500 flex items-center justify-center shadow-lg shadow-primary-500/25 group-hover:shadow-primary-500/40 transition-shadow duration-300"
+                        class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-lg shadow-primary-500/25 group-hover:shadow-primary-500/40 transition-shadow duration-300"
                     >
                         <UIcon name="i-lucide-zap" class="w-5 h-5 text-white" />
                     </div>
@@ -71,7 +71,7 @@ const navigation = [
             <UButton
                 to="/login?mode=register"
                 label="Үнэгүй эхлэх"
-                class="hidden lg:flex bg-gradient-to-r from-primary-500 to-pink-500 hover:from-primary-600 hover:to-pink-600 border-0 shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 transition-all duration-300"
+                class="hidden lg:flex bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 border-0 shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 transition-all duration-300"
             />
         </template>
 
@@ -84,7 +84,7 @@ const navigation = [
                     to="/login?mode=register"
                     label="Үнэгүй эхлэх"
                     block
-                    class="bg-gradient-to-r from-primary-500 to-pink-500 border-0"
+                    class="bg-gradient-to-r from-primary-500 to-primary-600 border-0"
                 />
             </div>
         </template>

@@ -179,7 +179,7 @@ onMounted(() => {
                             <UButton
                                 to="/login?mode=register"
                                 size="xl"
-                                class="bg-gradient-to-r from-primary-500 to-pink-500 hover:from-primary-600 hover:to-pink-600 border-0 shadow-xl shadow-primary-500/25 hover:shadow-primary-500/40 transition-all duration-300 btn-shine"
+                                class="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 border-0 shadow-xl shadow-primary-500/25 hover:shadow-primary-500/40 transition-all duration-300 btn-shine"
                             >
                                 <span>Үнэгүй эхлэх</span>
                                 <UIcon name="i-lucide-arrow-right" class="w-5 h-5 ml-2" />
@@ -229,7 +229,7 @@ onMounted(() => {
                         <div class="relative">
                             <!-- Glow effect behind mockup -->
                             <div
-                                class="absolute inset-0 bg-gradient-to-r from-primary-500/20 via-pink-500/20 to-violet-500/20 blur-3xl rounded-3xl"
+                                class="absolute inset-0 bg-gradient-to-r from-primary-500/20 via-blue-500/20 to-indigo-500/20 blur-3xl rounded-3xl"
                             />
 
                             <!-- Dashboard mockup card -->
@@ -301,7 +301,7 @@ onMounted(() => {
                                                 >
                                                     <div class="flex items-center gap-2">
                                                         <div
-                                                            class="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-pink-500"
+                                                            class="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-600"
                                                         />
                                                         <div>
                                                             <div class="text-sm text-white">
@@ -410,7 +410,7 @@ onMounted(() => {
                         }"
                     >
                         <div
-                            class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500/20 to-pink-500/20 flex items-center justify-center mx-auto mb-4"
+                            class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500/20 to-primary-600/20 flex items-center justify-center mx-auto mb-4"
                         >
                             <UIcon :name="stat.icon" class="w-6 h-6 text-primary-400" />
                         </div>
@@ -504,7 +504,7 @@ onMounted(() => {
                         <!-- Stat badge -->
                         <div class="absolute -top-3 right-4">
                             <span
-                                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-primary-500 to-pink-500 text-white shadow-lg"
+                                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg"
                             >
                                 {{ feature.stat }}
                             </span>
@@ -550,7 +550,7 @@ onMounted(() => {
                 <div class="grid md:grid-cols-3 gap-8 relative">
                     <!-- Connector line -->
                     <div
-                        class="hidden md:block absolute top-16 left-1/6 right-1/6 h-0.5 bg-gradient-to-r from-primary-500 via-pink-500 to-violet-500 opacity-30"
+                        class="hidden md:block absolute top-16 left-1/6 right-1/6 h-0.5 bg-gradient-to-r from-primary-500 via-primary-400 to-indigo-500 opacity-30"
                     />
 
                     <div
@@ -565,7 +565,7 @@ onMounted(() => {
                         <!-- Step number -->
                         <div class="relative inline-flex mb-6">
                             <div
-                                class="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-pink-500 flex items-center justify-center shadow-lg shadow-primary-500/25"
+                                class="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-lg shadow-primary-500/25"
                             >
                                 <UIcon :name="step.icon" class="w-8 h-8 text-white" />
                             </div>
@@ -601,10 +601,10 @@ onMounted(() => {
             <UContainer class="max-w-7xl">
                 <div class="text-center mb-16">
                     <div
-                        class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-pink-500/10 border border-pink-500/20 mb-6"
+                        class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/20 mb-6"
                     >
-                        <UIcon name="i-lucide-users" class="w-4 h-4 text-pink-500" />
-                        <span class="text-sm font-medium text-pink-600 dark:text-pink-400"
+                        <UIcon name="i-lucide-users" class="w-4 h-4 text-indigo-500" />
+                        <span class="text-sm font-medium text-indigo-600 dark:text-indigo-400"
                             >Амжилтын түүхүүд</span
                         >
                     </div>
@@ -625,7 +625,7 @@ onMounted(() => {
                         <!-- Metric highlight -->
                         <div class="mb-4">
                             <span
-                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-bold bg-gradient-to-r from-primary-500/10 to-pink-500/10 text-primary-600 dark:text-primary-400 border border-primary-500/20"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-bold bg-gradient-to-r from-primary-500/10 to-indigo-500/10 text-primary-600 dark:text-primary-400 border border-primary-500/20"
                             >
                                 <UIcon name="i-lucide-trending-up" class="w-4 h-4" />
                                 {{ testimonial.metric }}

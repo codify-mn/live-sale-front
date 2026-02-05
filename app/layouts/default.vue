@@ -38,6 +38,37 @@ const links = [
             }
         },
         {
+            label: 'Төлбөр',
+            to: '/dashboard/billing',
+            icon: 'i-lucide-credit-card',
+            defaultOpen: false,
+            type: 'trigger',
+            children: [
+                {
+                    label: 'Төлбөр',
+                    to: '/dashboard/billing',
+                    exact: true,
+                    onSelect: () => {
+                        open.value = false
+                    }
+                },
+                {
+                    label: 'Багц сонгох',
+                    to: '/dashboard/plans',
+                    onSelect: () => {
+                        open.value = false
+                    }
+                },
+                {
+                    label: 'Түүх',
+                    to: '/dashboard/history',
+                    onSelect: () => {
+                        open.value = false
+                    }
+                }
+            ]
+        },
+        {
             label: 'Тохиргоо',
             to: '/dashboard/settings',
             icon: 'i-lucide-settings',
@@ -62,13 +93,6 @@ const links = [
                 {
                     label: 'Мэдэгдэл',
                     to: '/dashboard/settings/notifications',
-                    onSelect: () => {
-                        open.value = false
-                    }
-                },
-                {
-                    label: 'Төлбөр',
-                    to: '/dashboard/settings/billing',
                     onSelect: () => {
                         open.value = false
                     }

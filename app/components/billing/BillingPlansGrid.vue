@@ -119,7 +119,7 @@ function handleSelect(plan: Plan) {
         <!-- Popular Badge -->
         <div v-if="isPopularPlan(plan)" class="absolute -top-4 left-1/2 -translate-x-1/2">
           <span
-            class="inline-flex items-center gap-1.5 bg-gradient-to-r from-primary-500 to-pink-500 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg"
+            class="inline-flex items-center gap-1.5 bg-gradient-to-r from-primary-500 to-primary-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg"
           >
             <UIcon name="i-lucide-star" class="w-3.5 h-3.5" />
             Хамгийн түгээмэл
@@ -218,7 +218,7 @@ function handleSelect(plan: Plan) {
           <UButton
             :class="[
               isPopularPlan(plan)
-                ? 'bg-gradient-to-r from-primary-500 to-pink-500 hover:from-primary-600 hover:to-pink-600 border-0 shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40'
+                ? 'bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 border-0 shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40'
                 : '',
               isCurrentPlan(plan) ? 'opacity-60 cursor-not-allowed' : ''
             ]"
@@ -252,13 +252,13 @@ function handleSelect(plan: Plan) {
 .pricing-popular {
   border: 2px solid transparent;
   background-image: linear-gradient(white, white),
-    linear-gradient(135deg, #f97316 0%, #ec4899 50%, #8b5cf6 100%);
+    linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #6366f1 100%);
   background-origin: border-box;
   background-clip: padding-box, border-box;
 }
 
 .dark .pricing-popular {
   background-image: linear-gradient(#111827, #111827),
-    linear-gradient(135deg, #f97316 0%, #ec4899 50%, #8b5cf6 100%);
+    linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #6366f1 100%);
 }
 </style>

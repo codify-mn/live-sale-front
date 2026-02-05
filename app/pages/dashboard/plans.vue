@@ -1,15 +1,6 @@
 <script setup lang="ts">
 import type { Plan, BillingCycle } from '~/types/subscription'
 
-definePageMeta({
-    layout: 'public'
-})
-
-useSeoMeta({
-    title: 'Үнийн мэдээлэл - CommentBoost',
-    description: 'Энгийн, ил тод үнийн бодлого. Бүх хэмжээний бизнест тохирсон багцууд.'
-})
-
 const {
     plans,
     subscription,
@@ -18,7 +9,6 @@ const {
     fetchSubscription,
     purchasePlan,
     currentInvoice,
-    purchaseLoading,
     checkingPayment,
     checkInvoicePayment
 } = useSubscription()
@@ -171,27 +161,6 @@ async function handleCheckPayment() {
     }
 }
 
-const faq = [
-    {
-        label: 'Багцаа сольж болох уу?',
-        content:
-            'Тийм, та хүссэн үедээ багцаа шинэчлэх эсвэл бууруулах боломжтой. Өөрчлөлт шууд хүчин төгөлдөр болно.'
-    },
-    {
-        label: 'Ямар төлбөрийн хэрэгсэл хүлээн авдаг вэ?',
-        content: 'Бид QPay, банкны шилжүүлэг, картын төлбөр хүлээн авдаг.'
-    },
-    {
-        label: 'Үнэгүй туршилт байгаа юу?',
-        content: 'Тийм, бүх төлбөртэй багц 30 хоногийн үнэгүй туршилттай. Карт шаардлагагүй.'
-    },
-    {
-        label: 'Хязгаараа хэтрүүлбэл яах вэ?',
-        content:
-            'Хязгаартаа ойртож байгаа тухай мэдэгдэл илгээнэ. Та хүссэн үедээ багцаа шинэчилж болно.'
-    }
-]
-
 const trustPoints = [
     { icon: 'i-lucide-shield-check', label: 'Аюулгүй төлбөр' },
     { icon: 'i-lucide-clock', label: '30 хоног үнэгүй' },
@@ -201,56 +170,35 @@ const trustPoints = [
 </script>
 
 <template>
-    <div>
-        <!-- Hero Section -->
-        <section class="relative py-20 md:py-28 overflow-hidden">
-            <!-- Background decoration -->
-            <div class="absolute inset-0 -z-10">
-                <div
-                    class="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full blur-3xl opacity-30"
-                    style="
-                        background: radial-gradient(
-                            circle,
-                            rgba(249, 115, 22, 0.2) 0%,
-                            transparent 70%
-                        );
-                    "
-                />
-                <div
-                    class="absolute top-20 right-1/4 w-[400px] h-[400px] rounded-full blur-3xl opacity-30"
-                    style="
-                        background: radial-gradient(
-                            circle,
-                            rgba(6, 182, 212, 0.15) 0%,
-                            transparent 70%
-                        );
-                    "
-                />
-            </div>
+    <div class="w-full h-full overflow-y-auto relative">
+        <!-- Background decoration -->
+        <div class="fixed inset-0 pointer-events-none overflow-hidden">
+            <div
+                class="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full blur-3xl opacity-30"
+                style="
+                    background: radial-gradient(
+                        circle,
+                        rgba(14, 165, 233, 0.2) 0%,
+                        transparent 70%
+                    );
+                "
+            />
+            <div
+                class="absolute top-20 right-1/4 w-[400px] h-[400px] rounded-full blur-3xl opacity-30"
+                style="
+                    background: radial-gradient(
+                        circle,
+                        rgba(6, 182, 212, 0.15) 0%,
+                        transparent 70%
+                    );
+                "
+            />
+        </div>
 
+        <!-- Hero Section -->
+        <section class="relative py-20 md:py-28">
             <UContainer class="max-w-7xl">
                 <div class="text-center max-w-3xl mx-auto">
-                    <div
-                        class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-500/10 border border-primary-500/20 mb-6"
-                    >
-                        <UIcon name="i-lucide-tag" class="w-4 h-4 text-primary-500" />
-                        <span class="text-sm font-medium text-primary-600 dark:text-primary-400"
-                            >Үнийн мэдээлэл</span
-                        >
-                    </div>
-
-                    <h1
-                        class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-gray-900 dark:text-white mb-6"
-                    >
-                        Энгийн, <span class="text-gradient">ил тод</span> үнэ
-                    </h1>
-
-                    <p
-                        class="text-lg md:text-xl text-gray-600 dark:text-gray-400 mb-10 max-w-2xl mx-auto"
-                    >
-                        Бизнесийнхээ хэмжээнд тохирсон багцыг сонгоорой. Нуугдмал төлбөр байхгүй.
-                    </p>
-
                     <!-- Billing Toggle -->
                     <div
                         class="inline-flex items-center gap-1 p-1.5 bg-gray-100 dark:bg-gray-800 rounded-full"
@@ -300,7 +248,7 @@ const trustPoints = [
         </section>
 
         <!-- Pricing Cards Section -->
-        <section class="pb-24">
+        <section class="pb-24 relative">
             <UContainer class="max-w-7xl">
                 <!-- Loading -->
                 <div v-if="loading" class="flex justify-center items-center py-20">
@@ -331,7 +279,7 @@ const trustPoints = [
                         <!-- Popular Badge -->
                         <div
                             v-if="isPopularPlan(plan)"
-                            class="absolute -top-4 left-1/2 -translate-x-1/2"
+                            class="absolute -top-4 left-1/2 -translate-x-1/2 z-20"
                         >
                             <span
                                 class="inline-flex items-center gap-1.5 bg-gradient-to-r from-primary-500 to-primary-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg"
@@ -342,7 +290,7 @@ const trustPoints = [
                         </div>
 
                         <!-- Current Plan Badge -->
-                        <div v-if="isCurrentPlan(plan)" class="absolute -top-4 right-4">
+                        <div v-if="isCurrentPlan(plan)" class="absolute -top-4 right-4 z-20">
                             <span
                                 class="inline-flex items-center gap-1.5 bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-full"
                             >
@@ -352,7 +300,7 @@ const trustPoints = [
                         </div>
 
                         <!-- Card Content -->
-                        <div class="p-8 flex-1 flex flex-col">
+                        <div class="p-8 flex-1 flex flex-col relative z-10">
                             <!-- Plan Name & Description -->
                             <div class="mb-6">
                                 <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">
@@ -450,7 +398,7 @@ const trustPoints = [
                             <UButton
                                 :class="[
                                     isPopularPlan(plan)
-                                        ? 'bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 border-0 shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40'
+                                        ? 'bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 border-0 shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 relative z-20'
                                         : '',
                                     isCurrentPlan(plan) ? 'opacity-60 cursor-not-allowed' : ''
                                 ]"
@@ -473,8 +421,8 @@ const trustPoints = [
                                 </template>
                                 <template v-else-if="plan.slug === 'free'"> Үнэгүй эхлэх </template>
                                 <template v-else>
-                                    Багц авах
-                                    <UIcon name="i-lucide-arrow-right" class="w-4 h-4 ml-2" />
+                                    <span class="relative z-10">Багц авах</span>
+                                    <UIcon name="i-lucide-arrow-right" class="w-4 h-4 ml-2 relative z-10" />
                                 </template>
                             </UButton>
 
@@ -485,98 +433,6 @@ const trustPoints = [
                             >
                                 {{ plan.trial_days }} хоногийн үнэгүй туршилт
                             </p>
-                        </div>
-                    </div>
-                </div>
-            </UContainer>
-        </section>
-
-        <!-- FAQ Section -->
-        <section id="faq" class="py-24 bg-gray-50 dark:bg-gray-900/50">
-            <UContainer class="max-w-4xl">
-                <div class="text-center mb-16">
-                    <div
-                        class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-500/10 border border-violet-500/20 mb-6"
-                    >
-                        <UIcon name="i-lucide-help-circle" class="w-4 h-4 text-violet-500" />
-                        <span class="text-sm font-medium text-violet-600 dark:text-violet-400"
-                            >Түгээмэл асуултууд</span
-                        >
-                    </div>
-                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                        Асуулт байна уу?
-                    </h2>
-                    <p class="text-lg text-gray-600 dark:text-gray-400">
-                        Хамгийн түгээмэл асуултуудын хариулт
-                    </p>
-                </div>
-
-                <div class="space-y-4">
-                    <UAccordion
-                        :items="faq"
-                        :ui="{
-                            item: 'bg-white dark:bg-gray-900/80 rounded-xl border border-gray-200 dark:border-gray-800 px-6',
-                            trigger:
-                                'py-5 font-semibold text-gray-900 dark:text-white hover:text-primary-500 transition-colors',
-                            content: 'pb-5 text-gray-600 dark:text-gray-400'
-                        }"
-                    />
-                </div>
-            </UContainer>
-        </section>
-
-        <!-- Enterprise CTA Section -->
-        <section class="py-24">
-            <UContainer class="max-w-4xl">
-                <div
-                    class="relative rounded-3xl overflow-hidden bg-gradient-to-br from-gray-900 to-gray-800 dark:from-gray-800 dark:to-gray-900"
-                >
-                    <!-- Background pattern -->
-                    <div class="absolute inset-0 opacity-10">
-                        <div
-                            class="absolute inset-0"
-                            style="
-                                background-image: radial-gradient(
-                                    circle at 25% 25%,
-                                    rgba(255, 255, 255, 0.2) 1px,
-                                    transparent 1px
-                                );
-                                background-size: 50px 50px;
-                            "
-                        />
-                    </div>
-
-                    <div class="relative px-8 py-16 md:px-16 md:py-20 text-center">
-                        <div
-                            class="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center mx-auto mb-6"
-                        >
-                            <UIcon name="i-lucide-building-2" class="w-8 h-8 text-white" />
-                        </div>
-
-                        <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
-                            Томоохон бизнест зориулсан
-                        </h2>
-                        <p class="text-gray-400 mb-8 max-w-xl mx-auto">
-                            Тусгай шаардлага, хязгааргүй хэрэглээ, дэмжлэгийн тусгай багц авахыг
-                            хүсвэл бидэнтэй холбогдоорой.
-                        </p>
-
-                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                            <UButton
-                                size="lg"
-                                class="bg-white text-gray-900 hover:bg-gray-100 border-0 font-semibold"
-                            >
-                                <UIcon name="i-lucide-mail" class="w-5 h-5 mr-2" />
-                                Холбоо барих
-                            </UButton>
-                            <UButton
-                                to="/docs"
-                                size="lg"
-                                variant="outline"
-                                class="border-gray-600 text-white hover:bg-white/10"
-                            >
-                                Дэлгэрэнгүй үзэх
-                            </UButton>
                         </div>
                     </div>
                 </div>

@@ -20,11 +20,11 @@ const totalCustomers = computed(() => 0) // TODO: Add customer stats endpoint
 const requiredActions = computed(() => {
     const actions = []
 
-    if (!shop.value?.settings?.payment_method) {
+    if (!shop.value?.qpay.is_registered) {
         actions.push({
-            title: 'Дансны мэдээлэл нэмэх',
-            description: 'Дансаа тохируулснаар захиалга авах боломжтой болно',
-            icon: 'i-lucide-credit-card',
+            title: 'QPay-д бүртгүүлэх',
+            description: 'QPay-д бүртгүүлж, шууд төлбөр хүлээн авах боломжтой болно.',
+            icon: 'i-lucide-qr-code',
             to: '/dashboard/settings'
         })
     }

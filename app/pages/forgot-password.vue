@@ -41,7 +41,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
                 style="
                     background: radial-gradient(
                         circle,
-                        rgba(249, 115, 22, 0.3) 0%,
+                        rgba(14, 165, 233, 0.3) 0%,
                         transparent 70%
                     );
                 "
@@ -51,7 +51,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
                 style="
                     background: radial-gradient(
                         circle,
-                        rgba(168, 85, 247, 0.2) 0%,
+                        rgba(99, 102, 241, 0.2) 0%,
                         transparent 70%
                     );
                 "
@@ -98,7 +98,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
                 <template v-else>
                     <div class="text-center mb-8">
                         <div
-                            class="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-pink-500 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary-500/25"
+                            class="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary-500/25"
                         >
                             <UIcon name="i-lucide-key-round" class="w-8 h-8 text-white" />
                         </div>
@@ -152,7 +152,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
                             block
                             size="lg"
                             :loading="isLoading"
-                            class="bg-gradient-to-r from-primary-500 to-pink-500 hover:from-primary-600 hover:to-pink-600 border-0 shadow-lg shadow-primary-500/25"
+                            class="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 border-0 shadow-lg shadow-primary-500/25"
                         >
                             Сэргээх холбоос илгээх
                         </UButton>

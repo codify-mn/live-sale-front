@@ -39,7 +39,7 @@ watch(
 
                         <NuxtLink to="/" class="flex items-center gap-2.5">
                             <div
-                                class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-pink-500 flex items-center justify-center"
+                                class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center"
                             >
                                 <UIcon name="i-lucide-zap" class="w-4 h-4 text-white" />
                             </div>
@@ -98,7 +98,7 @@ watch(
                             to="/login"
                             label="Нэвтрэх"
                             size="sm"
-                            class="hidden sm:flex bg-gradient-to-r from-primary-500 to-pink-500 border-0"
+                            class="hidden sm:flex bg-gradient-to-r from-primary-500 to-primary-600 border-0"
                         />
                     </div>
                 </div>
@@ -150,7 +150,7 @@ watch(
                                 to="/pricing#faq"
                                 class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors"
                             >
-                                <UIcon name="i-lucide-help-circle" class="w-4 h-4 text-pink-500" />
+                                <UIcon name="i-lucide-help-circle" class="w-4 h-4 text-indigo-500" />
                                 Түгээмэл асуултууд
                             </NuxtLink>
                         </div>
@@ -237,7 +237,7 @@ watch(
                     <div class="flex items-center gap-4">
                         <NuxtLink to="/" class="flex items-center gap-2">
                             <div
-                                class="w-7 h-7 rounded-lg bg-gradient-to-br from-primary-500 to-pink-500 flex items-center justify-center"
+                                class="w-7 h-7 rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center"
                             >
                                 <UIcon name="i-lucide-zap" class="w-3.5 h-3.5 text-white" />
                             </div>

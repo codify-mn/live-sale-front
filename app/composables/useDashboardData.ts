@@ -22,6 +22,17 @@ export interface Shop {
         bank_account_number: string
         bank_account_name: string
     }
+    qpay: {
+        is_registered: boolean
+        merchant_id: string | null
+        merchant_type: string | null
+        bank_account: {
+            acconunt_bank_code: string
+            account_number: string
+            account_name: string
+            is_default: boolean
+        }
+    }
 }
 
 export interface OrderStats {
