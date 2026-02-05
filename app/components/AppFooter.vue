@@ -105,8 +105,7 @@ const columns = [
                 class="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row justify-between items-center gap-4"
             >
                 <p class="text-gray-500 dark:text-gray-400 text-sm">
-                    &copy; {{ new Date().getFullYear() }} CommentBoost. Бүх эрх хуулиар
-                    хамгаалагдсан.
+                    &copy; {{ new Date().getFullYear() }} Кодифайя. Бүх эрх хуулиар хамгаалагдсан.
                 </p>
                 <div class="flex items-center gap-6">
                     <NuxtLink
