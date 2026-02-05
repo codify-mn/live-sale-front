@@ -3,6 +3,12 @@ interface Props {
     shopName: string
     shopUrl?: string
     logoUrl?: string
+    requiredActions?: {
+        title: string
+        description: string
+        icon: string
+        to: string
+    }[]
 }
 
 defineProps<Props>()
@@ -10,7 +16,7 @@ defineProps<Props>()
 
 <template>
     <div
-        class="relative overflow-hidden h-full rounded-2xl bg-linear-to-br from-primary-500 via-primary-600 to-accent-600 p-6"
+        class="relative overflow-hidden h-full rounded-2xl bg-linear-to-br from-primary-500 via-primary-600 to-accent-600 p-6 space-y-7"
     >
         <!-- Background decoration -->
         <div
@@ -54,12 +60,24 @@ defineProps<Props>()
 
             <UButton
                 to="/dashboard/settings"
-                color="white"
                 variant="ghost"
                 icon="i-lucide-settings"
                 size="sm"
                 class="text-white/70 hover:text-white hover:bg-white/10 shrink-0"
             />
         </div>
+         <div v-if="requiredActions" class=" grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div class="col-span-full text-white">
+                Шаардлагатай үйлдлүүд
+            </div>
+                        <DashboardActionCard
+                            v-for="action in requiredActions"
+                            :key="action.title"
+                            :title="action.title"
+                            :description="action.description"
+                            :icon="action.icon"
+                            :to="action.to"
+                        />
+         </div>
     </div>
 </template>

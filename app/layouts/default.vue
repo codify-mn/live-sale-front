@@ -38,37 +38,6 @@ const links = [
             }
         },
         {
-            label: 'Төлбөр',
-            to: '/dashboard/billing',
-            icon: 'i-lucide-credit-card',
-            defaultOpen: false,
-            type: 'trigger',
-            children: [
-                {
-                    label: 'Төлбөр',
-                    to: '/dashboard/billing',
-                    exact: true,
-                    onSelect: () => {
-                        open.value = false
-                    }
-                },
-                {
-                    label: 'Багц сонгох',
-                    to: '/dashboard/plans',
-                    onSelect: () => {
-                        open.value = false
-                    }
-                },
-                {
-                    label: 'Түүх',
-                    to: '/dashboard/history',
-                    onSelect: () => {
-                        open.value = false
-                    }
-                }
-            ]
-        },
-        {
             label: 'Тохиргоо',
             to: '/dashboard/settings',
             icon: 'i-lucide-settings',
@@ -105,6 +74,37 @@ const links = [
                     }
                 }
             ]
+        },
+        {
+            label: 'Үйлчилгээний эрх',
+            to: '/dashboard/billing',
+            defaultOpen: false,
+            type: 'trigger',
+            children: [
+                {
+                    label: 'Идэвхтэй багц',
+                    to: '/dashboard/billing',
+                    icon: 'i-lucide-credit-card',
+                    exact: true,
+                    onSelect: () => {
+                        open.value = false
+                    }
+                },
+                {
+                    label: 'Багц сонгох',
+                    to: '/dashboard/plans',
+                    onSelect: () => {
+                        open.value = false
+                    }
+                },
+                {
+                    label: 'Нэхэмжлэх',
+                    to: '/dashboard/history',
+                    onSelect: () => {
+                        open.value = false
+                    }
+                }
+            ]
         }
     ]
 ] satisfies NavigationMenuItem[][]
@@ -136,8 +136,10 @@ const groups = computed(() => [
 
             <template #default="{ collapsed }">
                 <UDashboardSearchButton
+                    label="Хайх..."
+                    placeholder="Хайх..."
                     :collapsed="collapsed"
-                    class="bg-gray-50/50 dark:bg-gray-800/30 ring-gray-200/60 dark:ring-gray-700/40 backdrop-blur-sm"
+                    class="bg-gray-50/50 dark:bg-gray-800/30  dark:ring-gray-700/40 backdrop-blur-sm"
                 />
 
                 <UNavigationMenu

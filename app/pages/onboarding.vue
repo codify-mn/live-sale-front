@@ -19,13 +19,11 @@ const { shop, fetchShop } = useShopSettings()
 const isSubmitting = ref(false)
 const isSavingStep = ref(false)
 const currentStep = ref(1)
-const totalSteps = 4
+const totalSteps = 2
 
 const steps = [
     { number: 1, label: 'Facebook холболт', icon: 'i-simple-icons-facebook' },
     { number: 2, label: 'Дэлгүүр', icon: 'i-lucide-store' },
-    { number: 3, label: 'QPay', icon: 'i-lucide-smartphone' },
-    { number: 4, label: 'Хүргэлт', icon: 'i-lucide-truck' }
 ]
 
 // Facebook connection state
@@ -33,7 +31,6 @@ const isConnecting = ref(false)
 const selectedPage = ref<FacebookPage | null>(null)
 
 // Shop state
-const qpayRegistered = ref(false)
 const shopCreated = ref(false)
 
 // Step 2 schema - shop info
@@ -41,16 +38,11 @@ const shopSchema = z.object({
     shop_name: z.string().min(2, 'Дэлгүүрийн нэр хамгийн багадаа 2 тэмдэгт байх ёстой')
 })
 
-type DeliveryType = 'none' | 'fixed' | 'free_over' | 'custom' | 'all_free'
 // Full state
 const state = reactive({
     facebook_page_id: 0,
     shop_name: '',
     phone_number: '',
-    delivery_type: 'none' as DeliveryType,
-    delivery_fee: 0,
-    delivery_note: '',
-    free_delivery_over: 0
 })
 
 const slideDirection = ref<'left' | 'right'>('left')
@@ -88,14 +80,6 @@ onMounted(async () => {
         shopCreated.value = true
         state.shop_name = shop.value.name || state.shop_name
         state.phone_number = shop.value.phone_number || ''
-        state.delivery_fee = shop.value.settings?.delivery_fee || 0
-        state.delivery_note = shop.value.settings?.delivery_note || ''
-        state.free_delivery_over = shop.value.settings?.free_delivery_over || 0
-
-        // Check if QPay is already registered
-        if (shop.value.qpay?.is_registered) {
-            qpayRegistered.value = true
-        }
     }
 })
 
@@ -109,9 +93,6 @@ async function createShop() {
                 facebook_page_id: state.facebook_page_id,
                 shop_name: state.shop_name,
                 phone_number: state.phone_number,
-                delivery_fee: state.delivery_fee,
-                delivery_note: state.delivery_note,
-                free_delivery_over: state.free_delivery_over
             }
         })
         shopCreated.value = true
@@ -139,11 +120,6 @@ async function updateShopSettings() {
             body: {
                 name: state.shop_name,
                 phone_number: state.phone_number,
-                settings: {
-                    delivery_fee: state.delivery_fee,
-                    delivery_note: state.delivery_note,
-                    free_delivery_over: state.free_delivery_over
-                }
             }
         })
         return true
@@ -153,8 +129,18 @@ async function updateShopSettings() {
     }
 }
 
+async function handleNext() {
+    const isLastStep = currentStep.value === totalSteps
+    const success = await nextStep()
+
+    if (success && isLastStep) {
+        await onSubmit()
+    }
+}
+
 async function nextStep() {
     // Step 1: Facebook connection validation
+    console.log('currentStep.value', currentStep.value)
     if (currentStep.value === 1) {
         if (!selectedPage.value) {
             toast.add({
@@ -162,7 +148,7 @@ async function nextStep() {
                 description: 'Facebook хуудас сонгоно уу',
                 color: 'warning'
             })
-            return
+            return false
         }
         state.facebook_page_id = selectedPage.value.id
         if (state.shop_name === '') {
@@ -179,7 +165,7 @@ async function nextStep() {
                 description: result.error.issues[0]?.message || 'Мэдээллээ шалгана уу',
                 color: 'error'
             })
-            return
+            return false
         }
 
         // Create shop after step 2
@@ -187,7 +173,7 @@ async function nextStep() {
             isSavingStep.value = true
             const success = await createShop()
             isSavingStep.value = false
-            if (!success) return
+            if (!success) return false
         } else {
             // Update existing shop
             isSavingStep.value = true
@@ -196,18 +182,12 @@ async function nextStep() {
         }
     }
 
-    // Step 3: QPay - validation is optional, user can skip
-    if (currentStep.value === 3) {
-        // Just update settings and continue
-        isSavingStep.value = true
-        await updateShopSettings()
-        isSavingStep.value = false
-    }
-
     if (currentStep.value < totalSteps) {
         slideDirection.value = 'left'
         currentStep.value++
     }
+
+    return true
 }
 
 function prevStep() {
@@ -215,23 +195,6 @@ function prevStep() {
         slideDirection.value = 'right'
         currentStep.value--
     }
-}
-
-function skipQPayStep() {
-    // Skip QPay registration and go to delivery
-    slideDirection.value = 'left'
-    currentStep.value++
-}
-
-function onQPaySuccess() {
-    qpayRegistered.value = true
-    toast.add({
-        title: 'Амжилттай!',
-        description: 'QPay бүртгэл амжилттай',
-        color: 'success'
-    })
-    // Auto advance to next step
-    nextStep()
 }
 
 async function onSubmit() {
@@ -286,7 +249,7 @@ async function onSubmit() {
                     <div
                         class="absolute top-5 left-0 h-0.5 bg-primary-500 mx-12 transition-all duration-500 ease-out"
                         :style="{
-                            width: `calc(${((currentStep - 1) / (totalSteps - 1)) * 100}% - ${(currentStep - 1) * 3}rem)`
+                            width: `calc(${((currentStep - 1) / (totalSteps - 1)) * 100}% - ${(currentStep - 1) * 4}rem)`
                         }"
                     />
 
@@ -362,34 +325,6 @@ async function onSubmit() {
                             </h1>
                             <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm">
                                 Дэлгүүрийнхээ үндсэн мэдээллийг оруулна уу
-                            </p>
-                        </div>
-
-                        <div v-else-if="currentStep === 3" key="header-3" class="text-center">
-                            <div
-                                class="w-14 h-14 rounded-2xl bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center mx-auto mb-4"
-                            >
-                                <UIcon name="i-lucide-smartphone" class="w-7 h-7 text-purple-500" />
-                            </div>
-                            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-                                QPay бүртгэл
-                            </h1>
-                            <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm">
-                                QPay мерчант болж бүртгүүлнэ үү
-                            </p>
-                        </div>
-
-                        <div v-else key="header-4" class="text-center">
-                            <div
-                                class="w-14 h-14 rounded-2xl bg-primary-50 dark:bg-primary-900/20 flex items-center justify-center mx-auto mb-4"
-                            >
-                                <UIcon name="i-lucide-truck" class="w-7 h-7 text-primary-500" />
-                            </div>
-                            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-                                Хүргэлтийн тохиргоо
-                            </h1>
-                            <p class="text-gray-500 dark:text-gray-400 mt-2 text-sm">
-                                Хүргэлтийн нөхцлөө тохируулна уу
                             </p>
                         </div>
                     </Transition>
@@ -510,35 +445,6 @@ async function onSubmit() {
                                 />
                             </UFormField>
                         </div>
-
-                        <!-- Step 3: QPay Registration -->
-                        <div
-                            v-else-if="currentStep === 3"
-                            key="step-3"
-                            class="max-h-[60vh] overflow-y-auto -mx-2 px-2"
-                        >
-                            <div v-if="qpayRegistered" class="text-center py-8 space-y-4">
-                                <div
-                                    class="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto"
-                                >
-                                    <UIcon name="i-lucide-check" class="w-8 h-8 text-green-500" />
-                                </div>
-                                <p class="text-gray-600 dark:text-gray-400">
-                                    QPay бүртгэл амжилттай хийгдсэн байна
-                                </p>
-                            </div>
-                            <QPayMerchantForm v-else inline @success="onQPaySuccess" />
-                        </div>
-
-                        <!-- Step 4: Delivery Settings -->
-                        <div v-else-if="currentStep === 4" key="step-4" class="space-y-4">
-                            <Delivery
-                                v-model:delivery_type="state.delivery_type"
-                                v-model:delivery_fee="state.delivery_fee"
-                                v-model:free_delivery_over="state.free_delivery_over"
-                                v-model:delivery_note="state.delivery_note"
-                            />
-                        </div>
                     </Transition>
 
                     <!-- Navigation buttons -->
@@ -555,51 +461,18 @@ async function onSubmit() {
                         <div v-else />
 
                         <div class="flex items-center gap-3">
-                            <!-- Skip QPay button -->
-                            <UButton
-                                v-if="currentStep === 3 && !qpayRegistered"
-                                variant="ghost"
-                                color="neutral"
-                                size="sm"
-                                @click="skipQPayStep"
-                            >
-                                Дараа бүртгүүлэх
-                            </UButton>
 
-                            <!-- Skip delivery settings button -->
-                            <UButton
-                                v-if="currentStep === 4"
-                                variant="ghost"
-                                color="neutral"
-                                size="sm"
-                                @click="onSubmit"
-                            >
-                                Дараа тохируулах
-                            </UButton>
 
                             <UButton
-                                v-if="
-                                    currentStep < totalSteps &&
-                                    (currentStep !== 3 || qpayRegistered)
-                                "
-                                trailing-icon="i-lucide-arrow-right"
+                                v-if="selectedPage"
+                                :icon="currentStep === totalSteps ? 'i-lucide-rocket' : 'i-lucide-arrow-right'"
                                 size="lg"
-                                :loading="isSavingStep"
-                                @click="nextStep"
+                                :loading="isSubmitting || isSavingStep"
+                                @click="handleNext"
                             >
                                 {{
-                                    currentStep === 2 && !shopCreated ? 'Дэлгүүр үүсгэх' : 'Дараах'
+                                    currentStep === totalSteps ? 'Дуусгах' : 'Дараах'
                                 }}
-                            </UButton>
-
-                            <UButton
-                                v-if="currentStep === totalSteps"
-                                size="lg"
-                                icon="i-lucide-rocket"
-                                :loading="isSubmitting"
-                                @click="onSubmit"
-                            >
-                                Дуусгах
                             </UButton>
                         </div>
                     </div>

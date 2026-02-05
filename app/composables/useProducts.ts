@@ -11,6 +11,21 @@ export interface Product {
     variants: ProductVariant[]
     created_at: string
     updated_at: string
+    
+    // Pricing at product level
+    price: number
+    sale_price: number | null
+    
+    // Quantity-based discount
+    bulk_discount_enabled: boolean
+    bulk_discount_quantity: number
+    bulk_discount_price: number | null
+    
+    // Time-limited sale
+    timed_sale_enabled: boolean
+    timed_sale_start: string | null
+    timed_sale_end: string | null
+    timed_sale_price: number | null
 }
 
 export interface ProductVariant {
@@ -22,10 +37,6 @@ export interface ProductVariant {
     barcode: string | null
     name: string
     options: Record<string, string>
-    price: number // Required for all variants now
-    sale_price: number | null
-    images: string[] // Variant-specific images
-    stock_quantity: number
     low_stock_alert: number
     is_active: boolean
     is_main: boolean // Marks the main variant for listing
@@ -48,7 +59,7 @@ export interface ProductFilter {
 export interface CreateProductInput {
     name: string
     description?: string
-    base_price: number
+    price: number
     sale_price?: number | null
     images?: string[]
     category?: string
@@ -57,6 +68,17 @@ export interface CreateProductInput {
     has_variants?: boolean
     status?: string
     variants?: CreateVariantInput[]
+    
+    // Quantity-based discount
+    bulk_discount_enabled?: boolean
+    bulk_discount_quantity?: number
+    bulk_discount_price?: number | null
+    
+    // Time-limited sale
+    timed_sale_enabled?: boolean
+    timed_sale_start?: string | null
+    timed_sale_end?: string | null
+    timed_sale_price?: number | null
 }
 
 export interface CreateVariantInput {
@@ -66,9 +88,6 @@ export interface CreateVariantInput {
     sku?: string // Optional
     barcode?: string | null
     options?: Record<string, string>
-    price?: number | null
-    sale_price?: number | null
-    images?: string[]
     stock_quantity: number
     low_stock_alert?: number
     is_main?: boolean // Marks the main variant
@@ -79,9 +98,6 @@ export interface UpdateVariantInput {
     keyword?: string
     sku?: string
     barcode?: string | null
-    price?: number | null
-    sale_price?: number | null
-    images?: string[]
     stock_quantity?: number
     low_stock_alert?: number
 }

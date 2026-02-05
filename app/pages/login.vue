@@ -80,12 +80,16 @@ const onRegisterSubmit = async (event: FormSubmitEvent<RegisterSchema>) => {
     // If successful, pendingVerificationEmail will be set and OTP form will show
 }
 
-const onOTPSubmit = async (event: FormSubmitEvent<OTPSchema>) => {
+const handleOTPVerification = async (otp: string) => {
     if (!pendingVerificationEmail.value) return
-    const success = await verifyOTP(pendingVerificationEmail.value, event.data.otp)
+    const success = await verifyOTP(pendingVerificationEmail.value, otp)
     if (success) {
         navigateTo('/auth/callback')
     }
+}
+
+const onOTPSubmit = async (event: FormSubmitEvent<OTPSchema>) => {
+    await handleOTPVerification(event.data.otp)
 }
 
 const handleResendOTP = async () => {
@@ -315,20 +319,22 @@ const features = [
                     v-if="pendingVerificationEmail"
                     :schema="otpSchema"
                     :state="otpState"
-                    class="space-y-5"
+                    class="space-y-5 text-center"
                     @submit="onOTPSubmit"
                 >
-                    <UFormField label="Баталгаажуулах код" name="otp">
-                        <UInput
-                            v-model="otpState.otp"
-                            type="text"
-                            inputmode="numeric"
-                            placeholder="000000"
-                            icon="i-lucide-shield-check"
-                            size="lg"
-                            maxlength="6"
-                            class="text-center tracking-[0.5em] font-mono text-lg"
-                        />
+                    <UFormField label="Баталгаажуулах код" name="otp" :ui="{ label: 'w-full text-center' }">
+                        <div class="flex justify-center mt-2">
+                            <OtpInput
+                                v-model="otpState.otp"
+                                type="text"
+                                inputmode="numeric"
+                                placeholder="○"
+                                icon="i-lucide-shield-check"
+                                size="xl"
+                                maxlength="6"
+                                @complete="handleOTPVerification"
+                            />
+                        </div>
                     </UFormField>
 
                     <UButton

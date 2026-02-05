@@ -16,6 +16,8 @@ const totalRevenue = computed(() => orderStats.value?.total_revenue || 0)
 const totalProducts = computed(() => productStats.value?.total || 0)
 const totalCustomers = computed(() => 0) // TODO: Add customer stats endpoint
 
+
+
 // Required actions
 const requiredActions = computed(() => {
     const actions = []
@@ -79,28 +81,32 @@ onMounted(() => {
                         :value="thisMonthOrders"
                         :subtitle="`Нийт ${totalOrders} захиалга`"
                         icon="i-lucide-shopping-cart"
-                        icon-color="primary"
+                        color="info"
+                        to="/dashboard/orders"
                     />
                     <DashboardStatCard
                         label="Нийт орлого"
                         :value="`${totalRevenue.toLocaleString()}₮`"
                         :subtitle="`Дундаж ${orderStats?.average_order_value?.toLocaleString() || 0}₮`"
                         icon="i-lucide-banknote"
-                        icon-color="success"
+                        color="success"
+                        to="/dashboard/orders"
                     />
                     <DashboardStatCard
                         label="Нийт бараа"
                         :value="totalProducts"
                         :subtitle="`Идэвхтэй ${totalProducts}`"
                         icon="i-lucide-package"
-                        icon-color="info"
+                        color="primary"
+                        to="/dashboard/products"
                     />
                     <DashboardStatCard
                         label="Нийт хэрэглэгч"
                         :value="totalCustomers"
                         subtitle="Энэ сар шинээр 0"
                         icon="i-lucide-users"
-                        icon-color="warning"
+                        color="warning"
+                        to="/dashboard/orders"
                     />
                 </div>
 
@@ -111,81 +117,19 @@ onMounted(() => {
                             :shop-name="shop?.name || 'Миний дэлгүүр'"
                             :shop-url="shopUrl"
                             :logo-url="shop?.picture"
+                            :required-actions="requiredActions"
                         />
                     </div>
                     <div class="lg:col-span-2">
                         <DashboardPlanCard
-                            plan-name="Үнэгүй"
-                            :is-active="true"
-                            :days-remaining="55"
                             upgrade-url="/pricing"
                         />
                     </div>
                 </div>
 
-                <!-- Required Actions -->
-                <DashboardSection
-                    v-if="requiredActions.length > 0"
-                    title="Шаардлагатай үйлдлүүд"
-                    description="Дараах тохиргоог хийснээр таны дэлгүүр бүрэн ажиллах болно"
-                >
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <DashboardActionCard
-                            v-for="action in requiredActions"
-                            :key="action.title"
-                            :title="action.title"
-                            :description="action.description"
-                            :icon="action.icon"
-                            :to="action.to"
-                        />
-                    </div>
-                </DashboardSection>
-
-                <!-- Recent Orders & Quick Actions Side by Side -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <!-- Recent Orders -->
+                <!-- Recent Orders - Full Width -->
+                <div class="grid grid-cols-1 gap-4">
                     <DashboardRecentOrders />
-
-                    <!-- Quick Actions -->
-                    <DashboardCard padding="none">
-                        <div class="p-4 border-b border-gray-100 dark:border-gray-800/50">
-                            <h3 class="font-semibold text-gray-900 dark:text-white">
-                                Түргэн үйлдлүүд
-                            </h3>
-                        </div>
-                        <div class="p-3">
-                            <div class="grid grid-cols-2 gap-2">
-                                <DashboardQuickAction
-                                    title="Бараа нэмэх"
-                                    description="Шинэ бараа"
-                                    icon="i-lucide-plus"
-                                    to="/dashboard/products/new"
-                                    color="blue"
-                                />
-                                <DashboardQuickAction
-                                    title="Захиалгууд"
-                                    description="Захиалга харах"
-                                    icon="i-lucide-shopping-cart"
-                                    to="/dashboard/orders"
-                                    color="green"
-                                />
-                                <DashboardQuickAction
-                                    title="Бараанууд"
-                                    description="Жагсаалт"
-                                    icon="i-lucide-package"
-                                    to="/dashboard/products"
-                                    color="purple"
-                                />
-                                <DashboardQuickAction
-                                    title="Тохиргоо"
-                                    description="Дэлгүүрийн"
-                                    icon="i-lucide-settings"
-                                    to="/dashboard/settings"
-                                    color="gray"
-                                />
-                            </div>
-                        </div>
-                    </DashboardCard>
                 </div>
 
                 <!-- Revenue Chart (optional, can show below) -->

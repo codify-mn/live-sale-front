@@ -71,13 +71,6 @@ const daysColor = computed(() => {
             <template v-else-if="hasSubscription && subscription">
                 <div class="flex items-center justify-between">
                     <span class="text-sm text-gray-500 dark:text-gray-400">Одоогийн багц</span>
-                    <NuxtLink
-                        to="/dashboard/settings/billing"
-                        class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 flex items-center gap-1"
-                    >
-                        <UIcon name="i-lucide-settings" class="w-4 h-4" />
-                        Тохиргоо
-                    </NuxtLink>
                 </div>
 
                 <div class="flex items-center gap-2 mt-2">
@@ -125,7 +118,7 @@ const daysColor = computed(() => {
                 <div class="mt-auto pt-4">
                     <UButton
                         v-if="subscription.plan?.slug === 'free' || isTrialing"
-                        to="/pricing"
+                        to="/dashboard/plans"
                         color="primary"
                         variant="outline"
                         block
@@ -135,7 +128,7 @@ const daysColor = computed(() => {
                     </UButton>
                     <UButton
                         v-else
-                        to="/dashboard/settings/billing"
+                        to="/dashboard/billing"
                         color="neutral"
                         variant="outline"
                         block

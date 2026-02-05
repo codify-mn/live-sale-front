@@ -35,7 +35,7 @@ const navigation = [
                     </div>
                 </div>
                 <span class="font-bold text-lg text-gray-900 dark:text-white">
-                    Comment<span class="text-gradient">Boost</span>
+                    <span class="text-gradient bg-gradient-to-r from-primary-500 to-primary-600">Codify</span> /  Comment<span class="text-gradient">Boost</span>
                 </span>
             </NuxtLink>
         </template>
