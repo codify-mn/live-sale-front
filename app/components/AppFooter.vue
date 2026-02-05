@@ -40,16 +40,7 @@ const columns = [
             <div class="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12">
                 <!-- Brand column -->
                 <div class="col-span-2 md:col-span-1">
-                    <NuxtLink to="/" class="flex items-center gap-2.5 mb-4">
-                        <div
-                            class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center"
-                        >
-                            <UIcon name="i-lucide-zap" class="w-5 h-5 text-white" />
-                        </div>
-                        <span class="font-bold text-lg text-gray-900 dark:text-white">
-                            Comment<span class="text-gradient">Boost</span>
-                        </span>
-                    </NuxtLink>
+                    <AppLogo class="mb-4" />
                     <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed mb-6">
                         Live худалдааны ухаалаг платформ. Facebook Live борлуулалтаа хялбархан
                         удирдаж, бизнесээ өсгөөрэй.

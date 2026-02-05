@@ -26,18 +26,7 @@ const navigation = [
         }"
     >
         <template #left>
-            <NuxtLink to="/" class="flex items-center gap-2.5 group">
-                <div class="relative">
-                    <div
-                        class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-lg shadow-primary-500/25 group-hover:shadow-primary-500/40 transition-shadow duration-300"
-                    >
-                        <UIcon name="i-lucide-zap" class="w-5 h-5 text-white" />
-                    </div>
-                </div>
-                <span class="font-bold text-lg text-gray-900 dark:text-white">
-                    <span class="text-gradient bg-gradient-to-r from-primary-500 to-primary-600">Codify</span> /  Comment<span class="text-gradient">Boost</span>
-                </span>
-            </NuxtLink>
+            <AppLogo />
         </template>
 
         <UNavigationMenu

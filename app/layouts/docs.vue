@@ -37,16 +37,7 @@ watch(
                             <UIcon name="i-lucide-menu" class="w-5 h-5" />
                         </button>
 
-                        <NuxtLink to="/" class="flex items-center gap-2.5">
-                            <div
-                                class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center"
-                            >
-                                <UIcon name="i-lucide-zap" class="w-4 h-4 text-white" />
-                            </div>
-                            <span class="font-bold text-gray-900 dark:text-white hidden sm:block">
-                                Comment<span class="text-gradient">Boost</span>
-                            </span>
-                        </NuxtLink>
+                        <AppLogo size="sm" />
 
                         <span class="text-gray-300 dark:text-gray-700 hidden sm:block">/</span>
 

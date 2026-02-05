@@ -248,7 +248,7 @@ onMounted(() => {
                                             <div
                                                 class="bg-gray-700 rounded-lg px-3 py-1.5 text-xs text-gray-400 text-center"
                                             >
-                                                app.commentboost.mn
+                                                codify.mn
                                             </div>
                                         </div>
                                     </div>

@@ -131,14 +131,7 @@ const features = [
             <!-- Content overlay -->
             <div class="relative z-10 flex flex-col justify-between p-12 xl:p-16 text-white">
                 <!-- Logo -->
-                <NuxtLink to="/" class="flex items-center gap-3 group">
-                    <div
-                        class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center group-hover:bg-white/30 transition-colors"
-                    >
-                        <UIcon name="i-lucide-zap" class="w-5 h-5 text-white" />
-                    </div>
-                    <span class="font-bold text-xl">CommentBoost</span>
-                </NuxtLink>
+                <AppLogo size="lg" variant="light" />
 
                 <!-- Main content -->
                 <div class="max-w-lg">
@@ -206,16 +199,7 @@ const features = [
         <div class="flex-1 flex items-center justify-center p-6 md:p-12 bg-white dark:bg-gray-950">
             <div class="w-full max-w-md">
                 <!-- Mobile logo -->
-                <NuxtLink to="/" class="flex lg:hidden items-center gap-2.5 mb-8 justify-center">
-                    <div
-                        class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center"
-                    >
-                        <UIcon name="i-lucide-zap" class="w-5 h-5 text-white" />
-                    </div>
-                    <span class="font-bold text-lg text-gray-900 dark:text-white">
-                        Comment<span class="text-gradient">Boost</span>
-                    </span>
-                </NuxtLink>
+                <AppLogo class="lg:hidden mb-8 justify-center" />
 
                 <!-- Header -->
                 <div class="text-center mb-8">

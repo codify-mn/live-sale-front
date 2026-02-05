@@ -2,38 +2,37 @@
 defineProps<{
     class?: string
     size?: 'sm' | 'md' | 'lg'
+    hideText?: boolean
+    variant?: 'default' | 'light'
 }>()
+
+const gradientId = `cb-grad-${Math.random().toString(36).slice(2, 8)}`
 </script>
 
 <template>
     <NuxtLink to="/" class="flex items-center gap-2.5 group" :class="$props.class">
-        <div
-            class="rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-lg shadow-primary-500/25 group-hover:shadow-primary-500/40 transition-shadow duration-300"
-            :class="{
-                'w-7 h-7': size === 'sm',
-                'w-9 h-9': size === 'md' || !size,
-                'w-11 h-11': size === 'lg'
-            }"
-        >
-            <UIcon
-                name="i-lucide-zap"
-                class="text-white"
-                :class="{
-                    'w-3.5 h-3.5': size === 'sm',
-                    'w-5 h-5': size === 'md' || !size,
-                    'w-6 h-6': size === 'lg'
-                }"
-            />
-        </div>
+
         <span
-            class="font-bold text-gray-900 dark:text-white"
-            :class="{
-                'text-base': size === 'sm',
-                'text-lg': size === 'md' || !size,
-                'text-xl': size === 'lg'
-            }"
+            v-if="!hideText"
+            class="font-bold tracking-tight"
+            :class="[
+                variant === 'light'
+                    ? 'text-white'
+                    : 'text-gray-900 dark:text-white',
+                {
+                    'text-sm': size === 'sm',
+                    'text-lg': size === 'md' || !size,
+                    'text-xl': size === 'lg'
+                }
+            ]"
         >
-            Comment<span class="text-gradient">Boost</span>
+            Codify<span
+                class="font-light mx-0.5"
+                :class="variant === 'light' ? 'text-white/60' : 'text-primary-400'"
+            >/</span>Comment<span
+                :class="variant === 'light' ? 'text-white' : 'text-gradient'"
+                class="font-extrabold"
+            >Boost</span>
         </span>
     </NuxtLink>
 </template>
