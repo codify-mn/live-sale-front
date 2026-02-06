@@ -7,6 +7,7 @@ export interface VariantData {
     barcode: string | null
     stock_quantity: number
     low_stock_alert: number
+    is_active: boolean
     images: string[]
 }
 

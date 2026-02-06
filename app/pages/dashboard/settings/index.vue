@@ -33,7 +33,9 @@ const state = reactive({
     reply_message: '',
     comment_prefix: '',
     max_quantity_per_item: 10,
-    unpaid_order_cancel_hours: 24
+    unpaid_order_cancel_hours: 24,
+    payment_methods: [] as string[],
+    max_featured_products: 6
 })
 
 const deliveryTypes = [
@@ -53,6 +55,22 @@ const cancelTimeOptions = [
     { label: '48 цаг', value: 48 },
     { label: '72 цаг', value: 72 }
 ]
+
+const paymentMethodOptions = [
+    { label: 'QPay', value: 'qpay' },
+    { label: 'Бэлнээр', value: 'cash' },
+    { label: 'Дансаар шилжүүлэх', value: 'bank_transfer' },
+    { label: 'Картаар', value: 'card' }
+]
+
+function togglePaymentMethod(value: string) {
+    const index = state.payment_methods.indexOf(value)
+    if (index === -1) {
+        state.payment_methods.push(value)
+    } else {
+        state.payment_methods.splice(index, 1)
+    }
+}
 
 const showDeliveryFee = computed(
     () => state.delivery_type === 'fixed' || state.delivery_type === 'free_over'
@@ -74,6 +92,8 @@ onMounted(async () => {
         state.comment_prefix = shop.value.settings?.comment_prefix || ''
         state.max_quantity_per_item = shop.value.settings?.max_quantity_per_item || 10
         state.unpaid_order_cancel_hours = shop.value.settings?.unpaid_order_cancel_hours || 24
+        state.payment_methods = shop.value.settings?.payment_methods || []
+        state.max_featured_products = shop.value.settings?.max_featured_products || 6
     }
 })
 
@@ -100,7 +120,9 @@ async function saveSettings() {
             reply_message: state.reply_message,
             comment_prefix: state.comment_prefix,
             max_quantity_per_item: state.max_quantity_per_item,
-            unpaid_order_cancel_hours: state.unpaid_order_cancel_hours
+            unpaid_order_cancel_hours: state.unpaid_order_cancel_hours,
+            payment_methods: state.payment_methods,
+            max_featured_products: state.max_featured_products
         }
     }
     await updateShop(updates)
@@ -313,11 +335,41 @@ function onFileClick() {
                         placeholder="Хугацаа сонгох"
                     />
                 </UFormField>
+                <USeparator />
+                <UFormField
+                    name="payment_methods"
+                    label="Төлбөрийн аргууд"
+                    description="Захиалга хийхэд нээлттэй байх төлбөрийн аргууд."
+                    class="flex max-sm:flex-col justify-between items-start gap-4"
+                >
+                    <div class="flex flex-wrap gap-4 pt-2">
+                        <UCheckbox
+                            v-for="option in paymentMethodOptions"
+                            :key="option.value"
+                            :model-value="state.payment_methods.includes(option.value)"
+                            :label="option.label"
+                            @update:model-value="togglePaymentMethod(option.value)"
+                        />
+                    </div>
+                </UFormField>
+                <USeparator />
+                <UFormField
+                    name="max_featured_products"
+                    label="Checkout санал болгох барааны тоо"
+                    description="Checkout хуудас дээр хэдэн санал болгох бараа харагдахыг тохируулна. Бараа тус бүр дээр одоор тэмдэглэнэ."
+                    class="flex max-sm:flex-col justify-between items-start gap-4"
+                >
+                    <UInput
+                        v-model.number="state.max_featured_products"
+                        type="number"
+                        min="1"
+                        max="20"
+                        autocomplete="off"
+                    />
+                </UFormField>
             </UPageCard>
 
-            <!-- Section 5: QPay Settings -->
-
-            <!-- Section 5: Auto Reply Settings -->
+            <!-- Section: Auto Reply Settings -->
             <UPageCard
                 title="Автомат хариулт"
                 description="Facebook мессенжерийн автомат хариултын тохиргоо."

@@ -33,7 +33,10 @@ const schema = z.object({
     timed_sale_enabled: z.boolean().default(false),
     timed_sale_start: z.string().optional().nullable(),
     timed_sale_end: z.string().optional().nullable(),
-    timed_sale_price: z.number().optional().nullable()
+    timed_sale_price: z.number().optional().nullable(),
+
+    // Featured product
+    is_featured: z.boolean().default(false)
 })
 
 type Schema = z.infer<typeof schema>
@@ -51,7 +54,8 @@ const state = reactive<Schema>({
     timed_sale_enabled: false,
     timed_sale_start: null,
     timed_sale_end: null,
-    timed_sale_price: null
+    timed_sale_price: null,
+    is_featured: false
 })
 
 // Computed: Check if timed sale will activate immediately (no dates set)
@@ -83,6 +87,7 @@ const createEmptyVariant = (): VariantData => ({
     barcode: null,
     stock_quantity: 0,
     low_stock_alert: 10,
+    is_active: true,
     images: []
 })
 
@@ -537,6 +542,11 @@ onMounted(() => {
                                             v-model="state.track_inventory"
                                             label="Үлдэгдэл автоматаар тооцох"
                                             description="Захиалга хийгдсэн үед тухайн барааны үлдэгдэлээс хасна."
+                                        />
+                                        <ProductSettingToggle
+                                            v-model="state.is_featured"
+                                            label="Checkout-д санал болгох"
+                                            description="Checkout хуудас дээр харилцагчид санал болгох бараа."
                                         />
                                     </div>
                                 </ProductFormCard>

@@ -42,6 +42,10 @@ const statusIcons: Record<string, string> = {
     refunded: 'i-lucide-undo-2'
 }
 
+const openCheckout = (token: string) => {
+    window.open(`/checkout/${token}`, '_blank')
+}
+
 onMounted(() => {
     loadOrders()
 })
@@ -128,13 +132,27 @@ onMounted(() => {
                 </div>
 
                 <!-- Amount & Time -->
-                <div class="text-right flex-shrink-0">
-                    <p class="font-semibold text-gray-900 dark:text-white text-sm">
-                        {{ formatPrice(order.total_amount) }}
-                    </p>
-                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                        {{ timeAgo(order.created_at) }}
-                    </p>
+                <div class="text-right flex-shrink-0 flex items-center gap-3">
+                    <div class="text-right">
+                        <p class="font-semibold text-gray-900 dark:text-white text-sm">
+                            {{ formatPrice(order.total_amount) }}
+                        </p>
+                        <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                            {{ timeAgo(order.created_at) }}
+                        </p>
+                    </div>
+                    
+                    <UTooltip text="Checkout нээх">
+                        <UButton
+                            v-if="order.checkout_token"
+                            icon="i-lucide-shopping-bag"
+                            variant="ghost"
+                            color="primary"
+                            size="sm"
+                            class="rounded-lg"
+                            @click.stop.prevent="openCheckout(order.checkout_token)"
+                        />
+                    </UTooltip>
                 </div>
             </NuxtLink>
         </div>

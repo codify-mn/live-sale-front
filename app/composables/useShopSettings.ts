@@ -11,6 +11,9 @@ export interface ShopSettings {
     free_delivery_over: number
     max_quantity_per_item: number
     unpaid_order_cancel_hours: number
+    payment_methods?: string[]
+    upsell_product_ids?: number[]
+    max_featured_products?: number
 }
 
 export interface ShopQPayData {

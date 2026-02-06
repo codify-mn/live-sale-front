@@ -20,7 +20,10 @@ const emit = defineEmits<{
 const { formatPrice } = useOrders()
 
 const getEffectivePrice = (item: CartItem): number => {
-    return item.variant.sale_price || item.variant.price
+    if (item.product.timed_sale_enabled && item.product.timed_sale_price) {
+        return item.product.timed_sale_price
+    }
+    return item.product.sale_price || item.product.price || 0
 }
 
 const getItemTotal = (item: CartItem): number => {

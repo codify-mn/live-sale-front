@@ -1,5 +1,6 @@
 import type { Product, ProductVariant } from './useProducts'
 import type { OrderStats } from './useDashboardData'
+import type { ShopData } from './useShopSettings'
 
 // Order status matches backend orderman.OrderStatus
 export type OrderStatus = 'pending' | 'paid' | 'shipped' | 'delivered' | 'cancelled' | 'refunded'
@@ -70,6 +71,9 @@ export interface Order {
     payment_method: PaymentMethod
     metadata: OrderMetadata
     items: OrderItem[]
+    checkout_token?: string
+    expires_at?: string
+    shop?: ShopData
     created_at: string
     updated_at: string
 }
@@ -98,11 +102,15 @@ export interface CreateOrderItemInput {
 
 export interface CreateOrderInput {
     // Customer info (flat structure as expected by backend)
+    customer_id?: number
     customer_name: string
     customer_phone: string
     customer_facebook_id?: string
+    customer_email?: string
     customer_address?: string
     customer_city?: string
+    customer_district?: string
+    customer_apartment?: string
     // Order items and details
     items: CreateOrderItemInput[]
     shipping_fee?: number
@@ -187,6 +195,35 @@ export function useOrders() {
         return response.orders || []
     }
 
+    const searchCustomerByPhone = async (phone: string): Promise<Customer | null> => {
+        const response = await $fetch<{ customer: Customer | null }>(
+            `${apiUrl}/api/customers/search?phone=${encodeURIComponent(phone)}`,
+            { credentials: 'include' }
+        )
+        return response.customer
+    }
+
+    const fetchPublicOrder = async (token: string): Promise<Order> => {
+        return await $fetch<Order>(`${apiUrl}/api/checkout/${token}`)
+    }
+
+    const fetchUpsellProducts = async (token: string): Promise<Product[]> => {
+        const response = await $fetch<{ products: Product[] }>(
+            `${apiUrl}/api/checkout/${token}/upsells`
+        )
+        return response.products || []
+    }
+
+    const completePublicCheckout = async (
+        token: string,
+        data: any
+    ): Promise<Order> => {
+        return await $fetch<Order>(`${apiUrl}/api/checkout/${token}/complete`, {
+            method: 'POST',
+            body: data
+        })
+    }
+
     // Helper functions for display
     const formatPrice = (price: number): string => {
         return new Intl.NumberFormat('mn-MN').format(price) + '₮'
@@ -239,6 +276,10 @@ export function useOrders() {
         formatPrice,
         getStatusLabel,
         getStatusColor,
-        getPaymentMethodLabel
+        getPaymentMethodLabel,
+        searchCustomerByPhone,
+        fetchPublicOrder,
+        fetchUpsellProducts,
+        completePublicCheckout
     }
 }

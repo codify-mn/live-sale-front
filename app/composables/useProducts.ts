@@ -26,6 +26,9 @@ export interface Product {
     timed_sale_start: string | null
     timed_sale_end: string | null
     timed_sale_price: number | null
+
+    // Featured product (shown on checkout)
+    is_featured: boolean
 }
 
 export interface ProductVariant {

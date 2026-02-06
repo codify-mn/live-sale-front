@@ -223,6 +223,26 @@ const toggleStatus = async (product: Product) => {
     }
 }
 
+// Toggle featured
+const toggleFeatured = async (product: Product) => {
+    const newFeatured = !product.is_featured
+    try {
+        await updateProduct(product.id, { is_featured: newFeatured } as any)
+        product.is_featured = newFeatured
+        toast.add({
+            title: 'Амжилттай',
+            description: newFeatured ? 'Checkout-д санал болгох бараанд нэмэгдлээ' : 'Санал болгох бараанаас хасагдлаа',
+            color: 'success'
+        })
+    } catch (err: any) {
+        toast.add({
+            title: 'Алдаа',
+            description: err.data?.message || 'Өөрчлөхөд алдаа гарлаа',
+            color: 'error'
+        })
+    }
+}
+
 // Bulk actions
 const bulkActionLoading = ref(false)
 
@@ -498,6 +518,19 @@ onMounted(() => {
                         <span class="font-medium text-gray-900 dark:text-white">
                             {{ row.original.name }}
                         </span>
+                        <button
+                            type="button"
+                            class="shrink-0 p-0.5 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                            :title="row.original.is_featured ? 'Санал болгохоос хасах' : 'Checkout-д санал болгох'"
+                            @click.stop="toggleFeatured(row.original)"
+                        >
+                            <UIcon
+                                name="i-lucide-star"
+                                class="w-4 h-4"
+                                :style="row.original.is_featured ? 'color: #f59e0b; fill: #f59e0b;' : ''"
+                                :class="!row.original.is_featured ? 'text-gray-300 dark:text-gray-600' : ''"
+                            />
+                        </button>
                     </div>
                 </template>
 

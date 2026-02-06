@@ -72,7 +72,10 @@ onMounted(() => {
             <!-- Content -->
             <div v-else class="space-y-6 mt-4 max-w-6xl mx-auto">
                 <!-- Greeting -->
-                <DashboardGreeting :name="userName" />
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <DashboardGreeting :name="userName" />
+                    <DashboardTestActions />
+                </div>
 
                 <!-- Stats Row -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

@@ -42,7 +42,10 @@ const schema = z.object({
     timed_sale_enabled: z.boolean().default(false),
     timed_sale_start: z.string().optional().nullable(),
     timed_sale_end: z.string().optional().nullable(),
-    timed_sale_price: z.number().optional().nullable()
+    timed_sale_price: z.number().optional().nullable(),
+
+    // Featured product
+    is_featured: z.boolean().default(false)
 })
 
 type Schema = z.infer<typeof schema>
@@ -60,7 +63,8 @@ const state = reactive<Schema>({
     timed_sale_enabled: false,
     timed_sale_start: null,
     timed_sale_end: null,
-    timed_sale_price: null
+    timed_sale_price: null,
+    is_featured: false
 })
 
 // Computed: Check if timed sale will activate immediately (no dates set)
@@ -92,6 +96,7 @@ const createEmptyVariant = (): VariantData => ({
     barcode: null,
     stock_quantity: 0,
     low_stock_alert: 10,
+    is_active: true,
     images: []
 })
 
@@ -167,6 +172,7 @@ const loadProduct = async () => {
         state.timed_sale_start = product.value.timed_sale_start ? new Date(product.value.timed_sale_start).toISOString().slice(0, 16) : null
         state.timed_sale_end = product.value.timed_sale_end ? new Date(product.value.timed_sale_end).toISOString().slice(0, 16) : null
         state.timed_sale_price = product.value.timed_sale_price
+        state.is_featured = product.value.is_featured || false
 
         if (product.value.variants && product.value.variants.length > 0) {
             variants.value = product.value.variants.map((v) => ({
@@ -177,6 +183,7 @@ const loadProduct = async () => {
                 barcode: v.barcode || null,
                 stock_quantity: v.stock_quantity,
                 low_stock_alert: v.low_stock_alert || 10,
+                is_active: v.is_active !== false,
                 images: v.images || []
             }))
         } else {
@@ -598,7 +605,14 @@ onMounted(async () => {
                                     <UInput v-model="state.category" placeholder="Ангилал..." size="lg" />
                                 </ProductFormCard>
                                 <ProductFormCard title="Барааны тохиргоо">
-                                    <ProductSettingToggle v-model="state.track_inventory" label="Үлдэгдэл тооцох" />
+                                    <div class="divide-y divide-gray-100 dark:divide-gray-800">
+                                        <ProductSettingToggle v-model="state.track_inventory" label="Үлдэгдэл тооцох" />
+                                        <ProductSettingToggle
+                                            v-model="state.is_featured"
+                                            label="Checkout-д санал болгох"
+                                            description="Checkout хуудас дээр харилцагчид санал болгох бараа."
+                                        />
+                                    </div>
                                 </ProductFormCard>
                             </div>
                         </div>

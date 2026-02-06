@@ -65,13 +65,17 @@ const getProductImage = (product: Product): string | null => {
 }
 
 const getProductPrice = (product: Product): number => {
-    const variant = product.variants?.[0]
-    return variant?.sale_price || variant?.price || 0
+    if (product.timed_sale_enabled && product.timed_sale_price) {
+        return product.timed_sale_price
+    }
+    return product.sale_price || product.price || 0
 }
 
 const getOriginalPrice = (product: Product): number | null => {
-    const variant = product.variants?.[0]
-    return variant?.sale_price ? variant.price : null
+    if (product.timed_sale_enabled && product.timed_sale_price) {
+        return product.price
+    }
+    return product.sale_price ? product.price : null
 }
 
 const getTotalStock = (product: Product): number => {
