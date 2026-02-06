@@ -231,7 +231,9 @@ const toggleFeatured = async (product: Product) => {
         product.is_featured = newFeatured
         toast.add({
             title: 'Амжилттай',
-            description: newFeatured ? 'Checkout-д санал болгох бараанд нэмэгдлээ' : 'Санал болгох бараанаас хасагдлаа',
+            description: newFeatured
+                ? 'Checkout-д санал болгох бараанд нэмэгдлээ'
+                : 'Санал болгох бараанаас хасагдлаа',
             color: 'success'
         })
     } catch (err: any) {
@@ -521,14 +523,24 @@ onMounted(() => {
                         <button
                             type="button"
                             class="shrink-0 p-0.5 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                            :title="row.original.is_featured ? 'Санал болгохоос хасах' : 'Checkout-д санал болгох'"
+                            :title="
+                                row.original.is_featured
+                                    ? 'Санал болгохоос хасах'
+                                    : 'Checkout-д санал болгох'
+                            "
                             @click.stop="toggleFeatured(row.original)"
                         >
                             <UIcon
                                 name="i-lucide-star"
                                 class="w-4 h-4"
-                                :style="row.original.is_featured ? 'color: #f59e0b; fill: #f59e0b;' : ''"
-                                :class="!row.original.is_featured ? 'text-gray-300 dark:text-gray-600' : ''"
+                                :style="
+                                    row.original.is_featured ? 'color: #f59e0b; fill: #f59e0b;' : ''
+                                "
+                                :class="
+                                    !row.original.is_featured
+                                        ? 'text-gray-300 dark:text-gray-600'
+                                        : ''
+                                "
                             />
                         </button>
                     </div>
@@ -548,9 +560,9 @@ onMounted(() => {
                     <span class="text-gray-900 dark:text-white">
                         {{
                             formatPrice(
-                                (row.original.timed_sale_enabled && row.original.timed_sale_price) ?
-                                    row.original.timed_sale_price :
-                                    row.original.price || 0
+                                row.original.timed_sale_enabled && row.original.timed_sale_price
+                                    ? row.original.timed_sale_price
+                                    : row.original.price || 0
                             )
                         }}
                     </span>

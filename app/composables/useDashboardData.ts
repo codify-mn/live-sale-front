@@ -57,26 +57,12 @@ export interface CustomerStats {
 export const useDashboardData = () => {
     const config = useRuntimeConfig()
 
-    const shop = ref<Shop | null>(null)
     const orderStats = ref<OrderStats | null>(null)
     const productStats = ref<ProductStats>({ total: 0, active: 0 })
     const customerStats = ref<CustomerStats>({ total: 0, this_month: 0 })
     const isLoading = ref(true)
     const error = ref<string | null>(null)
     const lives = ref<any[]>([])
-
-    const fetchShop = async () => {
-        try {
-            const data = await $fetch<Shop>(`${config.public.apiUrl}/api/shops/my`, {
-                credentials: 'include'
-            })
-            shop.value = data
-        } catch (err: any) {
-            if (err.status !== 404) {
-                console.error('Failed to fetch shop:', err)
-            }
-        }
-    }
 
     const fetchOrderStats = async () => {
         try {
@@ -125,7 +111,7 @@ export const useDashboardData = () => {
         error.value = null
 
         try {
-            await Promise.all([fetchShop(), fetchOrderStats(), fetchProductStats()])
+            await Promise.all([fetchOrderStats(), fetchProductStats()])
         } catch (err: any) {
             error.value = 'Failed to load dashboard data'
         } finally {
@@ -134,7 +120,6 @@ export const useDashboardData = () => {
     }
 
     return {
-        shop,
         orderStats,
         productStats,
         customerStats,
@@ -142,7 +127,6 @@ export const useDashboardData = () => {
         error,
         lives,
         fetchAll,
-        fetchShop,
         fetchOrderStats,
         fetchProductStats,
         fetchLives

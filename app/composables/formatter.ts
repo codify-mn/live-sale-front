@@ -15,13 +15,11 @@ export const formatDate = (dateString: string) => {
 }
 
 // Helper function to format currency
-export const formatCurrency = (amount: number, currency: string) => {
-    // const newAmount = currency === "MNT" ? amount / 100 : amount
-    const newAmount = amount / 100
+export const formatCurrency = (amount: number, currency: string = 'MNT') => {
     const formatter = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: currency === 'MNT' ? 'MNT' : 'USD',
         minimumFractionDigits: currency === 'MNT' ? 0 : 2
     })
-    return formatter.format(newAmount)
+    return formatter.format(amount)
 }

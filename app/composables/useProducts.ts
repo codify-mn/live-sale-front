@@ -59,6 +59,7 @@ export interface ProductFilter {
     stock?: string
     page?: number
     size?: number
+    sale_id?: number
 }
 
 export interface CreateProductInput {
@@ -133,6 +134,7 @@ export function useProducts() {
         if (filter.stock) params.set('stock', filter.stock)
         if (filter.page) params.set('page', filter.page.toString())
         if (filter.size) params.set('size', filter.size.toString())
+        if (filter.sale_id) params.set('sale_id', filter.sale_id.toString())
 
         const query = params.toString()
         const url = `${apiUrl}/api/products${query ? `?${query}` : ''}`

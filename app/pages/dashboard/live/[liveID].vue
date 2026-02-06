@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { LiveSale } from '~/types'
 import type { Product } from '~/composables/useProducts'
+import type { OverlayLayout } from '~/composables/useCanvasStream'
 
 const toast = useToast()
 const config = useRuntimeConfig()
@@ -24,13 +25,30 @@ const addedProducts = useState('addedProducts', () => liveProducts)
 
 const handleProductSelect = (product: Product) => {
     const imageUrl = product.variants?.[0]?.images?.[0] || null
-    webrtc.canvasStream.updateProduct(product.name, imageUrl)
+    webrtc.canvasStream.updateProduct({
+        name: product.name,
+        price: product.price,
+        salePrice: product.sale_price,
+        imageUrl
+    })
 }
 
 provide('onProductSelect', handleProductSelect)
 
 onBeforeUnmount(() => {
     webrtc.stopStream()
+})
+
+const overlayLayoutOptions = [
+    { label: 'Banner', value: 'banner' as OverlayLayout },
+    { label: 'Card', value: 'card' as OverlayLayout }
+]
+
+const selectedOverlayLayout = computed({
+    get: () => webrtc.canvasStream.overlayLayout.value,
+    set: (val: OverlayLayout) => {
+        webrtc.canvasStream.overlayLayout.value = val
+    }
 })
 
 const statusLabel = computed(() => {
@@ -57,7 +75,7 @@ const statusLabel = computed(() => {
         </div>
 
         <!-- Main Video Area -->
-        <div class="flex flex-1 flex-col min-w-0 bg-gray-100 dark:bg-gray-800 rounded-lg p-4 gap-4">
+        <div class="flex flex-1 flex-col min-w-0 bg-gray-100 dark:bg-gray-800 rounded-lg p-3 gap-4">
             <!-- Facebook Live Info Header -->
             <div
                 class="flex items-center justify-between bg-white dark:bg-gray-900 px-4 py-3 rounded-lg shadow-sm"
@@ -125,8 +143,10 @@ const statusLabel = computed(() => {
             </div>
 
             <!-- Video Player -->
-            <div class="flex-1 grid grid-cols-2 gap-2">
+            <div class="flex-1 grid grid-cols-2 gap-2 min-h-0 overflow-hidden">
                 <div class="flex-1 bg-black relative rounded-lg overflow-hidden min-h-0">
+                    <!-- black screen -->
+                    <!-- <div class="w-full h-full bg-white"></div> -->
                     <video
                         :ref="webrtc.videoRef"
                         autoplay
@@ -161,6 +181,16 @@ const statusLabel = computed(() => {
                 class="flex justify-between items-center bg-white dark:bg-gray-900 px-4 py-3 rounded-lg shadow-sm"
             >
                 <LiveStats :is-streaming="webrtc.isStreaming.value" />
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-gray-500">Overlay:</span>
+                    <USelect
+                        v-model="selectedOverlayLayout"
+                        :items="overlayLayoutOptions"
+                        value-key="value"
+                        size="xs"
+                        class="w-28"
+                    />
+                </div>
             </div>
         </div>
 

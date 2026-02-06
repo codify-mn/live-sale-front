@@ -85,9 +85,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div
-        class="p-3"
-    >
+    <div class="p-3">
         <div class="flex items-center justify-end gap-1">
             <UButton
                 color="primary"
@@ -127,6 +125,12 @@ onMounted(() => {
                         placeholder="улаан"
                         @update:model-value="handleKeywordInput($event)"
                     />
+                    <template #help>
+                        <p class="text-xs flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                            <UIcon name="i-lucide-wand-sparkles" :size="20" />
+                            Комментоос энэ үгээр барааг танина
+                        </p>
+                    </template>
                 </UFormField>
 
                 <UFormField label="Үлдэгдэл" required>

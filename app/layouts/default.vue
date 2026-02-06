@@ -17,12 +17,21 @@ const links = [
             label: 'Facebook Live',
             icon: 'i-lucide-tv-minimal-play',
             to: '/dashboard/live',
+            badge: 'Pro багц',
             onSelect: () => {
                 open.value = false
             }
         },
         {
-            label: 'Бүтээгдэхүүн',
+            label: 'Автоматжуулалт',
+            icon: 'i-lucide-wand-sparkles',
+            to: '/dashboard/automation',
+            onSelect: () => {
+                open.value = false
+            }
+        },
+        {
+            label: 'Бараа',
             icon: 'i-lucide-package',
             to: '/dashboard/products',
             onSelect: () => {
@@ -127,6 +136,7 @@ const groups = computed(() => [
             resizable
             class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-2xl border-r border-gray-200/50 dark:border-gray-800/50"
             :ui="{
+                header: 'mt-1',
                 footer: 'lg:border-t lg:border-gray-200/50 dark:lg:border-gray-800/50'
             }"
         >
@@ -139,7 +149,7 @@ const groups = computed(() => [
                     label="Хайх..."
                     placeholder="Хайх..."
                     :collapsed="collapsed"
-                    class="bg-gray-50/50 dark:bg-gray-800/30  dark:ring-gray-700/40 backdrop-blur-sm"
+                    class="bg-gray-50/50 dark:bg-gray-800/30 dark:ring-gray-700/40 backdrop-blur-sm"
                 />
 
                 <UNavigationMenu
@@ -148,6 +158,9 @@ const groups = computed(() => [
                     orientation="vertical"
                     tooltip
                     popover
+                    :ui="{
+                        link: collapsed ? 'py-2 text-sm' : 'p-3 text-md'
+                    }"
                 />
             </template>
 

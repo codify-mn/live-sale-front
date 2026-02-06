@@ -1,5 +1,16 @@
 <script setup lang="ts">
-const { shop, orderStats, productStats, isLoading, fetchAll } = useDashboardData()
+const { orderStats, productStats, isLoading, fetchAll } = useDashboardData()
+const { resetTour } = useTour()
+
+const shop = useShop()
+const tourRef = ref<{ startTour: () => void } | null>(null)
+
+const replayTour = () => {
+    resetTour()
+    nextTick(() => {
+        tourRef.value?.startTour()
+    })
+}
 
 const shopUrl = computed(() => {
     if (!shop.value) return ''
@@ -15,8 +26,6 @@ const totalOrders = computed(() => orderStats.value?.total_orders || 0)
 const totalRevenue = computed(() => orderStats.value?.total_revenue || 0)
 const totalProducts = computed(() => productStats.value?.total || 0)
 const totalCustomers = computed(() => 0) // TODO: Add customer stats endpoint
-
-
 
 // Required actions
 const requiredActions = computed(() => {
@@ -71,14 +80,27 @@ onMounted(() => {
 
             <!-- Content -->
             <div v-else class="space-y-6 mt-4 max-w-6xl mx-auto">
+                <!-- Tour -->
+                <DashboardTour ref="tourRef" />
+
                 <!-- Greeting -->
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <DashboardGreeting :name="userName" />
-                    <DashboardTestActions />
+                    <div class="flex items-center gap-2">
+                        <UButton
+                            icon="i-lucide-circle-help"
+                            variant="ghost"
+                            color="neutral"
+                            size="sm"
+                            label="Тур"
+                            @click="replayTour"
+                        />
+                        <DashboardTestActions />
+                    </div>
                 </div>
 
                 <!-- Stats Row -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div data-tour-stats class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <DashboardStatCard
                         label="Энэ сарын захиалга"
                         :value="thisMonthOrders"
@@ -115,7 +137,7 @@ onMounted(() => {
 
                 <!-- Shop & Plan Row -->
                 <div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
-                    <div class="lg:col-span-3">
+                    <div data-tour-shop class="lg:col-span-3">
                         <DashboardShopCard
                             :shop-name="shop?.name || 'Миний дэлгүүр'"
                             :shop-url="shopUrl"
@@ -124,9 +146,7 @@ onMounted(() => {
                         />
                     </div>
                     <div class="lg:col-span-2">
-                        <DashboardPlanCard
-                            upgrade-url="/pricing"
-                        />
+                        <DashboardPlanCard upgrade-url="/pricing" />
                     </div>
                 </div>
 

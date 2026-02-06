@@ -58,6 +58,24 @@ const state = reactive<Schema>({
     is_featured: false
 })
 
+watch(
+    () => state.bulk_discount_enabled,
+    (newVal) => {
+        if (newVal) {
+            state.bulk_discount_price = state.price
+        }
+    }
+)
+
+watch(
+    () => state.timed_sale_enabled,
+    (newVal) => {
+        if (newVal) {
+            state.timed_sale_price = state.price
+        }
+    }
+)
+
 // Computed: Check if timed sale will activate immediately (no dates set)
 const timedSaleActivatesImmediately = computed(() => {
     return state.timed_sale_enabled && !state.timed_sale_start && !state.timed_sale_end
@@ -168,8 +186,12 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
             ...event.data,
             images: images.value,
             variants: variants.value,
-            timed_sale_start: event.data.timed_sale_start ? new Date(event.data.timed_sale_start).toISOString() : null,
-            timed_sale_end: event.data.timed_sale_end ? new Date(event.data.timed_sale_end).toISOString() : null
+            timed_sale_start: event.data.timed_sale_start
+                ? new Date(event.data.timed_sale_start).toISOString()
+                : null,
+            timed_sale_end: event.data.timed_sale_end
+                ? new Date(event.data.timed_sale_end).toISOString()
+                : null
         })
 
         toast.add({
@@ -261,7 +283,10 @@ onMounted(() => {
                                                     size="lg"
                                                 >
                                                     <template #leading>
-                                                        <span class="text-gray-500 dark:text-gray-400 font-medium">₮</span>
+                                                        <span
+                                                            class="text-gray-500 dark:text-gray-400 font-medium"
+                                                            >₮</span
+                                                        >
                                                     </template>
                                                 </UInput>
                                             </UFormField>
@@ -271,19 +296,37 @@ onMounted(() => {
                                                 <!-- Timed Sale Toggle Card -->
                                                 <div
                                                     class="p-3 rounded-lg border-2 transition-all cursor-pointer"
-                                                    :class="state.timed_sale_enabled
-                                                        ? 'border-rose-500 bg-rose-50 dark:bg-rose-950/30'
-                                                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300'"
-                                                    @click="state.timed_sale_enabled = !state.timed_sale_enabled"
+                                                    :class="
+                                                        state.timed_sale_enabled
+                                                            ? 'border-rose-500 bg-rose-50 dark:bg-rose-950/30'
+                                                            : 'border-gray-200 dark:border-gray-700 hover:border-gray-300'
+                                                    "
+                                                    @click="
+                                                        state.timed_sale_enabled =
+                                                            !state.timed_sale_enabled
+                                                    "
                                                 >
-                                                    <div class="flex items-center justify-between gap-2">
+                                                    <div
+                                                        class="flex items-center justify-between gap-2"
+                                                    >
                                                         <div class="flex items-center gap-2">
                                                             <UIcon
                                                                 name="i-lucide-tag"
                                                                 class="w-4 h-4"
-                                                                :class="state.timed_sale_enabled ? 'text-rose-600' : 'text-gray-400'"
+                                                                :class="
+                                                                    state.timed_sale_enabled
+                                                                        ? 'text-rose-600'
+                                                                        : 'text-gray-400'
+                                                                "
                                                             />
-                                                            <span class="text-sm font-medium" :class="state.timed_sale_enabled ? 'text-rose-700 dark:text-rose-300' : 'text-gray-700 dark:text-gray-300'">
+                                                            <span
+                                                                class="text-sm font-medium"
+                                                                :class="
+                                                                    state.timed_sale_enabled
+                                                                        ? 'text-rose-700 dark:text-rose-300'
+                                                                        : 'text-gray-700 dark:text-gray-300'
+                                                                "
+                                                            >
                                                                 Хямдрал
                                                             </span>
                                                         </div>
@@ -291,7 +334,9 @@ onMounted(() => {
                                                             :model-value="state.timed_sale_enabled"
                                                             size="xs"
                                                             @click.stop
-                                                            @update:model-value="state.timed_sale_enabled = $event"
+                                                            @update:model-value="
+                                                                state.timed_sale_enabled = $event
+                                                            "
                                                         />
                                                     </div>
                                                 </div>
@@ -299,27 +344,49 @@ onMounted(() => {
                                                 <!-- Bulk Discount Toggle Card -->
                                                 <div
                                                     class="p-3 rounded-lg border-2 transition-all cursor-pointer"
-                                                    :class="state.bulk_discount_enabled
-                                                        ? 'border-primary-500 bg-primary-50 dark:bg-primary-950/30'
-                                                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300'"
-                                                    @click="state.bulk_discount_enabled = !state.bulk_discount_enabled"
+                                                    :class="
+                                                        state.bulk_discount_enabled
+                                                            ? 'border-primary-500 bg-primary-50 dark:bg-primary-950/30'
+                                                            : 'border-gray-200 dark:border-gray-700 hover:border-gray-300'
+                                                    "
+                                                    @click="
+                                                        state.bulk_discount_enabled =
+                                                            !state.bulk_discount_enabled
+                                                    "
                                                 >
-                                                    <div class="flex items-center justify-between gap-2">
+                                                    <div
+                                                        class="flex items-center justify-between gap-2"
+                                                    >
                                                         <div class="flex items-center gap-2">
                                                             <UIcon
                                                                 name="i-lucide-boxes"
                                                                 class="w-4 h-4"
-                                                                :class="state.bulk_discount_enabled ? 'text-primary-600' : 'text-gray-400'"
+                                                                :class="
+                                                                    state.bulk_discount_enabled
+                                                                        ? 'text-primary-600'
+                                                                        : 'text-gray-400'
+                                                                "
                                                             />
-                                                            <span class="text-sm font-medium" :class="state.bulk_discount_enabled ? 'text-primary-700 dark:text-primary-300' : 'text-gray-700 dark:text-gray-300'">
+                                                            <span
+                                                                class="text-sm font-medium"
+                                                                :class="
+                                                                    state.bulk_discount_enabled
+                                                                        ? 'text-primary-700 dark:text-primary-300'
+                                                                        : 'text-gray-700 dark:text-gray-300'
+                                                                "
+                                                            >
                                                                 Олноор авахад
                                                             </span>
                                                         </div>
                                                         <USwitch
-                                                            :model-value="state.bulk_discount_enabled"
+                                                            :model-value="
+                                                                state.bulk_discount_enabled
+                                                            "
                                                             size="xs"
                                                             @click.stop
-                                                            @update:model-value="state.bulk_discount_enabled = $event"
+                                                            @update:model-value="
+                                                                state.bulk_discount_enabled = $event
+                                                            "
                                                         />
                                                     </div>
                                                 </div>
@@ -335,8 +402,13 @@ onMounted(() => {
                                                     v-if="timedSaleActivatesImmediately"
                                                     class="flex items-center gap-2 px-3 py-2 bg-emerald-100 dark:bg-emerald-900/40 rounded-md"
                                                 >
-                                                    <UIcon name="i-lucide-zap" class="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                                                    <span class="text-xs font-medium text-emerald-700 dark:text-emerald-300">
+                                                    <UIcon
+                                                        name="i-lucide-zap"
+                                                        class="w-4 h-4 text-emerald-600 dark:text-emerald-400"
+                                                    />
+                                                    <span
+                                                        class="text-xs font-medium text-emerald-700 dark:text-emerald-300"
+                                                    >
                                                         Хугацаа оруулаагүй бол шууд идэвхжинэ
                                                     </span>
                                                 </div>
@@ -379,25 +451,34 @@ onMounted(() => {
                                                 <div class="grid grid-cols-2 gap-3">
                                                     <UFormField label="Дор хаяж (ширхэг)">
                                                         <UInput
-                                                            v-model.number="state.bulk_discount_quantity"
+                                                            v-model.number="
+                                                                state.bulk_discount_quantity
+                                                            "
                                                             type="number"
                                                             placeholder="3"
                                                             size="sm"
                                                         >
                                                             <template #trailing>
-                                                                <span class="text-primary-500 text-xs">ш</span>
+                                                                <span
+                                                                    class="text-primary-500 text-xs"
+                                                                    >ш</span
+                                                                >
                                                             </template>
                                                         </UInput>
                                                     </UFormField>
                                                     <UFormField label="Нэгж үнэ">
                                                         <UInput
-                                                            v-model.number="state.bulk_discount_price"
+                                                            v-model.number="
+                                                                state.bulk_discount_price
+                                                            "
                                                             type="number"
                                                             placeholder="0"
                                                             size="sm"
                                                         >
                                                             <template #leading>
-                                                                <span class="text-primary-500">₮</span>
+                                                                <span class="text-primary-500"
+                                                                    >₮</span
+                                                                >
                                                             </template>
                                                         </UInput>
                                                     </UFormField>
@@ -408,24 +489,48 @@ onMounted(() => {
                                         <!-- Right: Live Preview -->
                                         <div class="lg:col-span-2">
                                             <div class="sticky top-0">
-                                                <span class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 block">Харагдах байдал</span>
-                                                <div class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700">
+                                                <span
+                                                    class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 block"
+                                                    >Харагдах байдал</span
+                                                >
+                                                <div
+                                                    class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700"
+                                                >
                                                     <!-- Product Name Preview -->
-                                                    <p class="text-sm font-medium text-gray-900 dark:text-white mb-3 line-clamp-2">
+                                                    <p
+                                                        class="text-sm font-medium text-gray-900 dark:text-white mb-3 line-clamp-2"
+                                                    >
                                                         {{ state.name || 'Барааны нэр...' }}
                                                     </p>
 
                                                     <!-- Price Display -->
                                                     <div class="space-y-2">
-                                                        <div class="flex items-baseline gap-2 flex-wrap">
+                                                        <div
+                                                            class="flex items-baseline gap-2 flex-wrap"
+                                                        >
                                                             <span
                                                                 class="text-2xl font-bold"
-                                                                :class="state.timed_sale_enabled && state.timed_sale_price ? 'text-rose-600 dark:text-rose-400' : 'text-gray-900 dark:text-white'"
+                                                                :class="
+                                                                    state.timed_sale_enabled &&
+                                                                    state.timed_sale_price
+                                                                        ? 'text-rose-600 dark:text-rose-400'
+                                                                        : 'text-gray-900 dark:text-white'
+                                                                "
                                                             >
-                                                                {{ ((state.timed_sale_enabled && state.timed_sale_price) ? state.timed_sale_price : state.price || 0).toLocaleString() }}₮
+                                                                {{
+                                                                    (state.timed_sale_enabled &&
+                                                                    state.timed_sale_price
+                                                                        ? state.timed_sale_price
+                                                                        : state.price || 0
+                                                                    ).toLocaleString()
+                                                                }}₮
                                                             </span>
                                                             <span
-                                                                v-if="state.timed_sale_enabled && state.timed_sale_price && state.price"
+                                                                v-if="
+                                                                    state.timed_sale_enabled &&
+                                                                    state.timed_sale_price &&
+                                                                    state.price
+                                                                "
                                                                 class="text-sm text-gray-400 line-through"
                                                             >
                                                                 {{ state.price.toLocaleString() }}₮
@@ -433,21 +538,57 @@ onMounted(() => {
                                                         </div>
 
                                                         <!-- Sale Badge -->
-                                                        <div v-if="state.timed_sale_enabled && state.timed_sale_price && state.price && timedSaleDiscountPercent > 0" class="flex items-center gap-2">
-                                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300 text-xs font-semibold rounded-full">
-                                                                <UIcon name="i-lucide-arrow-down" class="w-3 h-3" />
+                                                        <div
+                                                            v-if="
+                                                                state.timed_sale_enabled &&
+                                                                state.timed_sale_price &&
+                                                                state.price &&
+                                                                timedSaleDiscountPercent > 0
+                                                            "
+                                                            class="flex items-center gap-2"
+                                                        >
+                                                            <span
+                                                                class="inline-flex items-center gap-1 px-2 py-0.5 bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300 text-xs font-semibold rounded-full"
+                                                            >
+                                                                <UIcon
+                                                                    name="i-lucide-arrow-down"
+                                                                    class="w-3 h-3"
+                                                                />
                                                                 {{ timedSaleDiscountPercent }}%
                                                             </span>
-                                                            <span class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
-                                                                {{ (state.price - state.timed_sale_price).toLocaleString() }}₮ хэмнэлт
+                                                            <span
+                                                                class="text-xs text-emerald-600 dark:text-emerald-400 font-medium"
+                                                            >
+                                                                {{
+                                                                    (
+                                                                        state.price -
+                                                                        state.timed_sale_price
+                                                                    ).toLocaleString()
+                                                                }}₮ хэмнэлт
                                                             </span>
                                                         </div>
 
                                                         <!-- Bulk Discount Badge -->
-                                                        <div v-if="state.bulk_discount_enabled && state.bulk_discount_price && state.price" class="pt-2 border-t border-gray-200 dark:border-gray-700">
-                                                            <span class="inline-flex items-center gap-1.5 px-2 py-1 bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300 text-xs font-medium rounded-md">
-                                                                <UIcon name="i-lucide-boxes" class="w-3.5 h-3.5" />
-                                                                {{ state.bulk_discount_quantity }}+ авахад {{ state.bulk_discount_price.toLocaleString() }}₮
+                                                        <div
+                                                            v-if="
+                                                                state.bulk_discount_enabled &&
+                                                                state.bulk_discount_price &&
+                                                                state.price
+                                                            "
+                                                            class="pt-2 border-t border-gray-200 dark:border-gray-700"
+                                                        >
+                                                            <span
+                                                                class="inline-flex items-center gap-1.5 px-2 py-1 bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300 text-xs font-medium rounded-md"
+                                                            >
+                                                                <UIcon
+                                                                    name="i-lucide-boxes"
+                                                                    class="w-3.5 h-3.5"
+                                                                />
+                                                                {{ state.bulk_discount_quantity }}+
+                                                                авахад
+                                                                {{
+                                                                    state.bulk_discount_price.toLocaleString()
+                                                                }}₮
                                                             </span>
                                                         </div>
                                                     </div>
@@ -462,22 +603,32 @@ onMounted(() => {
                                     <div v-if="variants.length > 0">
                                         <!-- Chrome-style Tabs -->
                                         <div class="chrome-tabs">
-                                            <div class="flex items-end gap-0.5 px-2 pt-2 bg-gray-100 dark:bg-gray-800 rounded-t-lg overflow-x-auto">
+                                            <div
+                                                class="flex items-end gap-0.5 px-2 pt-2 bg-gray-100 dark:bg-gray-800 rounded-t-lg overflow-x-auto"
+                                            >
                                                 <div
                                                     v-for="(variant, index) in variants"
                                                     :key="`tab-${index}`"
                                                     class="chrome-tab group"
-                                                    :class="activeTabIndex === index ? 'active' : ''"
+                                                    :class="
+                                                        activeTabIndex === index ? 'active' : ''
+                                                    "
                                                     @click="activeTabIndex = index"
                                                 >
                                                     <div class="tab-content">
                                                         <UIcon
                                                             name="i-lucide-layers"
                                                             class="w-3.5 h-3.5 flex-shrink-0"
-                                                            :class="activeTabIndex === index ? 'text-primary-600 dark:text-primary-400' : 'text-gray-400'"
+                                                            :class="
+                                                                activeTabIndex === index
+                                                                    ? 'text-primary-600 dark:text-primary-400'
+                                                                    : 'text-gray-400'
+                                                            "
                                                         />
                                                         <span class="tab-title">
-                                                            {{ variant.name || `Төрөл ${index + 1}` }}
+                                                            {{
+                                                                variant.name || `Төрөл ${index + 1}`
+                                                            }}
                                                         </span>
                                                         <button
                                                             v-if="variants.length > 1"
@@ -485,7 +636,10 @@ onMounted(() => {
                                                             class="tab-close"
                                                             @click.stop="removeVariant(index)"
                                                         >
-                                                            <UIcon name="i-lucide-x" class="w-3 h-3" />
+                                                            <UIcon
+                                                                name="i-lucide-x"
+                                                                class="w-3 h-3"
+                                                            />
                                                         </button>
                                                     </div>
                                                 </div>
@@ -508,7 +662,9 @@ onMounted(() => {
                                                     :index="activeTabIndex"
                                                     :product-name="state.name"
                                                     :can-remove="variants.length > 0"
-                                                    @update:model-value="handleVariantUpdate(activeTabIndex, $event)"
+                                                    @update:model-value="
+                                                        handleVariantUpdate(activeTabIndex, $event)
+                                                    "
                                                     @remove="removeVariant(activeTabIndex)"
                                                     @duplicate="duplicateVariant(activeTabIndex)"
                                                 />

@@ -31,7 +31,7 @@ const today = computed(() => {
 </script>
 
 <template>
-    <div class="flex items-center justify-between">
+    <div data-tour-greeting class="flex items-center justify-between">
         <div class="flex items-center gap-4">
             <div
                 class="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary-400 to-accent-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-primary-500/20"
