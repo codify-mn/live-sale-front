@@ -1,50 +1,111 @@
 <script setup lang="ts">
-import type { Automation } from '~/composables/useAutomation'
+import type { Automation, FlowType, AutomationTone, AutomationScope } from '~/composables/useAutomation'
 
-const { fetchAutomations, updateAutomation, deleteAutomation: deleteAutomationApi } = useAutomation()
+const { fetchAutomations, createAutomation, updateAutomation } = useAutomation()
 const toast = useToast()
 
 const automations = ref<Automation[]>([])
 const loading = ref(true)
-const isCreateModalOpen = ref(false)
+const togglingFlow = ref<FlowType | null>(null)
+
+const flowTypes: FlowType[] = ['simple', 'checkout', 'full']
+
+const flowNameMap: Record<FlowType, string> = {
+    simple: 'Энгийн автоматжуулалт',
+    checkout: 'Checkout автоматжуулалт',
+    full: 'Бүрэн автоматжуулалт'
+}
+
+function getAutomationByFlow(flowType: FlowType): Automation | null {
+    return automations.value.find(a => a.flow_type === flowType) ?? null
+}
 
 async function loadAutomations() {
     loading.value = true
     try {
         automations.value = await fetchAutomations()
-    } catch (err: any) {
+    } catch {
         toast.add({ title: 'Автоматжуулалт ачаалахад алдаа гарлаа', color: 'error' })
     } finally {
         loading.value = false
     }
 }
 
-async function handleToggle(id: number, isActive: boolean) {
+async function handleToggle(flowType: FlowType, isActive: boolean) {
+    const existing = getAutomationByFlow(flowType)
+    togglingFlow.value = flowType
+
     try {
-        await updateAutomation(id, { is_active: isActive })
-        const item = automations.value.find(a => a.id === id)
-        if (item) item.is_active = isActive
-        toast.add({
-            title: isActive ? 'Идэвхжүүллээ' : 'Идэвхгүй боллоо',
-            color: 'success'
-        })
-    } catch (err: any) {
+        if (!existing && isActive) {
+            // Create new automation for this flow type
+            const created = await createAutomation({
+                flow_type: flowType,
+                tone: 'professional',
+                scope: 'always_on'
+            })
+            // Deactivate others
+            await deactivateOthers(created.id)
+            await loadAutomations()
+            toast.add({ title: `${flowNameMap[flowType]} идэвхжүүллээ`, color: 'success' })
+        } else if (existing) {
+            await updateAutomation(existing.id, { is_active: isActive })
+            if (isActive) {
+                await deactivateOthers(existing.id)
+            }
+            await loadAutomations()
+            toast.add({
+                title: isActive ? 'Идэвхжүүллээ' : 'Идэвхгүй боллоо',
+                color: 'success'
+            })
+        }
+    } catch {
         toast.add({ title: 'Алдаа гарлаа', color: 'error' })
+    } finally {
+        togglingFlow.value = null
     }
 }
 
-async function handleDelete(id: number) {
+async function deactivateOthers(activeId: number) {
+    const others = automations.value.filter(a => a.id !== activeId && a.is_active)
+    for (const a of others) {
+        await updateAutomation(a.id, { is_active: false })
+    }
+}
+
+async function handleUpdateTone(flowType: FlowType, tone: AutomationTone) {
+    const existing = getAutomationByFlow(flowType)
+    if (!existing) return
+
     try {
-        await deleteAutomationApi(id)
-        automations.value = automations.value.filter(a => a.id !== id)
-        toast.add({ title: 'Амжилттай устгалаа', color: 'success' })
-    } catch (err: any) {
-        toast.add({ title: 'Устгахад алдаа гарлаа', color: 'error' })
+        await updateAutomation(existing.id, { tone })
+        existing.tone = tone
+    } catch {
+        toast.add({ title: 'Өнгө аяс шинэчлэхэд алдаа гарлаа', color: 'error' })
     }
 }
 
-function handleCreated() {
-    loadAutomations()
+async function handleUpdateScope(flowType: FlowType, scope: AutomationScope) {
+    const existing = getAutomationByFlow(flowType)
+    if (!existing) return
+
+    try {
+        await updateAutomation(existing.id, { scope })
+        existing.scope = scope
+    } catch {
+        toast.add({ title: 'Хамрах хүрээ шинэчлэхэд алдаа гарлаа', color: 'error' })
+    }
+}
+
+async function handleUpdateLikeComments(flowType: FlowType, value: boolean) {
+    const existing = getAutomationByFlow(flowType)
+    if (!existing) return
+
+    try {
+        await updateAutomation(existing.id, { like_comments: value })
+        existing.like_comments = value
+    } catch {
+        toast.add({ title: 'Тохиргоо шинэчлэхэд алдаа гарлаа', color: 'error' })
+    }
 }
 
 onMounted(() => {
@@ -56,15 +117,6 @@ onMounted(() => {
     <div class="w-full h-full overflow-y-auto">
         <UDashboardPage>
             <UDashboardNavbar>
-                <template #right>
-                    <UButton
-                        color="primary"
-                        icon="i-lucide-plus"
-                        @click="isCreateModalOpen = true"
-                    >
-                        Шинэ Автоматжуулалт
-                    </UButton>
-                </template>
                 <template #title>
                     Автоматжуулалт
                     <UTooltip
@@ -83,47 +135,22 @@ onMounted(() => {
                         <UIcon name="i-lucide-loader-2" class="w-6 h-6 animate-spin text-gray-400" />
                     </div>
 
-                    <!-- Empty state -->
-                    <div
-                        v-else-if="automations.length === 0"
-                        class="flex flex-col items-center justify-center py-20 text-center"
-                    >
-                        <div class="w-16 h-16 rounded-2xl bg-primary-100 dark:bg-primary-900/20 flex items-center justify-center mb-4">
-                            <UIcon name="i-lucide-bot" class="w-8 h-8 text-primary-500" />
-                        </div>
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                            Автоматжуулалт алга байна
-                        </h3>
-                        <p class="text-sm text-gray-500 dark:text-gray-400 max-w-md mb-6">
-                            Facebook коммент болон Messenger мессежэд автоматаар хариулж,
-                            захиалга үүсгэх автоматжуулалт тохируулаарай.
-                        </p>
-                        <UButton
-                            color="primary"
-                            icon="i-lucide-plus"
-                            @click="isCreateModalOpen = true"
-                        >
-                            Эхний Автоматжуулалтаа Үүсгэх
-                        </UButton>
-                    </div>
-
-                    <!-- Automation list -->
-                    <div v-else class="space-y-3">
-                        <AutomationListItem
-                            v-for="automation in automations"
-                            :key="automation.id"
-                            :automation="automation"
-                            @toggle="handleToggle"
-                            @delete="handleDelete"
+                    <!-- Launch pad -->
+                    <div v-else class="grid gap-4 md:grid-cols-1 lg:grid-cols-3">
+                        <AutomationLaunchCard
+                            v-for="ft in flowTypes"
+                            :key="ft"
+                            :flow-type="ft"
+                            :automation="getAutomationByFlow(ft)"
+                            :disabled="togglingFlow === ft"
+                            @toggle="handleToggle(ft, $event)"
+                            @update-tone="handleUpdateTone(ft, $event)"
+                            @update-scope="handleUpdateScope(ft, $event)"
+                            @update-like-comments="handleUpdateLikeComments(ft, $event)"
                         />
                     </div>
                 </UDashboardPanelContent>
             </UDashboardPanel>
         </UDashboardPage>
-
-        <AutomationCreateModal
-            v-model:open="isCreateModalOpen"
-            @created="handleCreated"
-        />
     </div>
 </template>

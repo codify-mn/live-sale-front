@@ -10,17 +10,17 @@ export interface Automation {
     flow_type: FlowType
     tone: AutomationTone
     scope: AutomationScope
+    like_comments: boolean
     keywords: string[]
     trigger_count: number
     created_at: string
 }
 
 export interface CreateAutomationInput {
-    name: string
+    name?: string
     flow_type: FlowType
     tone: AutomationTone
     scope: AutomationScope
-    keywords?: string[]
 }
 
 export interface AutomationsResponse {
@@ -90,8 +90,8 @@ export function useAutomation() {
 
     const getScopeLabel = (scope: AutomationScope): string => {
         const labels: Record<AutomationScope, string> = {
-            always_on: 'Үргэлж идэвхтэй',
-            live_only: 'Зөвхөн Live үед'
+            always_on: 'Бүх пост',
+            live_only: 'Live пост'
         }
         return labels[scope] || scope
     }
