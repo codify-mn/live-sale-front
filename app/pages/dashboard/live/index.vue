@@ -77,7 +77,7 @@ const formatDate = (dateStr: string) => {
             <div class="p-6 space-y-6 overflow-y-auto">
                 <!-- Live Sales List -->
                 <div v-if="status === 'pending'" class="space-y-3">
-                    <div class="flex items-center gap-4 p-4" v-for="i in 2">
+                    <div v-for="i in 2" class="flex items-center gap-4 p-4">
                         <USkeleton class="h-12 w-12 rounded-full" />
 
                         <div class="grid gap-2">

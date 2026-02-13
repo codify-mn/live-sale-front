@@ -98,15 +98,18 @@ const doPhoneLookup = useDebounceFn(async (phone: string) => {
 }, 500)
 
 // Watch phone input
-watch(() => state.customer_phone, (newPhone) => {
-    if (foundCustomer.value && newPhone !== foundCustomer.value.phone_number) {
-        foundCustomer.value = null
+watch(
+    () => state.customer_phone,
+    (newPhone) => {
+        if (foundCustomer.value && newPhone !== foundCustomer.value.phone_number) {
+            foundCustomer.value = null
+        }
+        const digits = newPhone.replace(/\D/g, '')
+        if (digits.length >= 8) {
+            doPhoneLookup(digits)
+        }
     }
-    const digits = newPhone.replace(/\D/g, '')
-    if (digits.length >= 8) {
-        doPhoneLookup(digits)
-    }
-})
+)
 
 // Product/Cart handlers
 const handleProductSelect = (product: Product) => {
@@ -152,9 +155,10 @@ const updateCartItemQuantity = (index: number, quantity: number) => {
 // Totals
 const subtotal = computed(() => {
     return cartItems.value.reduce((sum, item) => {
-        const price = (item.product.timed_sale_enabled && item.product.timed_sale_price)
-            ? item.product.timed_sale_price
-            : item.product.price || 0
+        const price =
+            item.product.timed_sale_enabled && item.product.timed_sale_price
+                ? item.product.timed_sale_price
+                : item.product.price || 0
         return sum + price * item.quantity
     }, 0)
 })
@@ -183,9 +187,10 @@ const buildOrderItems = () => {
         sku: item.variant.sku || item.variant.keyword || '',
         name: item.product.name,
         options: item.variant.name,
-        price: (item.product.timed_sale_enabled && item.product.timed_sale_price)
-            ? item.product.timed_sale_price
-            : item.product.price || 0,
+        price:
+            item.product.timed_sale_enabled && item.product.timed_sale_price
+                ? item.product.timed_sale_price
+                : item.product.price || 0,
         quantity: item.quantity
     }))
 }
@@ -326,16 +331,25 @@ const copyCheckoutLink = () => {
                         </div>
 
                         <!-- Right: Sidebar (scrollable independently) -->
-                        <div class="w-full lg:w-[400px] xl:w-[440px] lg:border-l border-gray-200 dark:border-gray-800 overflow-y-auto bg-gray-50/50 dark:bg-gray-950/50">
+                        <div
+                            class="w-full lg:w-[400px] xl:w-[440px] lg:border-l border-gray-200 dark:border-gray-800 overflow-y-auto bg-gray-50/50 dark:bg-gray-950/50"
+                        >
                             <div class="p-4 lg:p-5 space-y-4">
-
                                 <!-- Customer Lookup -->
-                                <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+                                <div
+                                    class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden"
+                                >
                                     <!-- Phone Input -->
                                     <div class="p-4">
                                         <div class="flex items-center gap-2 mb-3">
-                                            <UIcon name="i-lucide-user-search" class="w-4 h-4 text-primary" />
-                                            <span class="text-sm font-medium text-gray-900 dark:text-white">Харилцагч</span>
+                                            <UIcon
+                                                name="i-lucide-user-search"
+                                                class="w-4 h-4 text-primary"
+                                            />
+                                            <span
+                                                class="text-sm font-medium text-gray-900 dark:text-white"
+                                                >Харилцагч</span
+                                            >
                                         </div>
                                         <UFormField name="customer_phone">
                                             <UInput
@@ -346,7 +360,10 @@ const copyCheckoutLink = () => {
                                                 :loading="phoneSearching"
                                             >
                                                 <template v-if="foundCustomer" #trailing>
-                                                    <UIcon name="i-lucide-check-circle-2" class="text-green-500" />
+                                                    <UIcon
+                                                        name="i-lucide-check-circle-2"
+                                                        class="text-green-500"
+                                                    />
                                                 </template>
                                             </UInput>
                                         </UFormField>
@@ -359,13 +376,18 @@ const copyCheckoutLink = () => {
                                     >
                                         <div class="flex items-start justify-between gap-2">
                                             <div class="min-w-0">
-                                                <p class="font-medium text-gray-900 dark:text-white text-sm">
+                                                <p
+                                                    class="font-medium text-gray-900 dark:text-white text-sm"
+                                                >
                                                     {{ foundCustomer.name }}
                                                 </p>
                                                 <p class="text-xs text-gray-500 mt-0.5 truncate">
                                                     {{ customerSummary }}
                                                 </p>
-                                                <p v-if="foundCustomer.address" class="text-xs text-gray-400 mt-0.5 truncate">
+                                                <p
+                                                    v-if="foundCustomer.address"
+                                                    class="text-xs text-gray-400 mt-0.5 truncate"
+                                                >
                                                     {{ foundCustomer.address }}
                                                 </p>
                                             </div>
@@ -381,12 +403,23 @@ const copyCheckoutLink = () => {
 
                                     <!-- Customer Form (shown for new customer or editing) -->
                                     <div
-                                        v-if="showCustomerForm || (!foundCustomer && state.customer_phone.length >= 8 && !phoneSearching)"
+                                        v-if="
+                                            showCustomerForm ||
+                                            (!foundCustomer &&
+                                                state.customer_phone.length >= 8 &&
+                                                !phoneSearching)
+                                        "
                                         class="border-t border-gray-100 dark:border-gray-800 p-4 space-y-3"
                                     >
                                         <div class="flex items-center justify-between">
-                                            <span class="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                                {{ foundCustomer ? 'Мэдээлэл засах' : 'Шинэ харилцагч' }}
+                                            <span
+                                                class="text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                            >
+                                                {{
+                                                    foundCustomer
+                                                        ? 'Мэдээлэл засах'
+                                                        : 'Шинэ харилцагч'
+                                                }}
                                             </span>
                                             <UButton
                                                 v-if="foundCustomer"
@@ -400,28 +433,47 @@ const copyCheckoutLink = () => {
                                         </div>
 
                                         <UFormField label="Нэр" name="customer_name" required>
-                                            <UInput v-model="state.customer_name" placeholder="Нэр" />
+                                            <UInput
+                                                v-model="state.customer_name"
+                                                placeholder="Нэр"
+                                            />
                                         </UFormField>
 
                                         <div class="grid grid-cols-2 gap-3">
                                             <UFormField label="Хот/Аймаг" name="customer_city">
-                                                <UInput v-model="state.customer_city" placeholder="УБ" />
+                                                <UInput
+                                                    v-model="state.customer_city"
+                                                    placeholder="УБ"
+                                                />
                                             </UFormField>
                                             <UFormField label="Дүүрэг" name="customer_district">
-                                                <UInput v-model="state.customer_district" placeholder="БЗД" />
+                                                <UInput
+                                                    v-model="state.customer_district"
+                                                    placeholder="БЗД"
+                                                />
                                             </UFormField>
                                         </div>
 
                                         <UFormField label="Хаяг" name="customer_address">
-                                            <UInput v-model="state.customer_address" placeholder="Дэлгэрэнгүй хаяг" />
+                                            <UInput
+                                                v-model="state.customer_address"
+                                                placeholder="Дэлгэрэнгүй хаяг"
+                                            />
                                         </UFormField>
 
                                         <div class="grid grid-cols-2 gap-3">
                                             <UFormField label="Байр/Тоот" name="customer_apartment">
-                                                <UInput v-model="state.customer_apartment" placeholder="45 тоот" />
+                                                <UInput
+                                                    v-model="state.customer_apartment"
+                                                    placeholder="45 тоот"
+                                                />
                                             </UFormField>
                                             <UFormField label="Имэйл" name="customer_email">
-                                                <UInput v-model="state.customer_email" type="email" placeholder="Имэйл" />
+                                                <UInput
+                                                    v-model="state.customer_email"
+                                                    type="email"
+                                                    placeholder="Имэйл"
+                                                />
                                             </UFormField>
                                         </div>
                                     </div>
@@ -437,19 +489,35 @@ const copyCheckoutLink = () => {
                                 />
 
                                 <!-- Shipping & Discount (compact) -->
-                                <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4">
+                                <div
+                                    class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4"
+                                >
                                     <div class="grid grid-cols-2 gap-3">
                                         <div>
-                                            <label class="text-xs text-gray-500 mb-1 block">Хүргэлт</label>
-                                            <UInput v-model.number="shippingFee" type="number" min="0" placeholder="0">
+                                            <label class="text-xs text-gray-500 mb-1 block"
+                                                >Хүргэлт</label
+                                            >
+                                            <UInput
+                                                v-model.number="shippingFee"
+                                                type="number"
+                                                min="0"
+                                                placeholder="0"
+                                            >
                                                 <template #trailing>
                                                     <span class="text-gray-400 text-xs">₮</span>
                                                 </template>
                                             </UInput>
                                         </div>
                                         <div>
-                                            <label class="text-xs text-gray-500 mb-1 block">Хөнгөлөлт</label>
-                                            <UInput v-model.number="discount" type="number" min="0" placeholder="0">
+                                            <label class="text-xs text-gray-500 mb-1 block"
+                                                >Хөнгөлөлт</label
+                                            >
+                                            <UInput
+                                                v-model.number="discount"
+                                                type="number"
+                                                min="0"
+                                                placeholder="0"
+                                            >
                                                 <template #trailing>
                                                     <span class="text-gray-400 text-xs">₮</span>
                                                 </template>
@@ -459,17 +527,23 @@ const copyCheckoutLink = () => {
                                 </div>
 
                                 <!-- Payment Method (compact radio cards) -->
-                                <div class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4">
-                                    <label class="text-xs text-gray-500 mb-2 block">Төлбөрийн арга</label>
+                                <div
+                                    class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-4"
+                                >
+                                    <label class="text-xs text-gray-500 mb-2 block"
+                                        >Төлбөрийн арга</label
+                                    >
                                     <div class="grid grid-cols-2 gap-2">
                                         <button
                                             v-for="option in paymentMethodOptions"
                                             :key="option.value"
                                             type="button"
                                             class="flex items-center gap-2 px-3 py-2.5 rounded-lg border text-sm font-medium transition-all"
-                                            :class="state.payment_method === option.value
-                                                ? 'border-primary bg-primary/5 text-primary dark:border-primary dark:bg-primary/10'
-                                                : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-600'"
+                                            :class="
+                                                state.payment_method === option.value
+                                                    ? 'border-primary bg-primary/5 text-primary dark:border-primary dark:bg-primary/10'
+                                                    : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-gray-300 dark:hover:border-gray-600'
+                                            "
                                             @click="state.payment_method = option.value"
                                         >
                                             <UIcon :name="option.icon" class="w-4 h-4" />
@@ -523,12 +597,21 @@ const copyCheckoutLink = () => {
                             <template #header>
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                                            <UIcon name="i-lucide-link-2" class="w-5 h-5 text-green-600 dark:text-green-400" />
+                                        <div
+                                            class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center"
+                                        >
+                                            <UIcon
+                                                name="i-lucide-link-2"
+                                                class="w-5 h-5 text-green-600 dark:text-green-400"
+                                            />
                                         </div>
                                         <div>
-                                            <h3 class="text-base font-semibold">Линк бэлэн боллоо</h3>
-                                            <p class="text-xs text-gray-500">Хэрэглэгч рүү илгээнэ үү</p>
+                                            <h3 class="text-base font-semibold">
+                                                Линк бэлэн боллоо
+                                            </h3>
+                                            <p class="text-xs text-gray-500">
+                                                Хэрэглэгч рүү илгээнэ үү
+                                            </p>
                                         </div>
                                     </div>
                                     <UButton
@@ -540,8 +623,12 @@ const copyCheckoutLink = () => {
                                 </div>
                             </template>
 
-                            <div class="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                                <span class="text-sm truncate flex-1 font-mono">{{ checkoutLink }}</span>
+                            <div
+                                class="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+                            >
+                                <span class="text-sm truncate flex-1 font-mono">{{
+                                    checkoutLink
+                                }}</span>
                                 <UButton
                                     color="primary"
                                     variant="soft"

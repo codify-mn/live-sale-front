@@ -75,7 +75,9 @@ const isAdded = computed(() => {
             </p>
         </div>
 
-        <div class="opacity-0 group-hover:opacity-100 transition-opacity flex justify-center gap-2">
+        <div
+            class="md:opacity-0 md:group-hover:opacity-100 transition-opacity flex justify-center gap-2"
+        >
             <UButton
                 v-if="isAdded"
                 color="success"

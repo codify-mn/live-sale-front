@@ -21,6 +21,7 @@ const statusLabel = (status: string) => {
     return map[status] || status
 }
 </script>
+
 <template>
     <UBadge
         :color="statusColor(props.status) as any"

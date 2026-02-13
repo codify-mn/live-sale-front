@@ -70,7 +70,7 @@ export function useUpload() {
             for (let i = 0; i < files.length; i++) {
                 const file = files[i]
                 if (!file || !progress.value[i]) continue
-                
+
                 progress.value[i]!.status = 'uploading'
                 progress.value[i]!.progress = 50
 

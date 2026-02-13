@@ -99,8 +99,8 @@
     --content-bg: #ffffff;
     --sidebar-bg: #0f172a;
     --gradient-start: #0ea5e9; /* Sky-500 */
-    --gradient-mid: #0284c7;   /* Sky-600 - Subtle shift */
-    --gradient-end: #0369a1;   /* Sky-700 - Deeper shift */
+    --gradient-mid: #0284c7; /* Sky-600 - Subtle shift */
+    --gradient-end: #0369a1; /* Sky-700 - Deeper shift */
     --glass-bg: rgba(255, 255, 255, 0.7);
     --glass-border: rgba(255, 255, 255, 0.3);
     --glass-shadow: rgba(14, 165, 233, 0.05);
@@ -108,12 +108,12 @@
 
 /* Dark mode */
 .dark {
-    --app-bg: #141A22; /* Deep Charcoal */
-    --content-bg: #141A22;
+    --app-bg: #141a22; /* Deep Charcoal */
+    --content-bg: #141a22;
     --sidebar-bg: #1e293b;
     --gradient-start: #38bdf8; /* Sky-400 */
-    --gradient-mid: #0ea5e9;   /* Sky-500 */
-    --gradient-end: #0284c7;   /* Sky-600 */
+    --gradient-mid: #0ea5e9; /* Sky-500 */
+    --gradient-end: #0284c7; /* Sky-600 */
     --glass-bg: rgba(20, 26, 34, 0.75);
     --glass-border: rgba(56, 189, 248, 0.1);
     --glass-shadow: rgba(0, 0, 0, 0.3);

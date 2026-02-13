@@ -11,14 +11,11 @@ const gradientId = `cb-grad-${Math.random().toString(36).slice(2, 8)}`
 
 <template>
     <NuxtLink to="/" class="flex items-center gap-2.5 group" :class="$props.class">
-
         <span
             v-if="!hideText"
             class="font-bold tracking-tight"
             :class="[
-                variant === 'light'
-                    ? 'text-white'
-                    : 'text-gray-900 dark:text-white',
+                variant === 'light' ? 'text-white' : 'text-gray-900 dark:text-white',
                 {
                     'text-sm': size === 'sm',
                     'text-lg': size === 'md' || !size,
@@ -29,10 +26,12 @@ const gradientId = `cb-grad-${Math.random().toString(36).slice(2, 8)}`
             Codify<span
                 class="font-light mx-0.5"
                 :class="variant === 'light' ? 'text-white/60' : 'text-primary-400'"
-            >/</span>Comment<span
+                >/</span
+            >Comment<span
                 :class="variant === 'light' ? 'text-white' : 'text-gradient'"
                 class="font-extrabold"
-            >Boost</span>
+                >Boost</span
+            >
         </span>
     </NuxtLink>
 </template>

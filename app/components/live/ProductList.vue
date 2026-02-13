@@ -220,6 +220,7 @@ const handleQuickCreate = async () => {
     }
 }
 </script>
+
 <template>
     <div
         class="flex flex-col h-full rounded-lg bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800"
@@ -287,7 +288,7 @@ const handleQuickCreate = async () => {
         </div>
 
         <div class="p-2 border-t border-gray-200 dark:border-gray-800">
-            <UButton block @click="quickCreateOpen = true" icon="i-lucide-plus">
+            <UButton block icon="i-lucide-plus" @click="quickCreateOpen = true">
                 Quick Add Product
             </UButton>
         </div>

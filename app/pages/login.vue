@@ -204,9 +204,7 @@ const features = [
                 <!-- Header -->
                 <div class="text-center mb-8">
                     <h1 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                        <template v-if="pendingVerificationEmail">
-                            Имэйл баталгаажуулалт
-                        </template>
+                        <template v-if="pendingVerificationEmail"> Имэйл баталгаажуулалт </template>
                         <template v-else>
                             {{ isRegisterMode ? 'Бүртгүүлэх' : 'Тавтай морилно уу' }}
                         </template>
@@ -306,7 +304,11 @@ const features = [
                     class="space-y-5 text-center"
                     @submit="onOTPSubmit"
                 >
-                    <UFormField label="Баталгаажуулах код" name="otp" :ui="{ label: 'w-full text-center' }">
+                    <UFormField
+                        label="Баталгаажуулах код"
+                        name="otp"
+                        :ui="{ label: 'w-full text-center' }"
+                    >
                         <div class="flex justify-center mt-2">
                             <OtpInput
                                 v-model="otpState.otp"

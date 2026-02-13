@@ -2,23 +2,23 @@
 import type { QPayInvoice } from '~/composables/useQPay'
 
 const props = defineProps<{
-  modelValue: boolean
-  invoice: QPayInvoice | null
-  orderId?: number
-  orderNumber?: string
-  totalAmount?: number
+    modelValue: boolean
+    invoice: QPayInvoice | null
+    orderId?: number
+    orderNumber?: string
+    totalAmount?: number
 }>()
 
 const emit = defineEmits<{
-  'update:modelValue': [value: boolean]
-  paymentConfirmed: []
+    'update:modelValue': [value: boolean]
+    paymentConfirmed: []
 }>()
 
 const { checkPayment, isCheckingPayment } = useQPay()
 
 const isOpen = computed({
-  get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value),
+    get: () => props.modelValue,
+    set: (value) => emit('update:modelValue', value)
 })
 
 // Auto-refresh payment status
@@ -26,147 +26,176 @@ const pollingInterval = ref<ReturnType<typeof setInterval> | null>(null)
 const lastChecked = ref<Date | null>(null)
 
 watch(isOpen, (open) => {
-  if (open && props.orderId) {
-    startPolling()
-  } else {
-    stopPolling()
-  }
+    if (open && props.orderId) {
+        startPolling()
+    } else {
+        stopPolling()
+    }
 })
 
 onUnmounted(() => {
-  stopPolling()
+    stopPolling()
 })
 
 function startPolling() {
-  // Check immediately
-  checkPaymentStatus()
-  // Then every 10 seconds
-  pollingInterval.value = setInterval(checkPaymentStatus, 10000)
+    // Check immediately
+    checkPaymentStatus()
+    // Then every 10 seconds
+    pollingInterval.value = setInterval(checkPaymentStatus, 10000)
 }
 
 function stopPolling() {
-  if (pollingInterval.value) {
-    clearInterval(pollingInterval.value)
-    pollingInterval.value = null
-  }
+    if (pollingInterval.value) {
+        clearInterval(pollingInterval.value)
+        pollingInterval.value = null
+    }
 }
 
 async function checkPaymentStatus() {
-  if (!props.orderId || isCheckingPayment.value) return
+    if (!props.orderId || isCheckingPayment.value) return
 
-  try {
-    const result = await checkPayment(props.orderId)
-    lastChecked.value = new Date()
+    try {
+        const result = await checkPayment(props.orderId)
+        lastChecked.value = new Date()
 
-    if (result.is_paid) {
-      stopPolling()
-      emit('paymentConfirmed')
+        if (result.is_paid) {
+            stopPolling()
+            emit('paymentConfirmed')
+        }
+    } catch {
+        // Error handled in composable
     }
-  } catch {
-    // Error handled in composable
-  }
 }
 
 function formatAmount(amount?: number) {
-  return amount?.toLocaleString() + '₮' || ''
+    return amount?.toLocaleString() + '₮' || ''
 }
 </script>
 
 <template>
-  <UModal v-model:open="isOpen">
-    <template #content>
-      <UCard>
-        <template #header>
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <div
-                class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center"
-              >
-                <UIcon name="i-lucide-qr-code" class="w-5 h-5 text-primary-600 dark:text-primary-400" />
-              </div>
-              <div>
-                <h3 class="font-semibold text-gray-900 dark:text-white">QPay төлбөр</h3>
-                <p v-if="orderNumber" class="text-sm text-gray-500">Захиалга #{{ orderNumber }}</p>
-              </div>
-            </div>
-            <UButton icon="i-lucide-x" variant="ghost" color="neutral" size="sm" @click="isOpen = false" />
-          </div>
+    <UModal v-model:open="isOpen">
+        <template #content>
+            <UCard>
+                <template #header>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center"
+                            >
+                                <UIcon
+                                    name="i-lucide-qr-code"
+                                    class="w-5 h-5 text-primary-600 dark:text-primary-400"
+                                />
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-gray-900 dark:text-white">
+                                    QPay төлбөр
+                                </h3>
+                                <p v-if="orderNumber" class="text-sm text-gray-500">
+                                    Захиалга #{{ orderNumber }}
+                                </p>
+                            </div>
+                        </div>
+                        <UButton
+                            icon="i-lucide-x"
+                            variant="ghost"
+                            color="neutral"
+                            size="sm"
+                            @click="isOpen = false"
+                        />
+                    </div>
+                </template>
+
+                <div v-if="invoice" class="space-y-6">
+                    <!-- Amount -->
+                    <div class="text-center py-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+                        <p class="text-sm text-gray-500 mb-1">Нийт төлбөр</p>
+                        <p class="text-3xl font-bold text-primary-600 dark:text-primary-400">
+                            {{ formatAmount(totalAmount) }}
+                        </p>
+                    </div>
+
+                    <!-- QR Code -->
+                    <div class="flex flex-col items-center gap-4">
+                        <div class="p-4 bg-white rounded-xl shadow-sm border">
+                            <img
+                                v-if="invoice.qr_image"
+                                :src="invoice.qr_image"
+                                alt="QPay QR Code"
+                                class="w-48 h-48"
+                            />
+                            <div
+                                v-else
+                                class="w-48 h-48 flex items-center justify-center bg-gray-100 rounded"
+                            >
+                                <UIcon name="i-lucide-qr-code" class="w-16 h-16 text-gray-300" />
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-500 text-center">
+                            QR кодыг банкны апп-аар уншуулна уу
+                        </p>
+                    </div>
+
+                    <!-- Bank Apps -->
+                    <div v-if="invoice.deep_links?.length" class="space-y-3">
+                        <p class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Банкны апп-аар нээх
+                        </p>
+                        <div class="grid grid-cols-4 gap-2">
+                            <a
+                                v-for="link in invoice.deep_links"
+                                :key="link.name"
+                                :href="link.link"
+                                target="_blank"
+                                class="flex flex-col items-center gap-1.5 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                            >
+                                <img
+                                    v-if="link.logo"
+                                    :src="link.logo"
+                                    :alt="link.name"
+                                    class="w-10 h-10 rounded-lg object-cover"
+                                />
+                                <span class="text-[10px] text-gray-500 text-center line-clamp-1">{{
+                                    link.name
+                                }}</span>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Status -->
+                    <div
+                        class="flex items-center justify-between p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg"
+                    >
+                        <div class="flex items-center gap-2">
+                            <UIcon name="i-lucide-clock" class="w-4 h-4 text-amber-600" />
+                            <span class="text-sm text-amber-700 dark:text-amber-400"
+                                >Төлбөр хүлээж байна...</span
+                            >
+                        </div>
+                        <UButton
+                            size="xs"
+                            variant="ghost"
+                            :loading="isCheckingPayment"
+                            icon="i-lucide-refresh-cw"
+                            @click="checkPaymentStatus"
+                        >
+                            Шалгах
+                        </UButton>
+                    </div>
+
+                    <p v-if="lastChecked" class="text-xs text-gray-400 text-center">
+                        Сүүлд шалгасан: {{ lastChecked.toLocaleTimeString() }}
+                    </p>
+                </div>
+
+                <div v-else class="py-12 text-center">
+                    <UIcon
+                        name="i-lucide-loader-2"
+                        class="w-8 h-8 animate-spin text-gray-400 mx-auto mb-3"
+                    />
+                    <p class="text-sm text-gray-500">Нэхэмжлэх ачаалж байна...</p>
+                </div>
+            </UCard>
         </template>
-
-        <div v-if="invoice" class="space-y-6">
-          <!-- Amount -->
-          <div class="text-center py-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-            <p class="text-sm text-gray-500 mb-1">Нийт төлбөр</p>
-            <p class="text-3xl font-bold text-primary-600 dark:text-primary-400">
-              {{ formatAmount(totalAmount) }}
-            </p>
-          </div>
-
-          <!-- QR Code -->
-          <div class="flex flex-col items-center gap-4">
-            <div class="p-4 bg-white rounded-xl shadow-sm border">
-              <img
-                v-if="invoice.qr_image"
-                :src="invoice.qr_image"
-                alt="QPay QR Code"
-                class="w-48 h-48"
-              />
-              <div v-else class="w-48 h-48 flex items-center justify-center bg-gray-100 rounded">
-                <UIcon name="i-lucide-qr-code" class="w-16 h-16 text-gray-300" />
-              </div>
-            </div>
-            <p class="text-sm text-gray-500 text-center">QR кодыг банкны апп-аар уншуулна уу</p>
-          </div>
-
-          <!-- Bank Apps -->
-          <div v-if="invoice.deep_links?.length" class="space-y-3">
-            <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Банкны апп-аар нээх</p>
-            <div class="grid grid-cols-4 gap-2">
-              <a
-                v-for="link in invoice.deep_links"
-                :key="link.name"
-                :href="link.link"
-                target="_blank"
-                class="flex flex-col items-center gap-1.5 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              >
-                <img
-                  v-if="link.logo"
-                  :src="link.logo"
-                  :alt="link.name"
-                  class="w-10 h-10 rounded-lg object-cover"
-                />
-                <span class="text-[10px] text-gray-500 text-center line-clamp-1">{{ link.name }}</span>
-              </a>
-            </div>
-          </div>
-
-          <!-- Status -->
-          <div class="flex items-center justify-between p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
-            <div class="flex items-center gap-2">
-              <UIcon name="i-lucide-clock" class="w-4 h-4 text-amber-600" />
-              <span class="text-sm text-amber-700 dark:text-amber-400">Төлбөр хүлээж байна...</span>
-            </div>
-            <UButton
-              size="xs"
-              variant="ghost"
-              :loading="isCheckingPayment"
-              icon="i-lucide-refresh-cw"
-              @click="checkPaymentStatus"
-            >
-              Шалгах
-            </UButton>
-          </div>
-
-          <p v-if="lastChecked" class="text-xs text-gray-400 text-center">
-            Сүүлд шалгасан: {{ lastChecked.toLocaleTimeString() }}
-          </p>
-        </div>
-
-        <div v-else class="py-12 text-center">
-          <UIcon name="i-lucide-loader-2" class="w-8 h-8 animate-spin text-gray-400 mx-auto mb-3" />
-          <p class="text-sm text-gray-500">Нэхэмжлэх ачаалж байна...</p>
-        </div>
-      </UCard>
-    </template>
-  </UModal>
+    </UModal>
 </template>

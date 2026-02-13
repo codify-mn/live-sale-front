@@ -99,7 +99,7 @@ const getVariantImage = (variant: ProductVariant): string | null => {
 
 const getEffectivePrice = (): number => {
     if (!props.product) return 0
-    return (props.product.timed_sale_enabled && props.product.timed_sale_price)
+    return props.product.timed_sale_enabled && props.product.timed_sale_price
         ? props.product.timed_sale_price
         : props.product.price || 0
 }

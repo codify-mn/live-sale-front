@@ -23,7 +23,7 @@ const totalSteps = 2
 
 const steps = [
     { number: 1, label: 'Facebook холболт', icon: 'i-simple-icons-facebook' },
-    { number: 2, label: 'Дэлгүүр', icon: 'i-lucide-store' },
+    { number: 2, label: 'Дэлгүүр', icon: 'i-lucide-store' }
 ]
 
 // Facebook connection state
@@ -42,7 +42,7 @@ const shopSchema = z.object({
 const state = reactive({
     facebook_page_id: 0,
     shop_name: '',
-    phone_number: '',
+    phone_number: ''
 })
 
 const slideDirection = ref<'left' | 'right'>('left')
@@ -92,7 +92,7 @@ async function createShop() {
             body: {
                 facebook_page_id: state.facebook_page_id,
                 shop_name: state.shop_name,
-                phone_number: state.phone_number,
+                phone_number: state.phone_number
             }
         })
         shopCreated.value = true
@@ -119,7 +119,7 @@ async function updateShopSettings() {
             credentials: 'include',
             body: {
                 name: state.shop_name,
-                phone_number: state.phone_number,
+                phone_number: state.phone_number
             }
         })
         return true
@@ -343,9 +343,9 @@ async function onSubmit() {
                                     size="lg"
                                     icon="i-simple-icons-facebook"
                                     color="primary"
-                                    @click="connectFacebook"
                                     :loading="isConnecting"
                                     block
+                                    @click="connectFacebook"
                                 >
                                     Facebook холбох
                                 </UButton>
@@ -465,18 +465,18 @@ async function onSubmit() {
                         <div v-else />
 
                         <div class="flex items-center gap-3">
-
-
                             <UButton
                                 v-if="selectedPage"
-                                :icon="currentStep === totalSteps ? 'i-lucide-rocket' : 'i-lucide-arrow-right'"
+                                :icon="
+                                    currentStep === totalSteps
+                                        ? 'i-lucide-rocket'
+                                        : 'i-lucide-arrow-right'
+                                "
                                 size="lg"
                                 :loading="isSubmitting || isSavingStep"
                                 @click="handleNext"
                             >
-                                {{
-                                    currentStep === totalSteps ? 'Дуусгах' : 'Дараах'
-                                }}
+                                {{ currentStep === totalSteps ? 'Дуусгах' : 'Дараах' }}
                             </UButton>
                         </div>
                     </div>

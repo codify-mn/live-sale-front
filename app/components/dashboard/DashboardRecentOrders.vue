@@ -141,7 +141,6 @@ onMounted(() => {
                             {{ timeAgo(order.created_at) }}
                         </p>
                     </div>
-                    
                     <UTooltip text="Checkout нээх">
                         <UButton
                             v-if="order.checkout_token"

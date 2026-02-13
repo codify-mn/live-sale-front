@@ -14,9 +14,12 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const colorClasses = {
-    primary: 'bg-primary-50/60 dark:bg-primary-900/10 hover:bg-primary-50 dark:hover:bg-primary-900/20 group-hover:shadow-primary-200/50 dark:group-hover:shadow-primary-900/30',
-    success: 'bg-green-50/60 dark:bg-green-900/10 hover:bg-green-50 dark:hover:bg-green-900/20 group-hover:shadow-green-200/50 dark:group-hover:shadow-green-900/30',
-    warning: 'bg-amber-50/60 dark:bg-amber-900/10 hover:bg-amber-50 dark:hover:bg-amber-900/20 group-hover:shadow-amber-200/50 dark:group-hover:shadow-amber-900/30',
+    primary:
+        'bg-primary-50/60 dark:bg-primary-900/10 hover:bg-primary-50 dark:hover:bg-primary-900/20 group-hover:shadow-primary-200/50 dark:group-hover:shadow-primary-900/30',
+    success:
+        'bg-green-50/60 dark:bg-green-900/10 hover:bg-green-50 dark:hover:bg-green-900/20 group-hover:shadow-green-200/50 dark:group-hover:shadow-green-900/30',
+    warning:
+        'bg-amber-50/60 dark:bg-amber-900/10 hover:bg-amber-50 dark:hover:bg-amber-900/20 group-hover:shadow-amber-200/50 dark:group-hover:shadow-amber-900/30',
     error: 'bg-red-50/60 dark:bg-red-900/10 hover:bg-red-50 dark:hover:bg-red-900/20 group-hover:shadow-red-200/50 dark:group-hover:shadow-red-900/30',
     info: 'bg-blue-50/60 dark:bg-blue-900/10 hover:bg-blue-50 dark:hover:bg-blue-900/20 group-hover:shadow-blue-200/50 dark:group-hover:shadow-blue-900/30',
     gray: 'bg-white/60 dark:bg-gray-900/60 hover:bg-white/80 dark:hover:bg-gray-900/80 group-hover:shadow-gray-200/50 dark:group-hover:shadow-gray-900/30'
@@ -39,12 +42,16 @@ const iconClasses = {
         class="group relative p-5 rounded-2xl backdrop-blur-sm border border-transparent transition-all duration-300 hover:scale-[1.02] hover:shadow-lg cursor-pointer"
         :class="[
             colorClasses[color],
-            color === 'gray' ? 'border-white/20 dark:border-gray-700/30 hover:border-white/30 dark:hover:border-gray-700/40' : ''
+            color === 'gray'
+                ? 'border-white/20 dark:border-gray-700/30 hover:border-white/30 dark:hover:border-gray-700/40'
+                : ''
         ]"
     >
         <div class="space-y-4">
             <div class="flex items-center justify-between">
-                <p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <p
+                    class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                >
                     {{ label }}
                 </p>
                 <div
@@ -64,7 +71,11 @@ const iconClasses = {
                     <span
                         v-if="trend !== undefined && trend !== 0"
                         class="text-xs font-bold mb-1.5 flex items-center gap-0.5 px-1.5 py-0.5 rounded-md"
-                        :class="trend > 0 ? 'text-green-600 bg-green-100 dark:bg-green-900/30' : 'text-red-600 bg-red-100 dark:bg-red-900/30'"
+                        :class="
+                            trend > 0
+                                ? 'text-green-600 bg-green-100 dark:bg-green-900/30'
+                                : 'text-red-600 bg-red-100 dark:bg-red-900/30'
+                        "
                     >
                         <UIcon
                             :name="trend > 0 ? 'i-lucide-trending-up' : 'i-lucide-trending-down'"
@@ -86,12 +97,16 @@ const iconClasses = {
         class="group relative p-5 rounded-2xl backdrop-blur-sm border border-transparent transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
         :class="[
             colorClasses[color],
-            color === 'gray' ? 'border-white/20 dark:border-gray-700/30 hover:border-white/30 dark:hover:border-gray-700/40' : ''
+            color === 'gray'
+                ? 'border-white/20 dark:border-gray-700/30 hover:border-white/30 dark:hover:border-gray-700/40'
+                : ''
         ]"
     >
         <div class="space-y-4">
             <div class="flex items-center justify-between">
-                <p class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                <p
+                    class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+                >
                     {{ label }}
                 </p>
                 <div
@@ -111,7 +126,11 @@ const iconClasses = {
                     <span
                         v-if="trend !== undefined && trend !== 0"
                         class="text-xs font-bold mb-1.5 flex items-center gap-0.5 px-1.5 py-0.5 rounded-md"
-                        :class="trend > 0 ? 'text-green-600 bg-green-100 dark:bg-green-900/30' : 'text-red-600 bg-red-100 dark:bg-red-900/30'"
+                        :class="
+                            trend > 0
+                                ? 'text-green-600 bg-green-100 dark:bg-green-900/30'
+                                : 'text-red-600 bg-red-100 dark:bg-red-900/30'
+                        "
                     >
                         <UIcon
                             :name="trend > 0 ? 'i-lucide-trending-up' : 'i-lucide-trending-down'"

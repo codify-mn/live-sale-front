@@ -214,10 +214,7 @@ export function useOrders() {
         return response.products || []
     }
 
-    const completePublicCheckout = async (
-        token: string,
-        data: any
-    ): Promise<Order> => {
+    const completePublicCheckout = async (token: string, data: any): Promise<Order> => {
         return await $fetch<Order>(`${apiUrl}/api/checkout/${token}/complete`, {
             method: 'POST',
             body: data

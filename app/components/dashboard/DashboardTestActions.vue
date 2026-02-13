@@ -10,14 +10,15 @@ const openLatestCheckout = async () => {
     loadingLatest.value = true
     try {
         const { orders } = await fetchOrders({ size: 20 })
-        const orderWithToken = orders.find(o => o.checkout_token)
+        const orderWithToken = orders.find((o) => o.checkout_token)
         if (orderWithToken) {
             window.open(`/checkout/${orderWithToken.checkout_token}`, '_blank')
         } else {
-            toast.add({ 
-                title: 'Захиалга олдсонгүй', 
-                description: 'Checkout линктэй захиалга олдсонгүй. Эхлээд "Туршилтын захиалга үүсгэх" дарна уу.', 
-                color: 'warning' 
+            toast.add({
+                title: 'Захиалга олдсонгүй',
+                description:
+                    'Checkout линктэй захиалга олдсонгүй. Эхлээд "Туршилтын захиалга үүсгэх" дарна уу.',
+                color: 'warning'
             })
         }
     } catch (err) {
@@ -32,10 +33,10 @@ const createTestOrder = async () => {
     try {
         const { products } = await fetchProducts({ size: 1 })
         if (products.length === 0) {
-            toast.add({ 
-                title: 'Бараа олдсонгүй', 
-                description: 'Туршилтын захиалга үүсгэхийн тулд ядаж нэг бараа байх ёстой.', 
-                color: 'warning' 
+            toast.add({
+                title: 'Бараа олдсонгүй',
+                description: 'Туршилтын захиалга үүсгэхийн тулд ядаж нэг бараа байх ёстой.',
+                color: 'warning'
             })
             return
         }
@@ -48,15 +49,17 @@ const createTestOrder = async () => {
         const orderData = {
             customer_name: 'Туршилтын Хэрэглэгч',
             customer_phone: '88001122',
-            items: [{
-                product_id: product.id,
-                variant_id: variant.id,
-                sku: variant.sku || 'TEST',
-                name: product.name,
-                options: variant.name || '',
-                price: product.price,
-                quantity: 1
-            }],
+            items: [
+                {
+                    product_id: product.id,
+                    variant_id: variant.id,
+                    sku: variant.sku || 'TEST',
+                    name: product.name,
+                    options: variant.name || '',
+                    price: product.price,
+                    quantity: 1
+                }
+            ],
             payment_method: 'qpay' as any,
             metadata: { source: 'test_action' }
         }
@@ -64,11 +67,19 @@ const createTestOrder = async () => {
         const order = await createOrder(orderData)
         if (order.checkout_token) {
             window.open(`/checkout/${order.checkout_token}`, '_blank')
-            toast.add({ title: 'Амжилттай', description: 'Туршилтын захиалга үүсгэгдлээ.', color: 'success' })
+            toast.add({
+                title: 'Амжилттай',
+                description: 'Туршилтын захиалга үүсгэгдлээ.',
+                color: 'success'
+            })
         }
     } catch (err) {
         console.error(err)
-        toast.add({ title: 'Алдаа', description: 'Туршилтын захиалга үүсгэхэд алдаа гарлаа.', color: 'error' })
+        toast.add({
+            title: 'Алдаа',
+            description: 'Туршилтын захиалга үүсгэхэд алдаа гарлаа.',
+            color: 'error'
+        })
     } finally {
         generatingTest.value = false
     }

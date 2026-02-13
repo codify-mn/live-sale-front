@@ -65,78 +65,91 @@ async function handleCheckPayment() {
 <template>
     <div class="w-full h-full overflow-y-auto">
         <UDashboardPanel id="history" :ui="{ body: 'lg:py-12' }">
-        <template #header>
-            <UDashboardNavbar title="Төлбөр">
-                <template #leading>
-                    <UDashboardSidebarCollapse />
-                </template>
-            </UDashboardNavbar>
+            <template #header>
+                <UDashboardNavbar title="Төлбөр">
+                    <template #leading>
+                        <UDashboardSidebarCollapse />
+                    </template>
+                </UDashboardNavbar>
 
-            <UDashboardToolbar>
-                <UNavigationMenu
-                    :items="[
-                        [
-                            { label: 'Төлбөр', icon: 'i-lucide-credit-card', to: '/dashboard/billing', exact: true },
-                            { label: 'Багц сонгох', icon: 'i-lucide-crown', to: '/dashboard/plans' },
-                            { label: 'Түүх', icon: 'i-lucide-history', to: '/dashboard/history' }
-                        ]
-                    ]"
-                    highlight
-                    class="-mx-1 flex-1"
-                />
-            </UDashboardToolbar>
-        </template>
+                <UDashboardToolbar>
+                    <UNavigationMenu
+                        :items="[
+                            [
+                                {
+                                    label: 'Төлбөр',
+                                    icon: 'i-lucide-credit-card',
+                                    to: '/dashboard/billing',
+                                    exact: true
+                                },
+                                {
+                                    label: 'Багц сонгох',
+                                    icon: 'i-lucide-crown',
+                                    to: '/dashboard/plans'
+                                },
+                                {
+                                    label: 'Түүх',
+                                    icon: 'i-lucide-history',
+                                    to: '/dashboard/history'
+                                }
+                            ]
+                        ]"
+                        highlight
+                        class="-mx-1 flex-1"
+                    />
+                </UDashboardToolbar>
+            </template>
 
-        <template #body>
-            <div class="flex flex-col gap-4 w-full lg:max-w-4xl mx-auto">
-                <!-- Header -->
-                <div>
-                    <h1 class="text-xl font-semibold text-gray-900 dark:text-white">
-                        Төлбөрийн түүх
-                    </h1>
-                    <p class="text-sm text-gray-500">Таны нэхэмжлэх болон төлбөрийн бүртгэл</p>
-                </div>
+            <template #body>
+                <div class="flex flex-col gap-4 w-full lg:max-w-4xl mx-auto">
+                    <!-- Header -->
+                    <div>
+                        <h1 class="text-xl font-semibold text-gray-900 dark:text-white">
+                            Төлбөрийн түүх
+                        </h1>
+                        <p class="text-sm text-gray-500">Таны нэхэмжлэх болон төлбөрийн бүртгэл</p>
+                    </div>
 
-                <!-- History Table -->
-                <UPageCard variant="subtle">
-                    <BillingHistoryTable
-                        :invoices="invoices"
-                        :loading="loading"
-                        @view-invoice="handleViewInvoice"
+                    <!-- History Table -->
+                    <UPageCard variant="subtle">
+                        <BillingHistoryTable
+                            :invoices="invoices"
+                            :loading="loading"
+                            @view-invoice="handleViewInvoice"
+                        />
+
+                        <!-- Pagination -->
+                        <template v-if="totalPages > 1" #footer>
+                            <div class="flex justify-center">
+                                <UPagination
+                                    v-model="currentPage"
+                                    :total="invoicesTotal"
+                                    :items-per-page="pageSize"
+                                    @update:model-value="handlePageChange"
+                                />
+                            </div>
+                        </template>
+                    </UPageCard>
+
+                    <!-- Empty State -->
+                    <BillingEmptyState
+                        v-if="!loading && invoices.length === 0"
+                        title="Түүх байхгүй"
+                        description="Та одоогоор ямар нэгэн төлбөр хийгээгүй байна."
+                        action-label="Багц худалдаж авах"
+                        action-to="/dashboard/plans"
                     />
 
-                    <!-- Pagination -->
-                    <template v-if="totalPages > 1" #footer>
-                        <div class="flex justify-center">
-                            <UPagination
-                                v-model="currentPage"
-                                :total="invoicesTotal"
-                                :items-per-page="pageSize"
-                                @update:model-value="handlePageChange"
-                            />
-                        </div>
-                    </template>
-                </UPageCard>
-
-                <!-- Empty State -->
-                <BillingEmptyState
-                    v-if="!loading && invoices.length === 0"
-                    title="Түүх байхгүй"
-                    description="Та одоогоор ямар нэгэн төлбөр хийгээгүй байна."
-                    action-label="Багц худалдаж авах"
-                    action-to="/dashboard/plans"
-                />
-
-                <!-- Payment Modal -->
-                <BillingPaymentModal
-                    :open="showPaymentModal"
-                    :invoice="currentInvoice"
-                    :checking="checkingPayment"
-                    @update:open="showPaymentModal = $event"
-                    @check-payment="handleCheckPayment"
-                />
-            </div>
-        </template>
+                    <!-- Payment Modal -->
+                    <BillingPaymentModal
+                        :open="showPaymentModal"
+                        :invoice="currentInvoice"
+                        :checking="checkingPayment"
+                        @update:open="showPaymentModal = $event"
+                        @check-payment="handleCheckPayment"
+                    />
+                </div>
+            </template>
         </UDashboardPanel>
     </div>
 </template>

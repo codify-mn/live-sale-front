@@ -49,7 +49,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="grid grid-cols-4 gap-4 flex-1">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 flex-1">
         <LiveStatCard
             label="Захиалга"
             :value="orders"

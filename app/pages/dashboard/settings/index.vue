@@ -284,8 +284,9 @@ function onFileClick() {
                                 size="xs"
                                 color="primary"
                                 variant="soft"
-                                >Үндсэн</UBadge
                             >
+                                Үндсэн
+                            </UBadge>
                         </div>
                     </div>
                 </template>

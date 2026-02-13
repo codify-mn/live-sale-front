@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import type { Automation, FlowType, AutomationTone, AutomationScope } from '~/composables/useAutomation'
+import type {
+    Automation,
+    FlowType,
+    AutomationTone,
+    AutomationScope
+} from '~/composables/useAutomation'
 
 const { fetchAutomations, createAutomation, updateAutomation } = useAutomation()
 const toast = useToast()
@@ -17,7 +22,7 @@ const flowNameMap: Record<FlowType, string> = {
 }
 
 function getAutomationByFlow(flowType: FlowType): Automation | null {
-    return automations.value.find(a => a.flow_type === flowType) ?? null
+    return automations.value.find((a) => a.flow_type === flowType) ?? null
 }
 
 async function loadAutomations() {
@@ -66,7 +71,7 @@ async function handleToggle(flowType: FlowType, isActive: boolean) {
 }
 
 async function deactivateOthers(activeId: number) {
-    const others = automations.value.filter(a => a.id !== activeId && a.is_active)
+    const others = automations.value.filter((a) => a.id !== activeId && a.is_active)
     for (const a of others) {
         await updateAutomation(a.id, { is_active: false })
     }
@@ -132,7 +137,10 @@ onMounted(() => {
                 <UDashboardPanelContent>
                     <!-- Loading state -->
                     <div v-if="loading" class="flex items-center justify-center py-20">
-                        <UIcon name="i-lucide-loader-2" class="w-6 h-6 animate-spin text-gray-400" />
+                        <UIcon
+                            name="i-lucide-loader-2"
+                            class="w-6 h-6 animate-spin text-gray-400"
+                        />
                     </div>
 
                     <!-- Launch pad -->

@@ -58,7 +58,9 @@ onMounted(async () => {
                         class="w-12 h-12 text-red-500 mx-auto mb-4"
                     />
                     <h2 class="text-lg font-semibold mb-2">Алдаа гарлаа</h2>
-                    <p class="text-gray-500 dark:text-gray-400 mb-4">{{ error }}</p>
+                    <p class="text-gray-500 dark:text-gray-400 mb-4">
+                        {{ error }}
+                    </p>
                     <UButton to="/login" color="primary"> Дахин оролдох </UButton>
                 </template>
             </div>

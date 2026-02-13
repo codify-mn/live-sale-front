@@ -60,6 +60,14 @@ onMounted(() => {
 <template>
     <div class="w-full h-full overflow-y-auto">
         <UDashboardPanel id="home" class="px-4 pb-6 overflow-y-auto">
+            <UDashboardNavbar>
+                <template #title>
+                    <div class="flex items-center gap-2">
+                        <UIcon name="i-lucide-home" class="w-5 h-5" />
+                        <span>Нүүр</span>
+                    </div>
+                </template>
+            </UDashboardNavbar>
             <!-- Loading State -->
             <div v-if="isLoading" class="p-6 space-y-6 max-w-6xl mx-auto">
                 <div class="animate-pulse space-y-6">
@@ -92,7 +100,7 @@ onMounted(() => {
                             variant="ghost"
                             color="neutral"
                             size="sm"
-                            label="Тур"
+                            label="Заавар"
                             @click="replayTour"
                         />
                         <DashboardTestActions />

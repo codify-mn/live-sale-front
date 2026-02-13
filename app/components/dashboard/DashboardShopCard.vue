@@ -66,18 +66,16 @@ defineProps<Props>()
                 class="text-white/70 hover:text-white hover:bg-white/10 shrink-0"
             />
         </div>
-         <div v-if="requiredActions" class=" grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div class="col-span-full text-white">
-                Шаардлагатай үйлдлүүд
-            </div>
-                        <DashboardActionCard
-                            v-for="action in requiredActions"
-                            :key="action.title"
-                            :title="action.title"
-                            :description="action.description"
-                            :icon="action.icon"
-                            :to="action.to"
-                        />
-         </div>
+        <div v-if="requiredActions" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div class="col-span-full text-white">Шаардлагатай үйлдлүүд</div>
+            <DashboardActionCard
+                v-for="action in requiredActions"
+                :key="action.title"
+                :title="action.title"
+                :description="action.description"
+                :icon="action.icon"
+                :to="action.to"
+            />
+        </div>
     </div>
 </template>

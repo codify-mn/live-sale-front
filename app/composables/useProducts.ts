@@ -11,16 +11,15 @@ export interface Product {
     variants: ProductVariant[]
     created_at: string
     updated_at: string
-    
+
     // Pricing at product level
     price: number
     sale_price: number | null
-    
     // Quantity-based discount
     bulk_discount_enabled: boolean
     bulk_discount_quantity: number
     bulk_discount_price: number | null
-    
+
     // Time-limited sale
     timed_sale_enabled: boolean
     timed_sale_start: string | null
@@ -74,12 +73,12 @@ export interface CreateProductInput {
     has_variants?: boolean
     status?: string
     variants?: CreateVariantInput[]
-    
+
     // Quantity-based discount
     bulk_discount_enabled?: boolean
     bulk_discount_quantity?: number
     bulk_discount_price?: number | null
-    
+
     // Time-limited sale
     timed_sale_enabled?: boolean
     timed_sale_start?: string | null

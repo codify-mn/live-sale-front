@@ -141,7 +141,10 @@ watch(
                                 to="/pricing#faq"
                                 class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors"
                             >
-                                <UIcon name="i-lucide-help-circle" class="w-4 h-4 text-indigo-500" />
+                                <UIcon
+                                    name="i-lucide-help-circle"
+                                    class="w-4 h-4 text-indigo-500"
+                                />
                                 Түгээмэл асуултууд
                             </NuxtLink>
                         </div>

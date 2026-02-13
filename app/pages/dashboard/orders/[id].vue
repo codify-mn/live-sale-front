@@ -97,7 +97,7 @@ const paymentMethodIcons: Record<string, string> = {
 
 const currentStepIndex = computed(() => {
     if (!order.value) return -1
-    return statusSteps.findIndex(s => s.key === order.value!.status)
+    return statusSteps.findIndex((s) => s.key === order.value!.status)
 })
 
 const isCancelledOrRefunded = computed(() => {
@@ -108,11 +108,20 @@ const isCancelledOrRefunded = computed(() => {
 // Next action
 const nextAction = computed(() => {
     if (!order.value) return null
-    const map: Partial<Record<OrderStatus, { status: OrderStatus; label: string; icon: string }>> = {
-        pending: { status: 'paid', label: 'Төлөгдсөн гэж тэмдэглэх', icon: 'i-lucide-credit-card' },
-        paid: { status: 'shipped', label: 'Илгээгдсэн гэж тэмдэглэх', icon: 'i-lucide-truck' },
-        shipped: { status: 'delivered', label: 'Хүргэгдсэн гэж тэмдэглэх', icon: 'i-lucide-package-check' }
-    }
+    const map: Partial<Record<OrderStatus, { status: OrderStatus; label: string; icon: string }>> =
+        {
+            pending: {
+                status: 'paid',
+                label: 'Төлөгдсөн гэж тэмдэглэх',
+                icon: 'i-lucide-credit-card'
+            },
+            paid: { status: 'shipped', label: 'Илгээгдсэн гэж тэмдэглэх', icon: 'i-lucide-truck' },
+            shipped: {
+                status: 'delivered',
+                label: 'Хүргэгдсэн гэж тэмдэглэх',
+                icon: 'i-lucide-package-check'
+            }
+        }
     return map[order.value.status] || null
 })
 
@@ -341,7 +350,9 @@ onMounted(async () => {
                                 class="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800/50 rounded-xl p-5"
                             >
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                                    <div
+                                        class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center"
+                                    >
                                         <UIcon
                                             :name="statusIcons[order.status]"
                                             class="w-5 h-5 text-red-500"
@@ -363,15 +374,21 @@ onMounted(async () => {
                                 v-if="nextAction"
                                 class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden"
                             >
-                                <div class="border-l-4 border-primary-500 p-4 flex items-center justify-between gap-4">
+                                <div
+                                    class="border-l-4 border-primary-500 p-4 flex items-center justify-between gap-4"
+                                >
                                     <div class="flex items-center gap-3">
                                         <UIcon
                                             :name="statusIcons[order.status]"
                                             class="w-5 h-5 text-gray-400"
                                         />
                                         <div>
-                                            <p class="text-sm text-gray-500 dark:text-gray-400">Дараагийн алхам</p>
-                                            <p class="font-medium text-gray-900 dark:text-white">{{ nextAction.label }}</p>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                                Дараагийн алхам
+                                            </p>
+                                            <p class="font-medium text-gray-900 dark:text-white">
+                                                {{ nextAction.label }}
+                                            </p>
                                         </div>
                                     </div>
                                     <UButton
@@ -390,13 +407,24 @@ onMounted(async () => {
                                 v-else-if="order.status === 'delivered'"
                                 class="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden"
                             >
-                                <div class="border-l-4 border-green-500 p-4 flex items-center gap-3">
-                                    <div class="w-9 h-9 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                                        <UIcon name="i-lucide-check" class="w-5 h-5 text-green-600 dark:text-green-400" />
+                                <div
+                                    class="border-l-4 border-green-500 p-4 flex items-center gap-3"
+                                >
+                                    <div
+                                        class="w-9 h-9 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center"
+                                    >
+                                        <UIcon
+                                            name="i-lucide-check"
+                                            class="w-5 h-5 text-green-600 dark:text-green-400"
+                                        />
                                     </div>
                                     <div>
-                                        <p class="font-medium text-green-700 dark:text-green-400">Захиалга амжилттай хүргэгдсэн</p>
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">Бүх алхам дууссан</p>
+                                        <p class="font-medium text-green-700 dark:text-green-400">
+                                            Захиалга амжилттай хүргэгдсэн
+                                        </p>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                                            Бүх алхам дууссан
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -425,7 +453,9 @@ onMounted(async () => {
                                                 />
                                             </div>
                                             <div>
-                                                <p class="font-medium text-gray-900 dark:text-white text-sm">
+                                                <p
+                                                    class="font-medium text-gray-900 dark:text-white text-sm"
+                                                >
                                                     {{ item.name }}
                                                 </p>
                                                 <p
@@ -435,12 +465,15 @@ onMounted(async () => {
                                                     {{ item.options }}
                                                 </p>
                                                 <p class="text-xs text-gray-400 dark:text-gray-500">
-                                                    {{ formatPrice(item.price) }} &times; {{ item.quantity }}
+                                                    {{ formatPrice(item.price) }} &times;
+                                                    {{ item.quantity }}
                                                 </p>
                                             </div>
                                         </div>
                                         <div class="text-right flex-shrink-0">
-                                            <p class="font-medium text-gray-900 dark:text-white text-sm">
+                                            <p
+                                                class="font-medium text-gray-900 dark:text-white text-sm"
+                                            >
                                                 {{ formatPrice(item.subtotal) }}
                                             </p>
                                         </div>
@@ -461,7 +494,9 @@ onMounted(async () => {
                                         v-if="order.shipping_fee > 0"
                                         class="flex justify-between text-sm"
                                     >
-                                        <span class="text-gray-500 dark:text-gray-400">Хүргэлт</span>
+                                        <span class="text-gray-500 dark:text-gray-400"
+                                            >Хүргэлт</span
+                                        >
                                         <span class="text-gray-900 dark:text-white">{{
                                             formatPrice(order.shipping_fee)
                                         }}</span>
@@ -470,8 +505,12 @@ onMounted(async () => {
                                         v-if="order.discount > 0"
                                         class="flex justify-between text-sm"
                                     >
-                                        <span class="text-gray-500 dark:text-gray-400">Хөнгөлөлт</span>
-                                        <span class="text-green-600">-{{ formatPrice(order.discount) }}</span>
+                                        <span class="text-gray-500 dark:text-gray-400"
+                                            >Хөнгөлөлт</span
+                                        >
+                                        <span class="text-green-600"
+                                            >-{{ formatPrice(order.discount) }}</span
+                                        >
                                     </div>
                                     <div
                                         class="flex justify-between text-base font-semibold pt-2 border-t border-gray-200 dark:border-gray-700"
@@ -498,24 +537,38 @@ onMounted(async () => {
                                 <div class="space-y-3">
                                     <!-- Order number -->
                                     <div class="flex items-center justify-between">
-                                        <span class="text-sm text-gray-500 dark:text-gray-400">Дугаар</span>
+                                        <span class="text-sm text-gray-500 dark:text-gray-400"
+                                            >Дугаар</span
+                                        >
                                         <div class="flex items-center gap-1.5">
-                                            <span class="text-sm font-medium text-gray-900 dark:text-white">#{{ order.order_number }}</span>
+                                            <span
+                                                class="text-sm font-medium text-gray-900 dark:text-white"
+                                                >#{{ order.order_number }}</span
+                                            >
                                             <UButton
                                                 icon="i-lucide-copy"
                                                 color="neutral"
                                                 variant="ghost"
                                                 size="xs"
-                                                @click="copyToClipboard(order.order_number, 'Захиалгын дугаар')"
+                                                @click="
+                                                    copyToClipboard(
+                                                        order.order_number,
+                                                        'Захиалгын дугаар'
+                                                    )
+                                                "
                                             />
                                         </div>
                                     </div>
 
                                     <!-- Date -->
                                     <div class="flex items-center justify-between">
-                                        <span class="text-sm text-gray-500 dark:text-gray-400">Огноо</span>
+                                        <span class="text-sm text-gray-500 dark:text-gray-400"
+                                            >Огноо</span
+                                        >
                                         <UTooltip :text="formatDate(order.created_at)">
-                                            <span class="text-sm font-medium text-gray-900 dark:text-white">
+                                            <span
+                                                class="text-sm font-medium text-gray-900 dark:text-white"
+                                            >
                                                 {{ timeAgo(order.created_at) }}
                                             </span>
                                         </UTooltip>
@@ -523,21 +576,33 @@ onMounted(async () => {
 
                                     <!-- Payment method -->
                                     <div class="flex items-center justify-between">
-                                        <span class="text-sm text-gray-500 dark:text-gray-400">Төлбөр</span>
+                                        <span class="text-sm text-gray-500 dark:text-gray-400"
+                                            >Төлбөр</span
+                                        >
                                         <div class="flex items-center gap-1.5">
                                             <UIcon
-                                                :name="paymentMethodIcons[order.payment_method] || 'i-lucide-wallet'"
+                                                :name="
+                                                    paymentMethodIcons[order.payment_method] ||
+                                                    'i-lucide-wallet'
+                                                "
                                                 class="w-4 h-4 text-gray-400"
                                             />
-                                            <span class="text-sm font-medium text-gray-900 dark:text-white">
+                                            <span
+                                                class="text-sm font-medium text-gray-900 dark:text-white"
+                                            >
                                                 {{ getPaymentMethodLabel(order.payment_method) }}
                                             </span>
                                         </div>
                                     </div>
 
                                     <!-- Source -->
-                                    <div v-if="order.metadata?.source" class="flex items-center justify-between">
-                                        <span class="text-sm text-gray-500 dark:text-gray-400">Эх сурвалж</span>
+                                    <div
+                                        v-if="order.metadata?.source"
+                                        class="flex items-center justify-between"
+                                    >
+                                        <span class="text-sm text-gray-500 dark:text-gray-400"
+                                            >Эх сурвалж</span
+                                        >
                                         <UBadge color="neutral" variant="subtle" size="sm">
                                             {{ order.metadata.source }}
                                         </UBadge>
@@ -545,7 +610,9 @@ onMounted(async () => {
 
                                     <!-- Status -->
                                     <div class="flex items-center justify-between">
-                                        <span class="text-sm text-gray-500 dark:text-gray-400">Төлөв</span>
+                                        <span class="text-sm text-gray-500 dark:text-gray-400"
+                                            >Төлөв</span
+                                        >
                                         <UBadge
                                             :color="getStatusColor(order.status)"
                                             variant="subtle"
@@ -571,7 +638,9 @@ onMounted(async () => {
                                         <div
                                             class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center flex-shrink-0"
                                         >
-                                            <span class="text-sm font-semibold text-primary-600 dark:text-primary-400">
+                                            <span
+                                                class="text-sm font-semibold text-primary-600 dark:text-primary-400"
+                                            >
                                                 {{ customerInitials }}
                                             </span>
                                         </div>
@@ -586,7 +655,10 @@ onMounted(async () => {
                                         class="flex items-center justify-between"
                                     >
                                         <div class="flex items-center gap-2">
-                                            <UIcon name="i-lucide-phone" class="w-4 h-4 text-gray-400" />
+                                            <UIcon
+                                                name="i-lucide-phone"
+                                                class="w-4 h-4 text-gray-400"
+                                            />
                                             <span class="text-sm text-gray-900 dark:text-white">
                                                 {{ order.customer.phone_number }}
                                             </span>
@@ -596,7 +668,12 @@ onMounted(async () => {
                                             color="neutral"
                                             variant="ghost"
                                             size="xs"
-                                            @click="copyToClipboard(order.customer.phone_number, 'Утасны дугаар')"
+                                            @click="
+                                                copyToClipboard(
+                                                    order.customer.phone_number,
+                                                    'Утасны дугаар'
+                                                )
+                                            "
                                         />
                                     </div>
 
@@ -613,19 +690,43 @@ onMounted(async () => {
 
                                     <!-- Address block -->
                                     <div
-                                        v-if="order.customer?.address || order.customer?.city || order.customer?.district"
+                                        v-if="
+                                            order.customer?.address ||
+                                            order.customer?.city ||
+                                            order.customer?.district
+                                        "
                                         class="pt-2 border-t border-gray-100 dark:border-gray-800"
                                     >
                                         <div class="flex items-start gap-2">
-                                            <UIcon name="i-lucide-map-pin" class="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
-                                            <div class="text-sm text-gray-900 dark:text-white space-y-0.5">
-                                                <p v-if="order.customer.city || order.customer.district">
-                                                    {{ [order.customer.city, order.customer.district].filter(Boolean).join(', ') }}
+                                            <UIcon
+                                                name="i-lucide-map-pin"
+                                                class="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0"
+                                            />
+                                            <div
+                                                class="text-sm text-gray-900 dark:text-white space-y-0.5"
+                                            >
+                                                <p
+                                                    v-if="
+                                                        order.customer.city ||
+                                                        order.customer.district
+                                                    "
+                                                >
+                                                    {{
+                                                        [
+                                                            order.customer.city,
+                                                            order.customer.district
+                                                        ]
+                                                            .filter(Boolean)
+                                                            .join(', ')
+                                                    }}
                                                 </p>
                                                 <p v-if="order.customer.address">
                                                     {{ order.customer.address }}
                                                 </p>
-                                                <p v-if="order.customer.apartment" class="text-gray-500 dark:text-gray-400">
+                                                <p
+                                                    v-if="order.customer.apartment"
+                                                    class="text-gray-500 dark:text-gray-400"
+                                                >
                                                     {{ order.customer.apartment }}
                                                 </p>
                                             </div>
@@ -660,7 +761,10 @@ onMounted(async () => {
                                         class="flex items-center justify-between"
                                     >
                                         <div class="flex items-center gap-2">
-                                            <UIcon name="i-lucide-truck" class="w-4 h-4 text-gray-400" />
+                                            <UIcon
+                                                name="i-lucide-truck"
+                                                class="w-4 h-4 text-gray-400"
+                                            />
                                             <span class="text-sm text-gray-900 dark:text-white">
                                                 {{ order.metadata.tracking_number }}
                                             </span>
@@ -670,15 +774,26 @@ onMounted(async () => {
                                             color="neutral"
                                             variant="ghost"
                                             size="xs"
-                                            @click="copyToClipboard(order.metadata.tracking_number, 'Tracking дугаар')"
+                                            @click="
+                                                copyToClipboard(
+                                                    order.metadata.tracking_number,
+                                                    'Tracking дугаар'
+                                                )
+                                            "
                                         />
                                     </div>
 
                                     <!-- Seller notes -->
                                     <div v-if="order.metadata?.seller_notes">
                                         <div class="flex items-center gap-2 mb-1.5">
-                                            <UIcon name="i-lucide-sticky-note" class="w-4 h-4 text-gray-400" />
-                                            <span class="text-xs font-medium text-gray-500 dark:text-gray-400">Тэмдэглэл</span>
+                                            <UIcon
+                                                name="i-lucide-sticky-note"
+                                                class="w-4 h-4 text-gray-400"
+                                            />
+                                            <span
+                                                class="text-xs font-medium text-gray-500 dark:text-gray-400"
+                                                >Тэмдэглэл</span
+                                            >
                                         </div>
                                         <p class="text-sm text-gray-600 dark:text-gray-400 pl-6">
                                             {{ order.metadata.seller_notes }}

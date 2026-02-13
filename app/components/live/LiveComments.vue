@@ -3,6 +3,7 @@ import type { LiveSale } from '~/types'
 
 const live = inject<LiveSale>('live')
 </script>
+
 <template>
     <div
         class="flex-1 overflow-y-auto p-2 border border-gray-200 dark:border-gray-800 mx-2 rounded-lg"
