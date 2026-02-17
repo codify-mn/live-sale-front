@@ -6,7 +6,7 @@ definePageMeta({
 })
 
 useSeoMeta({
-    title: 'Үнийн мэдээлэл - CommentBoost',
+    title: 'Үнийн мэдээлэл - Instasell',
     description: 'Энгийн, ил тод үнийн бодлого. Бүх хэмжээний бизнест тохирсон багцууд.'
 })
 

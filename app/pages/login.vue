@@ -7,7 +7,7 @@ definePageMeta({
 })
 
 useSeoMeta({
-    title: 'Нэвтрэх - CommentBoost'
+    title: 'Нэвтрэх - Instasell'
 })
 
 const route = useRoute()
@@ -172,8 +172,8 @@ const features = [
                 <!-- Bottom testimonial -->
                 <div class="glass-card rounded-2xl p-6 max-w-md bg-white/10 border-white/20">
                     <p class="text-white/90 mb-4 leading-relaxed">
-                        "CommentBoost ашиглаж эхэлснээс хойш захиалгын боловсруулалтанд зарцуулах
-                        цаг 80%-иар багассан."
+                        "Instasell ашиглаж эхэлснээс хойш захиалгын боловсруулалтанд зарцуулах цаг
+                        80%-иар багассан."
                     </p>
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-full bg-white/20" />

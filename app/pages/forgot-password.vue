@@ -7,7 +7,7 @@ definePageMeta({
 })
 
 useSeoMeta({
-    title: 'Нууц үг сэргээх - CommentBoost'
+    title: 'Нууц үг сэргээх - Instasell'
 })
 
 const { forgotPassword, isLoading, authError, clearError } = useAuth()

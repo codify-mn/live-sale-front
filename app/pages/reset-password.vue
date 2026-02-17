@@ -7,7 +7,7 @@ definePageMeta({
 })
 
 useSeoMeta({
-    title: 'Шинэ нууц үг - CommentBoost'
+    title: 'Шинэ нууц үг - Instasell'
 })
 
 const route = useRoute()

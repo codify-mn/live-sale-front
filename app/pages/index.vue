@@ -4,7 +4,7 @@ definePageMeta({
 })
 
 useSeoMeta({
-    title: 'CommentBoost - Live худалдааны ухаалаг платформ',
+    title: 'Instasell - Live худалдааны ухаалаг платформ',
     description:
         'Facebook Live борлуулалтаа хялбархан удирдаж, захиалга автоматаар хүлээн авч, бизнесээ өсгөөрэй.'
 })
@@ -484,7 +484,7 @@ onMounted(() => {
                         >
                     </div>
                     <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                        Яагаад CommentBoost?
+                        Яагаад Instasell?
                     </h2>
                     <p class="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
                         Цаг хэмнэж, орлогоо нэмэгдүүлэх бодит шийдэл

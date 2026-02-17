@@ -12,6 +12,7 @@ const toast = useToast()
 const automations = ref<Automation[]>([])
 const loading = ref(true)
 const togglingFlow = ref<FlowType | null>(null)
+const showPostModal = ref(false)
 
 const flowTypes: FlowType[] = ['simple', 'checkout', 'full']
 
@@ -120,8 +121,8 @@ onMounted(() => {
 
 <template>
     <div class="w-full h-full overflow-y-auto">
-        <UDashboardPage>
-            <UDashboardNavbar>
+        <UDashboardPanel id="automation">
+            <UDashboardNavbar title="dogshit">
                 <template #title>
                     Автоматжуулалт
                     <UTooltip
@@ -131,34 +132,34 @@ onMounted(() => {
                         <UButton color="neutral" variant="ghost" icon="i-lucide-info" />
                     </UTooltip>
                 </template>
+                <template #right>
+                    <UButton icon="i-lucide-share" @click="showPostModal = true">
+                        Бараа нийтлэх
+                    </UButton>
+                </template>
             </UDashboardNavbar>
 
-            <UDashboardPanel>
-                <UDashboardPanelContent>
-                    <!-- Loading state -->
-                    <div v-if="loading" class="flex items-center justify-center py-20">
-                        <UIcon
-                            name="i-lucide-loader-2"
-                            class="w-6 h-6 animate-spin text-gray-400"
-                        />
-                    </div>
+            <!-- Loading state -->
+            <div v-if="loading" class="flex items-center justify-center py-20">
+                <UIcon name="i-lucide-loader-2" class="w-6 h-6 animate-spin text-gray-400" />
+            </div>
 
-                    <!-- Launch pad -->
-                    <div v-else class="grid gap-4 md:grid-cols-1 lg:grid-cols-3">
-                        <AutomationLaunchCard
-                            v-for="ft in flowTypes"
-                            :key="ft"
-                            :flow-type="ft"
-                            :automation="getAutomationByFlow(ft)"
-                            :disabled="togglingFlow === ft"
-                            @toggle="handleToggle(ft, $event)"
-                            @update-tone="handleUpdateTone(ft, $event)"
-                            @update-scope="handleUpdateScope(ft, $event)"
-                            @update-like-comments="handleUpdateLikeComments(ft, $event)"
-                        />
-                    </div>
-                </UDashboardPanelContent>
-            </UDashboardPanel>
-        </UDashboardPage>
+            <!-- Launch pad -->
+            <div v-else class="grid gap-4 md:grid-cols-1 lg:grid-cols-3">
+                <AutomationLaunchCard
+                    v-for="ft in flowTypes"
+                    :key="ft"
+                    :flow-type="ft"
+                    :automation="getAutomationByFlow(ft)"
+                    :disabled="togglingFlow === ft"
+                    @toggle="handleToggle(ft, $event)"
+                    @update-tone="handleUpdateTone(ft, $event)"
+                    @update-scope="handleUpdateScope(ft, $event)"
+                    @update-like-comments="handleUpdateLikeComments(ft, $event)"
+                />
+            </div>
+        </UDashboardPanel>
+
+        <ProductPostModal v-model:open="showPostModal" />
     </div>
 </template>

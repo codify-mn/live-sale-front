@@ -236,7 +236,7 @@ watch(
                                 <UIcon name="i-lucide-zap" class="w-3.5 h-3.5 text-white" />
                             </div>
                             <span class="font-semibold text-sm text-gray-900 dark:text-white"
-                                >CommentBoost</span
+                                >Instasell</span
                             >
                         </NuxtLink>
                         <span class="text-gray-300 dark:text-gray-700">|</span>
