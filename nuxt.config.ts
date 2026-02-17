@@ -39,7 +39,7 @@ export default defineNuxtConfig({
 
     runtimeConfig: {
         public: {
-            apiUrl: process.env.NUXT_PUBLIC_API_URL || 'http://localhost:4000',
+            apiUrl: process.env.NUXT_PUBLIC_API_URL || 'https://instasell-api.codify.mn',
             srsUrl: process.env.NUXT_PUBLIC_SRS_URL || 'http://localhost:1985'
         }
     },
