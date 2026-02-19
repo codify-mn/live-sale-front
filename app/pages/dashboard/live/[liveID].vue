@@ -23,6 +23,10 @@ const { data: liveProducts, refresh: refreshLiveProducts } = await useLazyFetch<
 
 const addedProducts = useState('addedProducts', () => liveProducts)
 
+// WebSocket for real-time comments and stats
+const liveSaleId = computed(() => live.value?.id)
+const { comments, stats, connected } = useLiveWebSocket(liveSaleId)
+
 const handleProductSelect = (product: Product) => {
     const imageUrl = product.variants?.[0]?.images?.[0] || null
     webrtc.canvasStream.updateProduct({
@@ -237,13 +241,13 @@ const mobileTab = ref('camera')
 
                         <!-- Comments: inline on desktop only (mobile has its own tab) -->
                         <div class="hidden md:flex flex-1">
-                            <LiveComments />
+                            <LiveComments :comments="comments" :is-streaming="webrtc.isStreaming.value" />
                         </div>
                     </div>
 
                     <!-- Stats + Controls -->
                     <div class="px-3 md:px-0 space-y-2">
-                        <LiveStats :is-streaming="webrtc.isStreaming.value" />
+                        <LiveStats :is-streaming="webrtc.isStreaming.value" :stats="stats" />
                         <div
                             class="flex items-center justify-between bg-white dark:bg-gray-900 px-3 md:px-4 py-2 md:py-3 rounded-lg shadow-sm"
                         >
@@ -278,7 +282,7 @@ const mobileTab = ref('camera')
                     class="flex-1 min-h-0 md:hidden!"
                     :class="mobileTab === 'comments' ? '' : 'hidden'"
                 >
-                    <LiveComments />
+                    <LiveComments :comments="comments" :is-streaming="webrtc.isStreaming.value" />
                 </div>
             </div>
         </UDashboardPanel>

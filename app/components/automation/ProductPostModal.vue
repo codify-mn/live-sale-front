@@ -3,6 +3,7 @@ import type { Product } from '~/composables/useProducts'
 
 const props = defineProps<{
     open: boolean
+    productId?: number
 }>()
 
 const emit = defineEmits<{
@@ -23,6 +24,7 @@ const selectedProductId = ref<number | undefined>(undefined)
 const selectedTemplate = ref('classic')
 const bgColor = ref('#FFFFFF')
 const caption = ref('')
+const watchComments = ref(true)
 const loadingProducts = ref(false)
 const loadingCaption = ref(false)
 const posting = ref(false)
@@ -56,6 +58,12 @@ const templates = [
         description: 'Цэвэрхэн, жижиг загвар'
     }
 ]
+
+// When productId prop is provided, use it directly and skip the dropdown
+const isPrepopulated = computed(() => props.productId !== undefined)
+const prepopulatedProduct = computed(() =>
+    props.productId !== undefined ? products.value.find((p) => p.id === props.productId) : undefined
+)
 
 const productOptions = computed(() =>
     products.value
@@ -134,12 +142,11 @@ async function handlePost() {
         await postToFacebook(selectedProductId.value, {
             template: selectedTemplate.value,
             bg_color: bgColor.value,
-            caption: caption.value
+            caption: caption.value,
+            watch_comments: watchComments.value
         })
         toast.add({ title: 'Facebook-д амжилттай нийтэллээ!', color: 'success' })
         isOpen.value = false
-        caption.value = ''
-        selectedProductId.value = undefined
     } catch (err: any) {
         const message = err?.data?.message || err?.message || 'Алдаа гарлаа'
         toast.add({ title: 'Нийтлэхэд алдаа гарлаа', description: message, color: 'error' })
@@ -148,11 +155,35 @@ async function handlePost() {
     }
 }
 
+function resetState() {
+    caption.value = ''
+    watchComments.value = true
+    if (!isPrepopulated.value) {
+        selectedProductId.value = undefined
+    }
+}
+
 watch(isOpen, (val) => {
-    if (val && products.value.length === 0) {
-        loadProducts()
+    if (val) {
+        if (props.productId !== undefined) {
+            selectedProductId.value = props.productId
+        }
+        if (products.value.length === 0) {
+            loadProducts()
+        }
+    } else {
+        resetState()
     }
 })
+
+watch(
+    () => props.productId,
+    (newId) => {
+        if (newId !== undefined && isOpen.value) {
+            selectedProductId.value = newId
+        }
+    }
+)
 </script>
 
 <template>
@@ -163,8 +194,19 @@ watch(isOpen, (val) => {
     >
         <template #body>
             <div class="flex flex-col gap-6">
-                <!-- Product selector -->
-                <div>
+                <!-- Product info chip (pre-selected) or selector -->
+                <div v-if="isPrepopulated">
+                    <label class="block text-sm font-medium mb-2">Бараа</label>
+                    <div
+                        class="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-800"
+                    >
+                        <UIcon name="i-lucide-package" class="w-4 h-4 text-primary-500 shrink-0" />
+                        <span class="text-sm font-medium text-primary-700 dark:text-primary-300">
+                            {{ prepopulatedProduct?.name ?? `Бараа #${productId}` }}
+                        </span>
+                    </div>
+                </div>
+                <div v-else>
                     <label class="block text-sm font-medium mb-2">Бараа сонгох</label>
                     <USelectMenu
                         v-model="selectedProductId"
@@ -239,7 +281,10 @@ watch(isOpen, (val) => {
                         />
                     </div>
                 </div>
-                <div v-else class="flex items-center justify-center h-40 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+                <div
+                    v-else
+                    class="flex items-center justify-center h-40 rounded-lg bg-gray-50 dark:bg-gray-800/50"
+                >
                     <p class="text-sm text-gray-400">Бараа сонгож урьдчилан харах</p>
                 </div>
 
@@ -257,22 +302,26 @@ watch(isOpen, (val) => {
                             AI-р үүсгэх
                         </UButton>
                     </div>
-                    <UTextarea
-                        v-model="caption"
-                        placeholder="Барааны тайлбар бичих..."
-                        :rows="4"
-                    />
+                    <UTextarea v-model="caption" placeholder="Барааны тайлбар бичих..." :rows="4" />
+                </div>
+
+                <!-- Watch Comments toggle -->
+                <div class="flex items-start gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+                    <USwitch v-model="watchComments" class="mt-0.5 shrink-0" />
+                    <div>
+                        <p class="text-sm font-medium">Сэтгэгдэл хянах</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                            Нийтлэл дээр сэтгэгдэл үлдээсэн хэрэглэгчид тухайн барааг картанд нэмж,
+                            Messenger-ээр мэдэгдэл явуулна.
+                        </p>
+                    </div>
                 </div>
             </div>
         </template>
 
         <template #footer>
             <div class="flex gap-2 w-full">
-                <UButton
-                    variant="outline"
-                    class="flex-1"
-                    @click="emit('update:open', false)"
-                >
+                <UButton variant="outline" class="flex-1" @click="emit('update:open', false)">
                     Болих
                 </UButton>
                 <UButton

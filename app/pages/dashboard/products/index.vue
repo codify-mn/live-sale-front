@@ -13,6 +13,15 @@ const router = useRouter()
 // Bulk import modal
 const bulkImportModalOpen = ref(false)
 
+// Post to Facebook modal
+const postModalOpen = ref(false)
+const postModalProductId = ref<number | undefined>(undefined)
+
+const openPostModal = (product: Product) => {
+    postModalProductId.value = product.id
+    postModalOpen.value = true
+}
+
 const loading = ref(true)
 const products = ref<Product[]>([])
 const total = ref(0)
@@ -321,6 +330,11 @@ const onRowClick = (product: Product) => {
 const getActionItems = (product: Product) => [
     [
         {
+            label: 'Facebook-д нийтлэх',
+            icon: 'i-lucide-share-2',
+            onSelect: () => openPostModal(product)
+        },
+        {
             label: 'Засах',
             icon: 'i-lucide-pencil',
             onSelect: () => router.push(`/dashboard/products/${product.id}`)
@@ -588,6 +602,14 @@ onMounted(() => {
 
                 <template #actions-cell="{ row }">
                     <div class="flex items-center justify-end gap-1" @click.stop>
+                        <UButton
+                            icon="i-lucide-share-2"
+                            color="neutral"
+                            variant="ghost"
+                            size="md"
+                            title="Facebook-д нийтлэх"
+                            @click.stop="openPostModal(row.original)"
+                        />
                         <UDropdownMenu :items="getActionItems(row.original)">
                             <UButton
                                 icon="i-lucide-more-horizontal"
@@ -725,5 +747,8 @@ onMounted(() => {
 
         <!-- Bulk Import Modal -->
         <ProductBulkImportModal v-model:open="bulkImportModalOpen" @success="onImportSuccess" />
+
+        <!-- Post to Facebook Modal -->
+        <ProductPostModal v-model:open="postModalOpen" :product-id="postModalProductId" />
     </div>
 </template>

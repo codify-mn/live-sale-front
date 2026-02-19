@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ButtonStatus } from '~/components/AnimatedButton.vue'
 import type {
     Automation,
     FlowType,
@@ -12,7 +13,7 @@ const toast = useToast()
 const automations = ref<Automation[]>([])
 const loading = ref(true)
 const togglingFlow = ref<FlowType | null>(null)
-const showPostModal = ref(false)
+const buttonStatus = ref<ButtonStatus>('idle')
 
 const flowTypes: FlowType[] = ['simple', 'checkout', 'full']
 
@@ -117,6 +118,13 @@ async function handleUpdateLikeComments(flowType: FlowType, value: boolean) {
 onMounted(() => {
     loadAutomations()
 })
+
+function onBtnClick() {
+    buttonStatus.value = 'loading'
+    setTimeout(() => {
+        buttonStatus.value = 'success'
+    }, 1000)
+}
 </script>
 
 <template>
@@ -133,9 +141,7 @@ onMounted(() => {
                     </UTooltip>
                 </template>
                 <template #right>
-                    <UButton icon="i-lucide-share" @click="showPostModal = true">
-                        Бараа нийтлэх
-                    </UButton>
+                    <AnimatedButton :status="buttonStatus" @click="onBtnClick" />
                 </template>
             </UDashboardNavbar>
 
@@ -160,6 +166,5 @@ onMounted(() => {
             </div>
         </UDashboardPanel>
 
-        <ProductPostModal v-model:open="showPostModal" />
     </div>
 </template>

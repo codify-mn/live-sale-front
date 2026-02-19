@@ -23,8 +23,10 @@
         "better-sqlite3": "^12.6.0",
         "date-fns": "^4.1.0",
         "driver.js": "^1.4.0",
+        "motion-v": "1.10.3",
         "nuxt": "^4.2.2",
         "nuxt-og-image": "^5.1.13",
+        "torph": "^0.0.5",
         "zod": "^4.2.1"
     },
     "devDependencies": {

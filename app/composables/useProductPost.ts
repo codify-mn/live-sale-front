@@ -2,6 +2,7 @@ export interface PostToFacebookInput {
     template: string
     bg_color: string
     caption: string
+    watch_comments: boolean
 }
 
 export interface PostToFacebookResponse {

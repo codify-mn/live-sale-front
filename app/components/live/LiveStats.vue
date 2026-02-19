@@ -1,11 +1,10 @@
 <script setup lang="ts">
+import type { LiveStatsData } from '~/composables/useLiveWebSocket'
+
 const props = defineProps<{
     isStreaming: boolean
+    stats: LiveStatsData
 }>()
-
-const revenue = ref(0)
-const orders = ref(0)
-const viewers = ref(156)
 
 const duration = ref('00:00:00')
 let timerInterval: NodeJS.Timeout | null = null
@@ -52,21 +51,21 @@ onUnmounted(() => {
     <div class="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4 flex-1">
         <LiveStatCard
             label="Захиалга"
-            :value="orders"
+            :value="stats.orders"
             icon="i-lucide-shopping-cart"
             icon-color="warning"
         />
         <LiveStatCard
             label="Нийт"
             prefix="₮"
-            :value="revenue"
+            :value="stats.revenue"
             icon="i-lucide-piggy-bank"
             icon-color="success"
         />
-        <LiveStatCard label="Үзэгч" :value="viewers" icon="i-lucide-users" icon-color="info" />
+        <LiveStatCard label="Үзэгч" :value="stats.viewers" icon="i-lucide-users" icon-color="info" />
         <LiveStatCard
-            label="Comments"
-            :value="viewers"
+            label="Сэтгэгдэл"
+            :value="stats.comments"
             icon="i-lucide-message-circle"
             icon-color="primary"
         />
